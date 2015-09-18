@@ -17,7 +17,7 @@ btrfs subvolume create /opt/cloudfleet/data
 rsync -avzP ${path_copy}/ ${path}/
 rm -rf ${path_copy}
 
-mkdir /opt/cloudfleet/.snapshots
+mkdir ${path}/.snapshot
 
 echo Starting Cloudfleet services
 /opt/cloudfleet/engineroom/bin/start-containers.sh
