@@ -1,3 +1,4 @@
+;;; <https://beta.quicklisp.org/quicklisp.lisp>
 #-quicklisp
 (let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp"
                                        (user-homedir-pathname))))
