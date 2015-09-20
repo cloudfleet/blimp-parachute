@@ -5,6 +5,6 @@
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
 
-(dolist (system '(:ironclad :simple-date-time))
+(dolist (system '(:ironclad :simple-date-time :cl-json))
   (ql:quickload system))
 
