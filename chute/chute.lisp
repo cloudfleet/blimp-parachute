@@ -14,6 +14,8 @@
 
 (defun snapshot (path)
   (declare (ignore path))
+  (unless (probe-file *snapshot-base*)
+    (error "No directory to create snapshots at ~s." *snapshot-base*))
   (let* ((o (make-string-output-stream))
          (timestamp (simple-date-time:|yyyymmddThhmmssZ| (simple-date-time:now)))
          (snapshot (format nil "btrfs subvolume snapshot ~a ~a"
