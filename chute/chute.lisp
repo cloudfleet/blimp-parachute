@@ -144,7 +144,7 @@
         (sb-ext:run-program command args :wait nil :output :stream)
       (t (error)
         (note "btfs send failed on cause ~a." error)
-        (return-from btrfs/send nil)))))
+        (return-from btrfs/send-sbcl nil)))))
 
 (defun note (message-or-format &rest args)
   (format t 
