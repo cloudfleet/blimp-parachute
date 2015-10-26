@@ -70,14 +70,28 @@
       (subseq buffer 0 size))
 |#
 
+(defmethod encrypt ((blob t)))
+
+(defparameter *uri-base* "http://slack.net/")
+
 (defun transfer (blob)
-  (warn "Unimplemented transfer of ~s off system." blob))
+  (warn "Untested transfer of ~s off system." blob)
+  (drakma:http-request
+   (format nil "~a/not.org/t/~a/~a"
+           *uri-base*
+           (timestamp blob)
+           (random (expt 2 128)))
+   :method :put
+   :content-type "application/binary"
+   :stream (encrypt blob)))
 
 (defun ensure-sanity ()
   (unless (probe-file *snapshot-base*)
     (error "No directory to create snapshots at ~s." *snapshot-base*))
   (unless (probe-file *btrfs-command*)
     (error "No setuid btrfs found at ~s." *btrfs-command*))
+  #+abcl
+  (probe-file *uri-base*)
   t)
 
 (defun snapshot ()
