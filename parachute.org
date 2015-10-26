@@ -1,2 +1,12 @@
+* running
+
+  (asdf:load-system :chute)
+
+
+** Need to execute 
+
+   (load (asdf:system-relative-pathname (asdf:find-system :chute) "chute-quickload"))
+   
+
 * separate privileges
 ** make a hard link to btrfs, setuid

@@ -141,7 +141,11 @@
   (let ((command *btrfs-command*)
         (args `("send" ,(namestring snapshot-path))))
     (handler-case
-        (sb-ext:run-program command args :wait nil :output :stream)
+        #+sbcl 
+      (sb-ext:run-program command args :wait nil :output :stream)
+      #+abcl
+      (uiop/run-program:run-program command args :output :stream)
+      
       (t (error)
         (note "btfs send failed on cause ~a." error)
         (return-from btrfs/send-sbcl nil)))))
