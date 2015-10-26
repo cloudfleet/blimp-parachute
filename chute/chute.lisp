@@ -1,5 +1,7 @@
 (in-package :chute)
 
+(declaim (optimize (debug 3)))
+
 (defparameter *path* "/opt/cloudfleet/data")
 (defparameter *snapshot-base* "/opt/cloudfleet/data/.snapshot/")
 (defparameter *btrfs-command* (asdf:system-relative-pathname :chute "../setup/btrfs"))
@@ -14,8 +16,59 @@
   ;;; get backup off system
     (transfer blob-path)))
 
-(defun serialize (snapshot blob)
-  (warn "Unimplemented serialize of ~s to ~s." snapshot blob))
+(defclass blob-metadata ()
+  ((version
+   :initform "2015092401"
+   :documentation "Version of blob metadata.")
+  (node
+   :documentation "Node creating this blob.")
+  (domain
+   :documentation "Domain creating this blob.")
+  (mount
+   :initform *path*
+   :documentation "Mount point of blob.")
+  (date
+   :initform (simple-date-time:rfc-2822 (simple-date-time:now)))
+  (parent 
+   :documentation "Previous blob, or nil if this is the first blob in a series.")
+  (checksum
+   :documentation "Checksum of blob.")))
+
+(defun serialize (snapshot-path path)
+  (ensure-directories-exist path)
+  (let ((metadata (make-instance 'blob-metadata))
+        (cipher (get-cipher))
+        (send-output (ironclad:make-octet-output-stream)))
+    #+nil
+    (with-open-file (stream (merge-pathnames "index.json" path) :direction :output)
+      (cl-json:encode-json metadata stream))
+    ;;; sbcl only
+    (btrfs/send :snapshot-path snapshot-path)
+    #+nil
+    (loop
+       :collecting (let ((buffer (ironclad::buffer send-output))
+                         (index (ironclad::index send-output)))
+                     (format t "buffer size: ~a~,8@tindex: ~a~%" (length buffer) index)
+                     (setf (ironclad::index send-output) (- index 8192))
+                     (setf (ironclad::buffer send-output)
+                           (if (> index 8192)
+                               (subseq buffer 8192 index)
+                               buffer))
+                     (let ((plain-text (if (> index 8192)
+                                           (subseq buffer 0 8192)
+                                           buffer))
+                           (cipher-text (make-array 8192 :element-type '(unsigned-byte 8))))
+                       (ironclad:encrypt cipher plain-text cipher-text)
+                       cipher-text)))))
+    #|
+
+ (defun get-some-stream-octets (stream size) 
+    (let ((buffer (ironclad::buffer stream)))
+          (index (ironclad::index stream))) 
+      (setf (ironclad::index stream) (- index size)) 
+      (setf (ironclad::buffer stream) (subseq buffer size index))
+      (subseq buffer 0 size))
+|#
 
 (defun transfer (blob)
   (warn "Unimplemented transfer of ~s off system." blob))
@@ -74,14 +127,21 @@
             (return-from btrfs/subvolume/show (values nil output error)))))
       (values t output error))))
 
-;;; TODO output should either be a pathname or an output stream
-(defun btrfs/send (&key (path *path*) (output (uiop/stream::get-temporary-file)))
+(defun btrfs/send (&key (snapshot-path *path*))
   (ensure-sanity)
-  (let ((command (format nil "~a send ~a | cat"
-                         *btrfs-command*
-                         path)))
+  (let ((command (format nil "~A send ~A" *btrfs-command* snapshot-path)))
     (handler-case
-        (uiop:run-program command :output output :error :string)
+        (uiop/run-program::%run-program command :wait nil)
+      (t (error)
+        (note "btfs send failed on cause ~a." error)
+        (return-from btrfs/send nil)))))
+
+(defun btrfs/send-sbcl (&key (snapshot-path *path*))
+  (ensure-sanity)
+  (let ((command *btrfs-command*)
+        (args `("send" ,(namestring snapshot-path))))
+    (handler-case
+        (sb-ext:run-program command args :wait nil :output :stream)
       (t (error)
         (note "btfs send failed on cause ~a." error)
         (return-from btrfs/send nil)))))
@@ -95,7 +155,14 @@
                  message-or-format
                  (if args 
                      args
-                     nil))))  
-
-    
+                     nil))))
         
+(defun get-cipher ()
+  ;;; TODO: initialize cipher correctly
+  (ironclad:make-cipher :aes
+                        :key
+                        (make-array 16 :element-type '(unsigned-byte 8))
+                        :mode :cfb
+                        :initialization-vector
+                        (make-array 16 :element-type '(unsigned-byte 8))))
+
