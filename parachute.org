@@ -1,4 +1,5 @@
-* running
+#+TITLE Parachute: a zero knowledge backup system
+* Installation
 
   (asdf:load-system :chute)
 
@@ -9,4 +10,18 @@
    
 
 * separate privileges
-** make a hard link to btrfs, setuid
+** DONE make a hard link to btrfs, setuid
+   CLOSED: [2015-10-27 Tue 12:44]
+   - CLOSING NOTE [2015-10-27 Tue 12:44] \\
+     Done as setup/make-suid-btfs.bash
+
+* Transfer
+
+** PUT n bytes in m windows
+
+Each chunk of a blob is adressed as a URI of the form:
+
+   .../<timestamp>/<hash>/<n-bytes>/<mth-window
+
+MIME type is "application/binary".
+
