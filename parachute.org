@@ -1,13 +1,16 @@
 #+TITLE Parachute: a zero knowledge backup system
 * Installation
 
-  (asdf:load-system :chute)
+#+BEGIN_SRC
+    (asdf:load-system :chute)
+#+END_SRC    
 
+** Loading Quicklisp dependencies
 
-** Need to execute 
-
-   (load (asdf:system-relative-pathname (asdf:find-system :chute) "chute-quickload"))
-   
+#+BEGIN_SRC
+    (load (asdf:system-relative-pathname 
+       (asdf:find-system :chute) "chute-quickload"))
+#+END_SRC    
 
 * separate privileges
 ** DONE make a hard link to btrfs, setuid
@@ -21,7 +24,11 @@
 
 Each chunk of a blob is adressed as a URI of the form:
 
-   .../<timestamp>/<hash>/<n-bytes>/<mth-window
+#+BEGIN_SRC
+    .../<timestamp>/<hash>/<n-bytes>/<mth-window>
+#+END_SRC
 
 MIME type is "application/binary".
+
+
 
