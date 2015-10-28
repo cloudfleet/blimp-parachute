@@ -16,29 +16,12 @@
   ;;; get backup off system
     (transfer blob-path)))
 
-(defclass blob-metadata ()
-  ((version
-   :initform "2015092401"
-   :documentation "Version of blob metadata.")
-  (node
-   :documentation "Node creating this blob.")
-  (domain
-   :documentation "Domain creating this blob.")
-  (mount
-   :initform *path*
-   :documentation "Mount point of blob.")
-  (date
-   :initform (simple-date-time:rfc-2822 (simple-date-time:now)))
-  (parent 
-   :documentation "Previous blob, or nil if this is the first blob in a series.")
-  (checksum
-   :documentation "Checksum of blob.")))
-
 (defun serialize (snapshot-path path)
   (ensure-directories-exist path)
   (let ((metadata (make-instance 'blob-metadata))
         (cipher (get-cipher))
         (send-output (ironclad:make-octet-output-stream)))
+    (declare (ignore metadata cipher send-output)) ;; FIXME
     #+nil
     (with-open-file (stream (merge-pathnames "index.json" path) :direction :output)
       (cl-json:encode-json metadata stream))

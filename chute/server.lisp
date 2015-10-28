@@ -1,9 +1,24 @@
-(in-package :chute)
+(in-package :chute.server)
 
-@route PUT "/blob/:timestamp/:hash/:n-bytes/:mth-window"
-(defun put-byte-range (&key timestamp hash n-bytes mth-window)
+(define-easy-handler (index :uri "/"
+                            :default-request-type :get)
+    nil
+  (setf (content-type*) "text/plain")
+  "Hello world!")
+
+;; @route PUT "/blob/:timestamp/:hash/:n-bytes/:mth-window"
+(define-easy-handler (put
+                      :uri (lambda (request)
+                             (cl-ppcre:scan "/blob" (request-uri* request)))
+                      :default-request-type :put)
+    nil
   ;;; Locate output directory
   ;;; Get a writable stream to the object
   ;;; Slurp bytes, writing to disk
-  (warn "Unimplemented PUT-BYTE-RANGE for ~a/~a." timestamp hash))
+  (setf (content-type*) "text/plain") ;; debugging
+  (warn "Unimplemented PUT-BYTE-RANGE.")
+  (format nil "uri: ~a" (request-uri*)))
+
+(defun start-server ()
+  (start (make-instance 'hunchentoot:easy-acceptor :port 2001)))
 

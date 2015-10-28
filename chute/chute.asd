@@ -7,20 +7,19 @@
                                        "chute-quickload")))
 |#
 
-(defsystem
-    :chute :version "0.0.6"
-#| AFSF&!@# you Fare
-    :in-order-to 
-      ((compile-op (load-op 
-    |#
-    :in-order-to ((test-op (load-op "test")))
-    :perform (test-op (o c) (symbol-call :do-tests :rt))
-    :depends-on (ironclad
-                 simple-date-time
-                 cl-json
-                 caveman2
-                 drakma
-                 rt)
-    :components ((:module source :pathname "" :serial t :components
-                          ((:file "package")
-                           (:file "chute")))))
+(defsystem :chute
+  :version "0.0.7"
+  :in-order-to ((test-op (load-op "test")))
+  :perform (test-op (o c) (symbol-call :do-tests :rt))
+  :depends-on (ironclad
+               simple-date-time
+               cl-json
+               hunchentoot
+               drakma
+               rt)
+  :components ((:module source :pathname "" :serial t :components
+                        ((:file "package")
+                         (:file "blob")
+                         (:file "server")
+                         (:file "chute")))))
+

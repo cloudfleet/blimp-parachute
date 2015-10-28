@@ -1,6 +1,5 @@
 ;;;; "doodles" of various tests
 
-
 ;;; on quoth/blimp
 (rt:deftest serialize.1
   (serialize
@@ -8,8 +7,6 @@
    #p"/var/tmp/blob")
   t)
    
-
-
 ;;; Demonstrate that IRONCLAD block ciphers indeed retain state
 (rt:deftest blocks.1
     (let ((cipher
