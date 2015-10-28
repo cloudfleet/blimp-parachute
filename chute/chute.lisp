@@ -1,12 +1,5 @@
 (in-package :chute)
 
-(declaim (optimize (debug 3)))
-
-(defparameter *path* "/opt/cloudfleet/data")
-(defparameter *snapshot-base* "/opt/cloudfleet/data/.snapshot/")
-(defparameter *btrfs-command* (asdf:system-relative-pathname :chute "../setup/btrfs"))
-(defparameter *keystore* "/opt/cloudfleet/data/shared/chute/")
-
 (defun backup ()
   ;;; create snapshot
   (let ((snapshot-path (snapshot))
@@ -54,8 +47,6 @@
 |#
 
 (defmethod encrypt ((blob t)))
-
-(defparameter *uri-base* "http://slack.net/")
 
 (defun transfer (blob)
   (warn "Untested transfer of ~s off system." blob)

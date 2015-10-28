@@ -19,6 +19,7 @@
                rt)
   :components ((:module source :pathname "" :serial t :components
                         ((:file "package")
+                         (:file "config")
                          (:file "blob")
                          (:file "server")
                          (:file "chute")))))
