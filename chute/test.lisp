@@ -1,4 +1,27 @@
+(in-package :chute.test)
 ;;;; "doodles" of various tests
+
+(defun make-test-blob (&key (directory (merge-pathnames "blob/" (uiop/stream:setup-temporary-directory))))
+  "Create a test blob with random data returning the directory it was created within."
+  (let ((metadata (make-instance 'metadata))
+        (shard-size (random (expt 2 16))))
+    (setf (size metadata) (* shard-size (shards metadata)))
+    (ensure-directories-exist directory)
+    (with-open-file (index (merge-pathnames "index.json" directory)
+                           :direction :output
+                           :if-exists :supersede)
+      (cl-json:encode-json metadata index))
+    (loop :for i :below (shards metadata)
+       :doing (with-open-file (output (merge-pathnames (format nil "~a" i) directory)
+                                      :direction :output
+                                      :element-type 'unsigned-byte
+                                      :if-exists :supersede)
+                (with-open-file (input "/dev/random"
+                                       :direction :input
+                                       :element-type 'unsigned-byte)
+                  (loop :for i :below shard-size
+                     :doing (write-byte (read-byte input) output)))))
+    directory))
 
 ;;; on quoth/blimp
 (rt:deftest serialize.1
@@ -35,7 +58,7 @@
       (replace cipher-12 cipher-2 :start1 4 :end1 8 :start2 0)
       (ironclad:decrypt cipher2 cipher-12 plain-12)
       (values cipher plain-1 cipher-1 plain-2 cipher-2 cipher-12 plain-12)))
-    t
+    t)
 
 
 
