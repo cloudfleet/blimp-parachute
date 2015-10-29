@@ -7,8 +7,9 @@
 
 (dolist (system '(:ironclad
                   :simple-date-time :cl-json
+                  :hunchentoot
                   :drakma
-                  :caveman2
+                  :osicat
                   :rt))
   (ql:quickload system))
 

@@ -16,6 +16,7 @@
                cl-json
                hunchentoot
                drakma
+               osicat
                rt)
   :components ((:module source :pathname "" :serial t :components
                         ((:file "package")
