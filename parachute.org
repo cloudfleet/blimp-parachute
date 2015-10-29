@@ -28,7 +28,7 @@ Each chunk of a blob is adressed as a URI of the form:
     .../<timestamp>/<hash>/<n-bytes>/<mth-window>
 #+END_SRC
 
-MIME type is "application/binary".
+MIME type is "application/octet-stream".
 
 
 

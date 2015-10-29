@@ -8,9 +8,8 @@
 |#
 
 (defsystem :chute
-  :version "0.0.7"
-  :in-order-to ((test-op (load-op "test")))
-  :perform (test-op (o c) (symbol-call :do-tests :rt))
+  :version "0.0.8"
+  :perform (test-op (o c) (symbol-call :rt :do-tests))
   :depends-on (ironclad
                simple-date-time
                cl-json
@@ -18,10 +17,24 @@
                drakma
                osicat
                rt)
-  :components ((:module source :pathname "" :serial t :components
-                        ((:file "package")
-                         (:file "config")
+  :components ((:module package :pathname ""
+                        :serial t :components
+                        ((:file "package")))
+               (:module client :pathname ""
+                        :depends-on (package)
+                        :serial t :components
+                        ((:file "config")
+                         (:file "note")
                          (:file "blob")
-                         (:file "server")
-                         (:file "chute")))))
+                         (:file "client")
+                         (:file "chute")))
+               (:module server :pathname ""
+                        :depends-on (package)
+                        :serial t :components
+                        ((:file "server")))
+               (:module test :pathname ""
+                        :depends-on (package client)
+                        :serial t :components
+                        ((:file "test")))))
+
 
