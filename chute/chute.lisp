@@ -138,17 +138,6 @@
         (note "btfs send failed on cause ~a." error)
         (return-from btrfs/send-sbcl nil)))))
 
-(defun note (message-or-format &rest args)
-  (format t 
-          "~&~a ~a"
-          (simple-date-time:rfc-2822 (simple-date-time:now))
-          (apply 'format 
-                 nil
-                 message-or-format
-                 (if args 
-                     args
-                     nil))))
-        
 (defun get-cipher ()
   ;;; TODO: initialize cipher correctly
   (ironclad:make-cipher :aes
