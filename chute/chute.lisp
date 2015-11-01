@@ -36,14 +36,14 @@
                            (cipher-text (make-array 8192 :element-type '(unsigned-byte 8))))
                        (ironclad:encrypt cipher plain-text cipher-text)
                        cipher-text)))))
-    #|
 
- (defun get-some-stream-octets (stream size) 
-    (let ((buffer (ironclad::buffer stream)))
-          (index (ironclad::index stream))) 
-      (setf (ironclad::index stream) (- index size)) 
-      (setf (ironclad::buffer stream) (subseq buffer size index))
-      (subseq buffer 0 size))
+#|
+(defun %get-some-stream-octets (stream size) 
+  (let ((buffer (ironclad::buffer stream)))
+    (index (ironclad::index stream))) 
+  (setf (ironclad::index stream) (- index size)) 
+  (setf (ironclad::buffer stream) (subseq buffer size index))
+  (subseq buffer 0 size))
 |#
 
 (defmethod encrypt ((blob t)))
@@ -56,7 +56,7 @@
            (timestamp blob)
            (random (expt 2 128)))
    :method :put
-   :content-type "application/binary"
+   :content-type "application/octet-stream"
    :stream (encrypt blob)))
 
 (defun ensure-sanity ()
