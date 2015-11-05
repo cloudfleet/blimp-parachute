@@ -1,6 +1,13 @@
 #+TITLE Parachute: a zero knowledge backup system
 * Installation
 
+** Place chute.asd in ASDF3 system registry
+#+BEGIN_SRC
+    mkdir -p ~/.config/common-lisp/source-registry.conf.d/
+    cp chute.conf ~/.config/common-lisp/source-registry.conf.d/
+#+END_SRC    
+
+** 
 #+BEGIN_SRC
     (asdf:load-system :chute)
 #+END_SRC    
@@ -8,9 +15,16 @@
 ** Loading Quicklisp dependencies
 
 #+BEGIN_SRC
+     wget https://beta.quicklisp.org/quicklisp.lisp
+     (load "~/quicklisp.lisp")
+#+END_SRC    
+#+BEGIN_SRC
     (load (asdf:system-relative-pathname 
        (asdf:find-system :chute) "chute-quickload"))
 #+END_SRC    
+
+
+
 
 * separate privileges
 ** DONE make a hard link to btrfs, setuid
