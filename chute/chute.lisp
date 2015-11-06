@@ -14,28 +14,13 @@
   (let ((metadata (make-instance 'blob-metadata))
         (cipher (get-cipher))
         (send-output (ironclad:make-octet-output-stream)))
-    (declare (ignore metadata cipher send-output)) ;; FIXME
+    (declare (ignore metadata)) ;; FIXME
     #+nil
     (with-open-file (stream (merge-pathnames "index.json" path) :direction :output)
       (cl-json:encode-json metadata stream))
     ;;; sbcl only
     (btrfs/send :snapshot-path snapshot-path)
-    #+nil
-    (loop
-       :collecting (let ((buffer (ironclad::buffer send-output))
-                         (index (ironclad::index send-output)))
-                     (format t "buffer size: ~a~,8@tindex: ~a~%" (length buffer) index)
-                     (setf (ironclad::index send-output) (- index 8192))
-                     (setf (ironclad::buffer send-output)
-                           (if (> index 8192)
-                               (subseq buffer 8192 index)
-                               buffer))
-                     (let ((plain-text (if (> index 8192)
-                                           (subseq buffer 0 8192)
-                                           buffer))
-                           (cipher-text (make-array 8192 :element-type '(unsigned-byte 8))))
-                       (ironclad:encrypt cipher plain-text cipher-text)
-                       cipher-text)))))
+    (encrypt send-output :cipher cipher)))
 
 #|
 (defun %get-some-stream-octets (stream size) 
@@ -68,12 +53,18 @@
   (probe-file *uri-base*)
   t)
 
+
 (defun snapshot ()
   "Make snapshot, returning path of generated snapshot."
   (multiple-value-bind (out err snap-path)
       (btrfs/subvolume/snapshot :path *path*)
     (note "Snapshot ~a with output ~a and error ~a" snap-path out err)
     snap-path))
+
+(defun snapshot/mock ()
+  (prog1 
+      (make-blob/mock)
+    (note "Snapshot mock created at ~a.")))
 
 (defun btrfs/subvolume/snapshot (&key (path *path*))
   (ensure-sanity)
@@ -129,21 +120,11 @@
   (let ((command *btrfs-command*)
         (args `("send" ,(namestring snapshot-path))))
     (handler-case
-        #+sbcl 
-      (sb-ext:run-program command args :wait nil :output :stream)
-      #+abcl
-      (uiop/run-program:run-program command args :output :stream)
-      
+`        #+sbcl 
+      `  (sb-ext:run-program command args :wait nil :output :stream)
+         #-sbcl
+         (uiop/run-program:run-program command args :output :stream)
       (t (error)
         (note "btfs send failed on cause ~a." error)
         (return-from btrfs/send-sbcl nil)))))
-
-(defun get-cipher ()
-  ;;; TODO: initialize cipher correctly
-  (ironclad:make-cipher :aes
-                        :key
-                        (make-array 16 :element-type '(unsigned-byte 8))
-                        :mode :cfb
-                        :initialization-vector
-                        (make-array 16 :element-type '(unsigned-byte 8))))
 

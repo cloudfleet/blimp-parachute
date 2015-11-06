@@ -8,7 +8,7 @@
 |#
 
 (defsystem :chute
-  :version "0.0.8"
+  :version "0.0.9"
   :perform (test-op (o c) (symbol-call :rt :do-tests))
   :depends-on (ironclad
                simple-date-time
@@ -20,8 +20,12 @@
   :components ((:module package :pathname ""
                         :serial t :components
                         ((:file "package")))
-               (:module client :pathname ""
+               (:module crypt :pathname ""
                         :depends-on (package)
+                        :serial t :components
+                        ((:file "crypt")))
+               (:module client :pathname ""
+                        :depends-on (package crypt)
                         :serial t :components
                         ((:file "config")
                          (:file "note")

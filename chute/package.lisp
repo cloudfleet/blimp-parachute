@@ -10,6 +10,13 @@
 
    #:put-file
 
+   #:snapshot #:snapshot/mock
+
+   #:make-blob #:make-blob/mock
+
+   #:encrypt
+   #:get-cipher
+
    #:btrfs/subvolume/snapshot
    #:btrfs/send
    #:btrfs/subvolume/find-new))
