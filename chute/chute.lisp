@@ -20,16 +20,7 @@
       (cl-json:encode-json metadata stream))
     ;;; sbcl only
     (btrfs/send :snapshot-path snapshot-path)
-    (encrypt send-output :cipher cipher)))
-
-#|
-(defun %get-some-stream-octets (stream size) 
-  (let ((buffer (ironclad::buffer stream)))
-    (index (ironclad::index stream))) 
-  (setf (ironclad::index stream) (- index size)) 
-  (setf (ironclad::buffer stream) (subseq buffer size index))
-  (subseq buffer 0 size))
-|#
+    (encrypt-output send-output :cipher cipher)))
 
 (defmethod encrypt ((blob t)))
 

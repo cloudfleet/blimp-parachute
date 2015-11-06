@@ -1,6 +1,6 @@
 (in-package :chute)
 
-(defmethod encrypt ((send-output t) &key (cipher 'aes))
+(defmethod encrypt-output ((send-output t) &key (cipher 'aes))
     (let ((size 8192))
       (loop
        :collecting (let ((buffer (ironclad::buffer send-output))
@@ -26,4 +26,11 @@
                         :mode :cfb
                         :initialization-vector
                         (make-array 16 :element-type '(unsigned-byte 8))))
+
+(defun %get-some-stream-octets (stream size) 
+  (let ((buffer (ironclad::buffer stream)))
+    (index (ironclad::index stream))) 
+  (setf (ironclad::index stream) (- index size)) 
+  (setf (ironclad::buffer stream) (subseq buffer size index))
+  (subseq buffer 0 size))
 
