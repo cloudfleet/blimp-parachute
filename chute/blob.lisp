@@ -42,7 +42,7 @@
     (loop :for i :below (shards metadata)
        :doing (with-open-file (output (merge-pathnames (format nil "~a" i) directory)
                                       :direction :output
-                                      :element-type 'unsigned-byte
+                                      :element-type '(unsigned-byte 8)
                                       :if-exists :supersede)
                 (with-open-file (input "/dev/random"
                                        :direction :input
