@@ -46,7 +46,7 @@
                                       :if-exists :supersede)
                 (with-open-file (input "/dev/random"
                                        :direction :input
-                                       :element-type 'unsigned-byte)
+                                       :element-type '(unsigned-byte 8))
                   (loop :for i :below shard-size
                      :doing (write-byte (read-byte input) output)))))
     directory))
