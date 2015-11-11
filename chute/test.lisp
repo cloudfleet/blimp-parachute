@@ -8,26 +8,14 @@
    #p"/var/tmp/blob")
   t)
    
-;;; Demonstrate that IRONCLAD block ciphers indeed retain state
+;;; Demonstrate that IRONCLAD AES block ciphers indeed retain state
 (rt:deftest blocks.1
-    (let ((cipher
-         (ironclad:make-cipher :aes
-                               :key
-                               (make-array 16 :element-type '(unsigned-byte 8))
-                               :mode :cfb
-                               :initialization-vector
-                               (make-array 16 :element-type '(unsigned-byte 8))))
-        (cipher2
-         (ironclad:make-cipher :aes
-                               :key
-                               (make-array 16 :element-type '(unsigned-byte 8))
-                               :mode :cfb
-                               :initialization-vector
-                               (make-array 16 :element-type '(unsigned-byte 8))))
-        (plain-1 (ironclad:ascii-string-to-byte-array "this"))
-        (cipher-1 (make-array 4 :element-type '(unsigned-byte 8)))
-        (plain-2 (ironclad:ascii-string-to-byte-array "open"))
-        (cipher-2 (make-array 4 :element-type '(unsigned-byte 8))))
+    (let ((cipher (get-cipher :aes))
+          (cipher2 (get-cipher :aes))
+          (plain-1 (ironclad:ascii-string-to-byte-array "this"))
+          (cipher-1 (make-array 4 :element-type '(unsigned-byte 8)))
+          (plain-2 (ironclad:ascii-string-to-byte-array "open"))
+          (cipher-2 (make-array 4 :element-type '(unsigned-byte 8))))
     (ironclad:encrypt cipher plain-1 cipher-1)
     (ironclad:encrypt cipher plain-2 cipher-2)
     (let ((cipher-12 (make-array 8 :element-type '(unsigned-byte 8)))

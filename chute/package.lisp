@@ -14,8 +14,9 @@
 
    #:make-blob #:make-blob/mock
 
-   #:encrypt
    #:get-cipher
+
+   #:encrypt
 
    #:btrfs/subvolume/snapshot
    #:btrfs/send

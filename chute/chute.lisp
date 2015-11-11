@@ -12,7 +12,7 @@
 (defun serialize (snapshot-path path)
   (ensure-directories-exist path)
   (let ((metadata (make-instance 'blob-metadata))
-        (cipher (get-cipher))
+        (cipher (get-cipher :aes))
         (send-output (ironclad:make-octet-output-stream)))
     (declare (ignore metadata)) ;; FIXME
     #+nil
@@ -22,7 +22,9 @@
     (btrfs/send :snapshot-path snapshot-path)
     (encrypt-output send-output :cipher cipher)))
 
-(defmethod encrypt ((blob t)))
+(defun encrypt (blob)
+  (declare (ignore blob))
+  (warn "Encyrption unimplemented."))
 
 (defun transfer (blob)
   (warn "Untested transfer of ~s off system." blob)
@@ -98,25 +100,17 @@
       (values t output error))))
 
 (defun btrfs/send (&key (snapshot-path *path*))
+  "Returns the stream containing the output of the btrfs/send operation on SNAPSHOT-PATH."
   (ensure-sanity)
   (let ((command (format nil "~A send ~A" *btrfs-command* snapshot-path)))
     (handler-case
-        (uiop/run-program::%run-program command :wait nil)
-      (t (error)
-        (note "btfs send failed on cause ~a." error)
-        (return-from btrfs/send nil)))))
-
-(defun btrfs/send-sbcl (&key (snapshot-path *path*))
-  (ensure-sanity)
-  (let ((command *btrfs-command*)
-        (args `("send" ,(namestring snapshot-path))))
-    (handler-case
-      #+sbcl 
-      (sb-ext:run-program command args :wait nil :output :stream)
+      #+sbcl
+      ;; XXX EH, could be that command/args really do need to be split
+      (sb-ext:run-program command nil :wait nil :output :stream)
       #-sbcl
       (uiop/run-program:run-program command args :output :stream)
-
       (t (error)
-        (note "btfs send failed with cause ~a." error)
-        (return-from btrfs/send-sbcl nil)))))
+        (note "btfs send failed with '~a'." error)
+        (return-from btrfs/send nil)))))
+
 
