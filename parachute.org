@@ -55,6 +55,6 @@ http://trac.clozure.com/ccl/wiki/PlatformNotes
 
 
 * Colophon
-<mark@evenson.eu>
-Created: 01-OCT-2015
-Revised: 11-NOV-2015
+    <mark@evenson.eu>
+    Created: 01-OCT-2015
+    Revised: 11-NOV-2015
