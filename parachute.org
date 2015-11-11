@@ -7,9 +7,14 @@
     cp chute.conf ~/.config/common-lisp/source-registry.conf.d/
 #+END_SRC    
 
-** 
+** Loading from ASDF
 #+BEGIN_SRC
     (asdf:load-system :chute)
+#+END_SRC    
+
+** Testing from ASDF
+#+BEGIN_SRC
+    (asdf:test-system :chute)
 #+END_SRC    
 
 ** Loading Quicklisp dependencies
@@ -23,10 +28,7 @@
        (asdf:find-system :chute) "chute-quickload"))
 #+END_SRC    
 
-
-
-
-* separate privileges
+* Separate privileges
 ** DONE make a hard link to btrfs, setuid
    CLOSED: [2015-10-27 Tue 12:44]
    - CLOSING NOTE [2015-10-27 Tue 12:44] \\
@@ -46,3 +48,13 @@ MIME type is "application/octet-stream".
 
 
 
+
+* Platform arm32
+** CCL 
+http://trac.clozure.com/ccl/wiki/PlatformNotes
+
+
+* Colophon
+<mark@evenson.eu>
+Created: 01-OCT-2015
+Revised: 11-NOV-2015
