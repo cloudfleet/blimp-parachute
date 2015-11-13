@@ -10,16 +10,18 @@
 
    #:put-file
 
-   #:snapshot #:snapshot/mock
+   #:snapshot 
 
-   #:make-blob #:make-blob/mock
+   #:make-blob #:make-blob/test
 
    #:get-cipher
 
    #:encrypt
 
+   #:btrfs-snapshots
    #:btrfs/subvolume/snapshot
    #:btrfs/send
+   #:btrfs/subvolume/show
    #:btrfs/subvolume/find-new))
 
 (defpackage :chute.server

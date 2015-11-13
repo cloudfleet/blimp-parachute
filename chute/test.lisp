@@ -44,8 +44,17 @@
                (file (merge-pathnames "0" directory)))
           (put-file file)))
   t)
-  
 
+(rt:deftest send-snapshot.1
+    ;;; assuming there is at least one snapshot
+    (let ((snapshots (btrfs-snapshots)))
+      (unless snapshots
+        (error "No snapshots to send."))
+      (string= 
+       (read-line (btrfs/send (first snapshots)))
+       ;;; "At subvol" only appears on CCL: is it mixing stderr/stdout?
+       (format nil "At subvol %s" (first (btrfs-snapshots)))))
+t)
 
 
 

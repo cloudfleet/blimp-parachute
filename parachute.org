@@ -28,14 +28,14 @@
        (asdf:find-system :chute) "chute-quickload"))
 #+END_SRC    
 
-* Separate privileges
-** DONE make a hard link to btrfs, setuid
+* Tasks (incomplete)
+** Separate privileges
+*** DONE make a hard link to btrfs, setuid
    CLOSED: [2015-10-27 Tue 12:44]
    - CLOSING NOTE [2015-10-27 Tue 12:44] \\
      Done as setup/make-suid-btfs.bash
 
 * Transfer
-
 ** PUT n bytes in m windows
 
 Each chunk of a blob is adressed as a URI of the form:
@@ -48,13 +48,20 @@ MIME type is "application/octet-stream".
 
 
 
-
 * Platform arm32
 ** CCL 
 http://trac.clozure.com/ccl/wiki/PlatformNotes
 
+* Bugs
+**  BTRFS/SEND
+*** TODO stdout/stderr mixing
+SBCL/CCL returning different starts of output stream.  CCL contains
+"At subvolume" which means it is mixing stdout/stderr?
+*** TODO Use octet streams
+We should pass the streams we wish to read from, rather than having
+RUN-PROGAM construct them for us.
 
 * Colophon
     <mark@evenson.eu>
     Created: 01-OCT-2015
-    Revised: 11-NOV-2015
+    Revised: 13-NOV-2015
