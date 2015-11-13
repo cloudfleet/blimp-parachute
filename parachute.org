@@ -1,6 +1,5 @@
 #+TITLE Parachute: a zero knowledge backup system
 * Installation
-
 ** Place chute.asd in ASDF3 system registry
 #+BEGIN_SRC
     mkdir -p ~/.config/common-lisp/source-registry.conf.d/
@@ -27,6 +26,17 @@
     (load (asdf:system-relative-pathname 
        (asdf:find-system :chute) "chute-quickload"))
 #+END_SRC    
+
+** TODO BTRFS volume must have ".snapshot/" directory
+The CHUTE:SNAPSHOT command will create snapshots under a the specified
+volume (by default "/opt/cloudfleet/data") in a sub-directory named
+".snapshot/", i.e. for the default in
+"/opt/cloudfleet/data/.snapshot/<TIMESTAMP>".
+
+Therefore, the "/opt/cloudfleet/data/.snapshot/" must exist and be
+owned by root.  Currently this is done once per node as part of
+installation when "setup/add-subvolume.bash" is executed.  It should
+be made part of the setup done by setting up the encrypted volumes.
 
 * Tasks (incomplete)
 ** Separate privileges
