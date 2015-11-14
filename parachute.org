@@ -24,7 +24,7 @@
 #+END_SRC    
 #+BEGIN_SRC
     (load (asdf:system-relative-pathname 
-       (asdf:find-system :chute) "chute-quickload"))
+       (asdf:find-system :chute) "quicklisp-setup"))
 #+END_SRC    
 
 ** TODO BTRFS volume must have ".snapshot/" directory
