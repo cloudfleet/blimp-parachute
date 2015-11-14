@@ -1,5 +1,7 @@
 (in-package :chute)
 
+(defun mocked-p () t)
+
 (defparameter *path*
   "/opt/cloudfleet/data")
 (defparameter *snapshot-base*
@@ -10,7 +12,7 @@
   "/opt/cloudfleet/data/shared/chute/")
 
 (defparameter *uri-base*
-  "http://localhost:2001/blob"
+  "http://localhost:2001/chute/blob/"
 #+nil
   "http://slack.net/")
 

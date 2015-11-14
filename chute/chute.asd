@@ -8,7 +8,7 @@
 |#
 
 (defsystem :chute
-  :version "0.0.10"
+  :version "0.0.10.1"
   :perform (test-op (o c) (symbol-call :rt :do-tests))
   :depends-on (ironclad
                simple-date-time
@@ -28,6 +28,7 @@
                         :depends-on (package)
                         :serial t :components
                         ((:file "config")
+                         (:file "btrfs")
                          (:file "note")
                          (:file "blob")
                          (:file "chute")))
