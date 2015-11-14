@@ -64,12 +64,42 @@ http://trac.clozure.com/ccl/wiki/PlatformNotes
 
 * Bugs
 **  BTRFS/SEND
-*** TODO stdout/stderr mixing
+*** DONE stdout/stderr mixing
+    CLOSED: [2015-11-14 Sat 10:16]
+    - CLOSING NOTE [2015-11-14 Sat 10:16] \\
+      Fixed by specifying separate error/output arguments to CCL:RUN-PROGAM
 SBCL/CCL returning different starts of output stream.  CCL contains
 "At subvolume" which means it is mixing stdout/stderr?
+
 *** TODO Use octet streams
 We should pass the streams we wish to read from, rather than having
 RUN-PROGAM construct them for us.
+
+Unfortunately, this doesn't seem to work:
+#+BEGIN_SRC lisp
+  (ccl:run-program
+     "/bin/ls" nil
+     :wait nil
+     :output (ironclad:make-octet-input-stream
+             (make-array 16 :element-type '(unsigned-byte 8)))
+     :element-type '(unsigned-byte 8))
+#+END_SRC
+
+complaining about
+
+#+BEGIN_ASCII
+There is no applicable method for the generic function:
+  #<STANDARD-GENERIC-FUNCTION STREAM-WRITE-VECTOR #x30200006518F>
+when called with arguments:
+  (#<IRONCLAD::OCTET-INPUT-STREAM #x3020023CA75D> "chute
+LICENSE
+parachute.org
+setup
+...
+#+END_ASCII
+
+Fortunately, CCL:RUN-PROGRAM takes an :ELEMENT-TYPE keyword which
+allows us to get octet streams out of the subprocesses.
 
 * Colophon
     <mark@evenson.eu>

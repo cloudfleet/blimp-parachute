@@ -118,12 +118,13 @@
                 #+sbcl
                 (sb-ext:run-program command args :wait nil
                                     :output :stream
-                                    :error :stream
-                                    :external-format :iso-8859-1)
+                                    :error :stream)
+;;                                    :external-format :iso-8859-1) ;; FIXME: how to get octets
                 #+ccl
                 (ccl:run-program command args :wait nil
-                                :output :stream
-                                :external-format :iso-8859-1) ;; FIXME: how to get octets?
+                                 :output :stream
+                                 :error :stream
+                                 :element-type '(unsigned-byte 8))
                 #-(or sbcl ccl) ;; Untested, probably broken
                 (uiop/run-program::%run-program (format nil "~a ~a" command args) :wait nil
                                                 :output :stream

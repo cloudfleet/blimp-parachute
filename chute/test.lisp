@@ -50,12 +50,11 @@
     (let ((snapshots (btrfs-snapshots)))
       (unless snapshots
         (error "No snapshots to send."))
-      (string= 
-       (read-line (btrfs/send (first snapshots)))
-       ;;; "At subvol" only appears on CCL: is it mixing stderr/stdout?
-       (format nil "At subvol %s" (first (btrfs-snapshots)))))
+      (let ((result (btrfs/send (first (btrfs-snapshots)))))
+        (and
+         (streamp result)
+         (equal (stream-element-type result) '(unsigned-byte 8)))))
 t)
-
 
 
 
