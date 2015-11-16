@@ -15,6 +15,7 @@
                cl-json
                hunchentoot
                drakma
+               #-(or solaris)
                osicat
                rt)
   :components ((:module package :pathname ""
