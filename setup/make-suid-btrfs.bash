@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+# Create suid btrfs for use by chute in current directory
 
 # as root...
 if [ $(id -u) != 0 ]; then
@@ -18,8 +20,8 @@ if [ -x "$BTRFS" ]; then
     exit 1
 fi
 
-target=$PWD/btrfs
+target="$PWD/btrfs"
 
-ln "$BTRFS" $target  && chmod u+s $target && echo Created setuid at $btrfs && exit 0
+ln "$BTRFS" "$target"  && chmod u+s "$target" && echo Created setuid at "$target" && exit 0
 
 
