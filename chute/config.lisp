@@ -10,6 +10,8 @@
   (asdf:system-relative-pathname :chute "../setup/btrfs"))
 (defparameter *keystore*
   "/opt/cloudfleet/data/shared/chute/")
+(defparameter *random-device*
+  "/dev/urandom") ;; "/dev/random" will block
 
 (defparameter *uri-base*
   "http://localhost:2001/chute/blob/"

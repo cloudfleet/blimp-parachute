@@ -29,25 +29,29 @@
    (checksum
     :documentation "Checksum of blob.")))
 
-(defun make-blob/mock (&key (directory (merge-pathnames "blob/" (uiop/stream:setup-temporary-directory))))
+(defun make-blob/test (&key (directory (merge-pathnames "blob/" (uiop/stream:setup-temporary-directory))))
   "Create a test blob with random data returning the directory it was created within."
   (let ((metadata (make-instance 'metadata))
-        (shard-size (random (expt 2 16))))
+        (shard-size (random (expt 2 16)))
+        (blob-bytes 0))
     (setf (size metadata) (* shard-size (shards metadata)))
     (ensure-directories-exist directory)
-    (with-open-file (index (merge-pathnames "index.json" directory)
-                           :direction :output
-                           :if-exists :supersede)
-      (cl-json:encode-json metadata index))
+    (note "Creating test blob under '~a'." directory)
     (loop :for i :below (shards metadata)
        :doing (with-open-file (output (merge-pathnames (format nil "~a" i) directory)
                                       :direction :output
                                       :element-type '(unsigned-byte 8)
                                       :if-exists :supersede)
-                (with-open-file (input "/dev/random"
+                (with-open-file (input *random-device*
                                        :direction :input
                                        :element-type '(unsigned-byte 8))
                   (loop :for i :below shard-size
-                     :doing (write-byte (read-byte input) output)))))
+                     :doing (write-byte (read-byte input) output) ;; XXX slow:  use {WRITE,READ}-SEQUENCE
+                     :doing (incf blob-bytes 1)))))
+    (setf (size metadata) blob-bytes)
+    (with-open-file (index (merge-pathnames "index.json" directory)
+                           :direction :output
+                           :if-exists :supersede)
+      (cl-json:encode-json metadata index))
     directory))
 
