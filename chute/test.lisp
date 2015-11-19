@@ -2,11 +2,31 @@
 ;;;; "doodles" of various tests
 
 ;;; on quoth/blimp
-(rt:deftest serialize.1
-  (serialize
-   #p"/opt/cloudfleet/data/.snapshot/20150922T154338Z"
-   #p"/var/tmp/blob")
+(rt:deftest make-blob.1
+    (let ((snapshots (btrfs-snapshots)))
+      (unless snapshots
+        (error "No snapshots to send."))
+      (make-blob
+       (first snapshots)
+       #p"/var/tmp/blob/"))
   t)
+
+(rt:deftest make-and-decrypt-blob.2
+    (let* ((file #p"/etc/passwd")
+           (blob-directory (make-blob file (make-new-directory)))
+           (octets (decrypt-blob-as-octets blob-directory)))
+      (values
+       (flexi-streams:octets-to-string octets)
+       (with-open-file (stream file :direction :input :element-type '(unsigned-byte 8))
+         (loop
+            :for n :upfrom 0
+            :with byte = (read-byte stream)
+            :unless (= byte (aref octets n))
+            :return (progn (note "Mismatch at byte ~a between ~a and blob in ~a."
+                                 n file blob-directory)
+                           nil)
+            :finally (return t)))))
+  t t)
    
 ;;; Demonstrate that IRONCLAD AES block ciphers indeed retain state
 (rt:deftest blocks.1

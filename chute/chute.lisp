@@ -5,28 +5,14 @@
   (let ((snapshot-path (snapshot))
         (blob-path (uiop:temporary-directory)))
   ;;; serialize snapshot to directory encrypting blob in-memory
-    (serialize snapshot-path blob-path)
+    (make-blob snapshot-path blob-path)
   ;;; get backup off system
     (transfer blob-path)))
 
-(defun serialize (snapshot-path path)
-  (ensure-directories-exist path)
-  (let ((metadata (make-instance 'blob-metadata))
-        (cipher (get-cipher :aes))
-        (send-output (ironclad:make-octet-output-stream)))
-    (declare (ignore cipher send-output))
-    (if (mocked-p)
-        (make-blob/mock)
-        (progn 
-          (with-open-file (stream (merge-pathnames "index.json" path) :direction :output)
-            (cl-json:encode-json metadata stream))
-          (btrfs/send snapshot-path))
-        #+nil
-        (encrypt-output send-output :cipher cipher))))
 
 (defun encrypt (blob)
   (declare (ignore blob))
-  (warn "Encyrption unimplemented."))
+  (warn "Encryption unimplemented."))
 
 (defun transfer (blob)
   (warn "Untested transfer of ~s off system." blob)
@@ -55,3 +41,10 @@
     (note "Snapshot ~a with output ~a and error ~a" snap-path out err)
     snap-path))
 
+
+(defun make-new-directory ()
+  (ensure-directories-exist *blobs-directory*)
+  (let ((file (uiop/stream::get-temporary-file :directory *blobs-directory*)))
+    (delete-file file)
+    (ensure-directories-exist
+     (pathname (concatenate 'string (namestring file) "/")))))

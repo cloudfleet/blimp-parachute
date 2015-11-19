@@ -2,8 +2,10 @@
 
 (defclass metadata ()
   ((version
-    :initform "2015102901"
+    :initform "2015111801"
     :documentation "Version of blob metadata.")
+   (prototype
+    :initform '(("lispClass" ."metadata") ("lispPackage". "chute")))
    (node
     :initform "urn:chute:node:0"
     :documentation "Node creating this blob.")
@@ -27,7 +29,81 @@
     :accessor size
     :documentation "Size of blob in bytes.")
    (checksum
-    :documentation "Checksum of blob.")))
+    :documentation "Checksum of blob.")
+   (nonce 
+    :accessor nonce
+    :documentation "Nonce of block key.")))
+
+(defmethod make-blob ((file pathname) blob-path)
+  (with-open-file (input-stream file
+                                :direction :input
+                                :element-type '(unsigned-byte 8))
+    (make-blob input-stream blob-path)))
+  
+(defmethod make-blob ((snapshot-path string) blob-path)
+  (make-blob (btrfs/send snapshot-path) blob-path))
+
+(defmethod make-blob ((input-stream stream) blob-path)
+  (ensure-directories-exist blob-path)
+  (let* ((shard-bytes 0)
+         (metadata (make-instance 'metadata))
+           ;;; TODO: initialize with AES key and random nonce
+         (aes-ctr-key (get-key)) 
+         (cipher (cipher aes-ctr-key))
+         (buffer-size 8192)
+         (buffer (make-array buffer-size :element-type '(unsigned-byte 8))))
+          ;;; TODO: how do we know the total size of the snapshot
+          ;;; until we read all the bytes?  Until we figure this out
+          ;;; we cannot shard without two passes through all the data
+          ;;; serialize metadata containing key
+    (with-open-file (shard (merge-pathnames "0" blob-path)
+                           :direction :output
+                           :if-exists :supersede 
+                           :element-type '(unsigned-byte 8))
+      (loop
+         :with eof = nil
+         :until eof
+         :do (let ((bytes-read (read-sequence buffer input-stream :start 0 :end buffer-size)))
+               (when (not (= bytes-read buffer-size))
+                 (setf eof t))
+               (incf shard-bytes bytes-read)
+               (ironclad:encrypt-in-place cipher buffer :start 0 :end bytes-read)
+               (write-sequence buffer shard :start 0 :end bytes-read))))
+    (setf (size metadata) shard-bytes)
+    (setf (nonce metadata) (nonce aes-ctr-key))
+    (with-open-file (stream (merge-pathnames "index.json" blob-path) :direction :output
+                            :if-exists :supersede)
+;;      (cl-json:with-substitute-printed-representation-restart (metadata stream) ;; XXX not working
+      (cl-json:encode-json metadata stream))
+    (values blob-path metadata)))
+
+;;; XXX this will read the ENTIRE BLOB into memory before returning a result
+(defun decrypt-blob-as-octets (directory)
+  "Decrypt the blob in DIRECTORY as a stream of bytes."
+  (let* ((metadata (with-open-file (stream (merge-pathnames "index.json" directory))
+                     (cl-json:with-decoder-simple-clos-semantics (cl-json:decode-json stream))))
+         (aes-ctr-key (make-instance 'aes-ctr-key :nonce (slot-value metadata 'nonce)))
+         (cipher (cipher aes-ctr-key))
+         (buffer-size 8192)
+         (buffer (make-array buffer-size :element-type '(unsigned-byte 8))))
+    (with-open-file (shard (merge-pathnames "0" directory)
+                           :direction :input
+                           :element-type '(unsigned-byte 8))
+      (values 
+       (loop
+          :with result = (make-array 0 :element-type '(unsigned-byte 8) :fill-pointer t :adjustable t)
+          :with eof = nil
+          :until eof
+          :do (let ((bytes-read (read-sequence buffer shard :start 0 :end buffer-size)))
+                (when (not (= bytes-read buffer-size))
+                  (setf eof t))
+                (ironclad:decrypt-in-place cipher buffer :start 0 :end bytes-read)
+                ;;; XXX one byte at a time? Optimize me!
+                (loop :for i :upto bytes-read
+                   :doing (vector-push-extend (aref buffer i) result)))
+          :finally (return result))
+       metadata
+       cipher))))
 
 (defun make-blob/test (&key (directory (merge-pathnames "blob/" (uiop/stream:setup-temporary-directory))))
   "Create a test blob with random data returning the directory it was created within."

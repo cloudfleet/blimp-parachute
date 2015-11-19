@@ -2,6 +2,8 @@
 
 (defun mocked-p () t)
 
+(defun serialize-mocked-p () t)
+
 (defparameter *path*
   "/opt/cloudfleet/data")
 (defparameter *snapshot-base*
@@ -12,6 +14,9 @@
   "/opt/cloudfleet/data/shared/chute/")
 (defparameter *random-device*
   "/dev/urandom") ;; "/dev/random" will block
+(defparameter *blobs-directory*
+  "/var/tmp/blobs/")
+  
 
 (defparameter *uri-base*
   "http://localhost:2001/chute/blob/"

@@ -10,13 +10,16 @@
 
    #:put-file
 
-   #:snapshot 
+   #:snapshot
 
    #:make-blob #:make-blob/test
+   #:decrypt-blob-as-octets
 
-   #:get-cipher
+   #:get-cipher #:get-key
 
    #:encrypt
+
+   #:make-new-directory
 
    #:btrfs-snapshots
    #:btrfs/subvolume/snapshot
