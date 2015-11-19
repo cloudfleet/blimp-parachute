@@ -2,7 +2,7 @@
 
 (defclass metadata ()
   ((version
-    :initform "2015111801"
+    :initform "2015111901"
     :documentation "Version of blob metadata.")
    (prototype
     :initform '(("lispClass" ."metadata") ("lispPackage". "chute")))

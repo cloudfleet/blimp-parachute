@@ -71,7 +71,10 @@ http://trac.clozure.com/ccl/wiki/PlatformNotes
 SBCL/CCL returning different starts of output stream.  CCL contains
 "At subvolume" which means it is mixing stdout/stderr?
 
-*** TODO Use octet streams
+*** DONE Use octet streams
+    CLOSED: [2015-11-19 Thu 10:47]
+    - CLOSING NOTE [2015-11-19 Thu 10:47] \\
+      Resolved by use of octets streams directly on MAKE-BLOB
 We should pass the streams we wish to read from, rather than having
 RUN-PROGAM construct them for us.
 
@@ -101,7 +104,10 @@ setup
 Fortunately, CCL:RUN-PROGRAM takes an :ELEMENT-TYPE keyword which
 allows us to get octet streams out of the subprocesses.
 
+** TODO Read key from key device
+** TODO Initialize nonce from random data
+** TODO Read domain from /opt/cloudfleet/data/config/blimp-vars.sh
 * Colophon
     <mark@evenson.eu>
     Created: 01-OCT-2015
-    Revised: 13-NOV-2015
+    Revised: 19-NOV-2015
