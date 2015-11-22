@@ -11,5 +11,5 @@ WORKDIR  /opt/cloudfleet/app/parachute
 
 RUN setup/install-docker.bash
 
-CMD setup/start-chute.bash
+CMD bin/start-parachute-client.bash
 
