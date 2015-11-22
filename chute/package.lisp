@@ -1,6 +1,7 @@
 (defpackage :chute
   (:use :cl)
   (:export
+   #:client
 
    #:metadata
    #:timestamp #:shards #:size

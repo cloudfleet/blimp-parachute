@@ -1,5 +1,14 @@
 (in-package :chute)
 
+(defun client ()
+  (note "Client starting up.")
+  (if lparallel:*kernel*
+      (warn "lparallel kernel unexpectedly present.")
+      (setf lparallel:*kernel* (lparallel:make-kernel 3)))
+  (let ((backup-channel (lparallel:make-channel)))
+    (note "Performing single backup task.")
+    (lparallel:submit-task channel 'backer)))
+
 (defun backup ()
   "Main task for backup.  To be run periodically on queue."
   (let ((snapshot-path (snapshot)) ;; create snapshot
