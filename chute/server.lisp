@@ -22,16 +22,16 @@
   (chute:note "uri: ~a" (request-uri*))
   (case (hunchentoot:request-method*)
     (:post
-     (blob-post (request-uri*)))
+     (receive-blob-post (request-uri*)))
     (:get
      "Unimplemented.")
     (:put
-     (blob-put (request-uri*)))
+     (receive-blob-put (request-uri*)))
     (otherwise
      (format nil "Unimplemented method ~a." (hunchentoot:request-method*)))))
 
 (defparameter *last-metadata* nil)
-(defun blob-post (uri)
+(defun receive-blob-post (uri)
   ;;; TODO check that the uri is "/blob"
   ;;; Create output directory
   (chute:note "Raw post data: ~a" (raw-post-data :force-text t))
@@ -55,8 +55,8 @@
       (format file (raw-post-data :force-text t)))
     (format nil "~a/~a" uri relative-local-path)))
 
-;;; Unused?
-(defun blob-put ()
+(defun receive-blob-put (uri)
+  (chute:note "Processing blob put for ~a" uri)
   ;;; Get a writable stream to the object
   (let ((octets (raw-post-data :force-binary t)))
     (chute:note "octets: ~a..." (subseq octets 0 16))

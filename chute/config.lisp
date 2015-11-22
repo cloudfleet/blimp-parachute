@@ -14,18 +14,28 @@
   "/opt/cloudfleet/data/shared/chute/")
 (defparameter *random-device*
   "/dev/urandom") ;; "/dev/random" will block
+;; REST Server bast
+(defparameter *uri-base*
+  "http://localhost:2001/chute/blob/"
+  #+nil
+  "http://slack.net/")
 ;; SERVER
 (defparameter *blob-storage-dir*
   (merge-pathnames "blob/storage/" (user-homedir-pathname)))
 ;; CLIENT
 (defparameter *blobs-directory*
   "/var/tmp/blobs/")
-  
 
-(defparameter *uri-base*
-  "http://localhost:2001/chute/blob/"
-#+nil
-  "http://slack.net/")
+(defun ensure-sanity ()
+  (unless (probe-file *snapshot-base*)
+    (error "No directory to create snapshots at ~s." *snapshot-base*))
+  (unless (probe-file *btrfs-command*)
+    (error "No setuid btrfs found at ~s." *btrfs-command*))
+  #+abcl
+  (probe-file *uri-base*)
+  t)
+
+
 
 
 

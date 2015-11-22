@@ -9,15 +9,6 @@
         (transfer-blob blob-path)     ;; get blob off system
       (warn "Unimplemented cleanup of blob at ~a" blob-path))))
 
-(defun ensure-sanity ()
-  (unless (probe-file *snapshot-base*)
-    (error "No directory to create snapshots at ~s." *snapshot-base*))
-  (unless (probe-file *btrfs-command*)
-    (error "No setuid btrfs found at ~s." *btrfs-command*))
-  #+abcl
-  (probe-file *uri-base*)
-  t)
-
 (defun snapshot ()
   "Make snapshot of btfs volume at *path*, returning path of generated snapshot."
   (multiple-value-bind (out err snap-path)
