@@ -2,24 +2,29 @@
 
 (defclass metadata ()
   ((version
-    :initform "2015111901"
+    :initform "2015111902"
+    :accessor version
     :documentation "Version of blob metadata.")
    (prototype
     :initform '(("lispClass" ."metadata") ("lispPackage". "chute")))
    (node
     :initform "urn:chute:node:0"
+    :accessor node
     :documentation "Node creating this blob.")
    (domain
     :initform "example.com"
+    :accessor domain
     :documentation "Domain creating this blob.")
    (mount
     :initform *path*
+    :accessor mount
     :documentation "Mount point of blob.")
    (timestamp
     :reader timestamp
-    :initform (simple-date-time:rfc-2822 (simple-date-time:now)))
+    :initform (simple-date-time:|yyyymmddThhmmssZ| (simple-date-time:now)))
    (parent
     :initform nil
+    :accessor parent
     :documentation "Previous blob, or nil if this is the first blob in a series.")
    (shards
     :initform 1

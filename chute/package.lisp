@@ -8,7 +8,7 @@
    #:backup
    #:note
 
-   #:put-file
+   #:transfer-blob #:put-file 
 
    #:snapshot
 
@@ -17,7 +17,11 @@
 
    #:get-cipher #:get-key
 
+   #:*blob-storage-dir*
+
    #:encrypt
+
+   #:strip-double-slash
 
    #:make-new-directory
 

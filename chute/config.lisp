@@ -14,6 +14,10 @@
   "/opt/cloudfleet/data/shared/chute/")
 (defparameter *random-device*
   "/dev/urandom") ;; "/dev/random" will block
+;; SERVER
+(defparameter *blob-storage-dir*
+  (merge-pathnames "blob/storage/" (user-homedir-pathname)))
+;; CLIENT
 (defparameter *blobs-directory*
   "/var/tmp/blobs/")
   

@@ -46,24 +46,18 @@
       (values cipher plain-1 cipher-1 plain-2 cipher-2 cipher-12 plain-12)))
     t)
 
-(rt:deftest server.1
-    (let ((directory (make-test-blob)))
-      (chute.server:start-server)
+(rt:deftest client.1
+    (let ((directory (make-blob #p"/etc/passwd" (make-new-directory)))
+          (already-running-server-p (chute.server:running-server-p)))
+      (unless already-running-server-p
+        (chute.server:start-server))
       (prog1
           (multiple-value-list
-           (put-file (merge-pathnames "0" directory)))
-        (chute.server:stop-server)))
+           (transfer-blob directory))
+        (unless already-running-server-p
+          (chute.server:stop-server))))
   t)
 
-;;; A test for a running server
-;;; (rt:do-test 'chute.test::put-request.1)
-(rt:deftest put-request.1
-    (if (not (chute.server:running-server-p))
-        (error "No server running.")
-        (let* ((directory (make-test-blob))
-               (file (merge-pathnames "0" directory)))
-          (put-file file)))
-  t)
 
 (rt:deftest send-snapshot.1
     ;;; assuming there is at least one snapshot

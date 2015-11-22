@@ -29,6 +29,7 @@
                         :depends-on (package)
                         :serial t :components
                         ((:file "config")
+                         (:file "util")
                          (:file "btrfs")
                          (:file "note")
                          (:file "blob")
