@@ -6,6 +6,7 @@
     (load quicklisp-init)))
 
 (dolist (system '(:ironclad
+                  :lparallel
                   :simple-date-time :cl-json
                   :hunchentoot
                   :drakma

@@ -8,9 +8,10 @@
 |#
 
 (defsystem :chute
-  :version "0.0.11.0"
+  :version "0.1.0"
   :perform (test-op (o c) (symbol-call :rt :do-tests))
   :depends-on (ironclad
+               lparallel
                simple-date-time
                cl-json
                hunchentoot
