@@ -41,7 +41,14 @@ cd "$HOME" && wget https://beta.quicklisp.org/quicklisp.lisp
 
 ccl="$base/ccl/$ccl_bin"
 
+# Populate ASDF registry
+asdf_conf="${HOME}/.config/common-lisp/source-registry.conf.d"
+mkdir -p "$asdf_conf"
+cp chute/chute.conf "$asdf_conf"
+
 ccl --no-init --load "$chute/install-quicklisp.lisp"
+
+
 
 
 

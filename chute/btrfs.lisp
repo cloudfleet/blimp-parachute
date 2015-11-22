@@ -1,4 +1,6 @@
 (in-package :chute)
+;;;; BTRFS specific code
+;;;; (swap in ZFS as an exercise?)
 
 (defun btrfs/subvolume/snapshot (&key (path *path*))
   (ensure-sanity)

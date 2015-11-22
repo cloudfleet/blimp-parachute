@@ -1,29 +1,13 @@
 (in-package :chute)
 
 (defun backup ()
-  ;;; create snapshot
-  (let ((snapshot-path (snapshot))
+  "Main task for backup.  To be run periodically on queue."
+  (let ((snapshot-path (snapshot)) ;; create snapshot
         (blob-path (uiop:temporary-directory)))
-  ;;; serialize snapshot to directory encrypting blob in-memory
-    (make-blob snapshot-path blob-path)
-  ;;; get backup off system
-    (transfer blob-path)))
-
-
-(defun encrypt (blob)
-  (declare (ignore blob))
-  (warn "Encryption unimplemented."))
-
-(defun transfer (blob)
-  (warn "Untested transfer of ~s off system." blob)
-  (drakma:http-request
-   (format nil "~a/not.org/t/~a/~a"
-           *uri-base*
-           (timestamp blob)
-           (random (expt 2 128)))
-   :method :put
-   :content-type "application/octet-stream"
-   :stream (encrypt blob)))
+    (make-blob snapshot-path blob-path)     ;; serialize encrypted blob to path
+    (prog1
+        (transfer-blob blob-path)     ;; get blob off system
+      (warn "Unimplemented cleanup of blob at ~a" blob-path))))
 
 (defun ensure-sanity ()
   (unless (probe-file *snapshot-base*)
@@ -40,7 +24,6 @@
       (btrfs/subvolume/snapshot :path *path*)
     (note "Snapshot ~a with output ~a and error ~a" snap-path out err)
     snap-path))
-
 
 (defun make-new-directory ()
   (ensure-directories-exist *blobs-directory*)

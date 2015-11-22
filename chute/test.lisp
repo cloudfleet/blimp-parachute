@@ -46,7 +46,7 @@
       (values cipher plain-1 cipher-1 plain-2 cipher-2 cipher-12 plain-12)))
     t)
 
-(rt:deftest client.1
+(rt:deftest transfer-blob.1
     (let ((directory (make-blob #p"/etc/passwd" (make-new-directory)))
           (already-running-server-p (chute.server:running-server-p)))
       (unless already-running-server-p
@@ -58,8 +58,7 @@
           (chute.server:stop-server))))
   t)
 
-
-(rt:deftest send-snapshot.1
+(rt:deftest btrfs-send-snapshot.1
     ;;; assuming there is at least one snapshot
     (let ((snapshots (btrfs-snapshots)))
       (unless snapshots
@@ -69,6 +68,7 @@
          (streamp result)
          (equal (stream-element-type result) '(unsigned-byte 8)))))
 t)
+
 
 
 

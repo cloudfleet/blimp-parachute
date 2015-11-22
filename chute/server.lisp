@@ -55,7 +55,8 @@
       (format file (raw-post-data :force-text t)))
     (format nil "~a/~a" uri relative-local-path)))
 
-(defun blob-put (uri)
+;;; Unused?
+(defun blob-put ()
   ;;; Get a writable stream to the object
   (let ((octets (raw-post-data :force-binary t)))
     (chute:note "octets: ~a..." (subseq octets 0 16))
