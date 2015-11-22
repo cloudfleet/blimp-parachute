@@ -1,4 +1,4 @@
 #!/bin/bash
-ccl=ccl
+lisp=ccl
 
-exec ccl --load /opt/cloudfleet/data/app/parachute/chute/boot-client.lisp
+exec $lisp --load /opt/cloudfleet/data/app/parachute/chute/boot-client.lisp
