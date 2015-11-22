@@ -39,12 +39,12 @@ installation when "setup/add-subvolume.bash" is executed.  It should
 be made part of the setup done by setting up the encrypted volumes.
 
 * Tasks (incomplete)
-** Separate privileges
-*** DONE make a hard link to btrfs, setuid
+** DONE make a hard link to btrfs, setuid
    CLOSED: [2015-10-27 Tue 12:44]
    - CLOSING NOTE [2015-10-27 Tue 12:44] \\
      Done as setup/make-suid-btfs.bash
 
+** TODO parse id for PUT uri from POST
 * Transfer
 ** PUT n bytes in m windows
 
@@ -55,7 +55,6 @@ Each chunk of a blob is adressed as a URI of the form:
 #+END_SRC
 
 MIME type is "application/octet-stream".
-
 
 
 * Platform arm32
@@ -108,6 +107,6 @@ allows us to get octet streams out of the subprocesses.
 ** TODO Initialize nonce from random data
 ** TODO Read domain from /opt/cloudfleet/data/config/blimp-vars.sh
 * Colophon
-    <mark@evenson.eu>
-    Created: 01-OCT-2015
-    Revised: 19-NOV-2015
+        <mark@evenson.eu>
+        Created: 01-OCT-2015
+        Revised: 22-NOV-2015
