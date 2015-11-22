@@ -1,15 +1,18 @@
 (in-package :chute)
 
 (defmethod put-shard ((file pathname) &key (uri "http://localhost:2001/blob/foo"))
-  (drakma:http-request uri
-                       :method :put
-                       :content-type "application/octet-stream"
-                       :content file))
+  (time 
+   (drakma:http-request uri
+                        :method :put
+                        :content-type "application/octet-stream"
+                        :content file)))
 
 (defmethod put-shard ((input stream) &key (uri "http://localhost:2001/blob/foo"))
-  (drakma:http-request uri
-                       :content input
-                       :content-type "application/octet-stream"))
+  (time
+   (drakma:http-request uri
+                        :method :put
+                        :content input
+                        :content-type "application/octet-stream")))
 
 (defun transfer-blob (blob-directory &key (uri-base "http://localhost:2001/blob/"))
   ;;; POST the metadata
