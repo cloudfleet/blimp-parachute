@@ -4,12 +4,14 @@
                                            (user-homedir-pathname))
                           :direction :output
                           :if-exists :supersede)
-  (write ccl-init
-         '((let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp"
-                                       (user-homedir-pathname))))
+  (write '(progn
+           (let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp"
+                                                  (user-homedir-pathname))))
              (when (probe-file quicklisp-init)
                (load quicklisp-init)))
-           (setf *load-verbose* t))))
+           (setf *load-verbose* t))
+           ccl-init))
+         
 
 (load "/opt/cloudfleet/app/chute/quicklisp-setup.lisp")
 
