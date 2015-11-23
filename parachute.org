@@ -57,9 +57,12 @@ Each chunk of a blob is adressed as a URI of the form:
 MIME type is "application/octet-stream".
 
 
-* Platform arm32
+* Client platform arm32
 ** CCL 
 http://trac.clozure.com/ccl/wiki/PlatformNotes
+* Server platform x64
+** SBCL
+sbcl-1.3.0 known to work
 
 * Bugs
 **  BTRFS/SEND
@@ -109,4 +112,4 @@ allows us to get octet streams out of the subprocesses.
 * Colophon
         <mark@evenson.eu>
         Created: 01-OCT-2015
-        Revised: 22-NOV-2015
+        Revised: 23-NOV-2015

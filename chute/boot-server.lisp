@@ -1,4 +1,4 @@
 (require :asdf)
-(asdf:load-system :chute.server)
+(asdf:load-system :chute)
 (chute.server:start-server)
 

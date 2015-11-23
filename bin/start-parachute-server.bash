@@ -1,4 +1,5 @@
 #!/bin/bash
+. "/opt/cloudfleet/apps/parachute/etc/cf-vars.sh"
 lisp=sbcl
-exec $lisp --load /opt/cloudfleet/app/parachute/chute/boot-server.lisp
+exec $lisp --load "${CF_APPS}/parachute/chute/boot-server.lisp"
 

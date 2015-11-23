@@ -1,7 +1,16 @@
 (load (merge-pathnames "quicklisp.lisp"
                        (user-homedir-pathname)))
-(with-open-file (ccl-init (merge-pathnames ".ccl-init.lisp"
-                                           (user-homedir-pathname))
+
+(funcall (intern (symbol-name 'install) :quicklisp-quickstart))
+
+(with-open-file (ccl-init (merge-pathnames
+                           #+ccl
+                           ".ccl-init.lisp"
+                           #+abcl
+                           ".abclrc"
+                           #+sbcl
+                           ".sbclrc"
+                           (user-homedir-pathname))
                           :direction :output
                           :if-exists :supersede)
   (write '(progn
@@ -10,9 +19,8 @@
              (when (probe-file quicklisp-init)
                (load quicklisp-init)))
            (setf *load-verbose* t))
-           ccl-init))
-         
-
-(load "/opt/cloudfleet/app/chute/quicklisp-setup.lisp")
+           :stream ccl-init))
+;;; TODOD parse variables in <file:../etc/cf-vars.sh>
+(load "/opt/cloudfleet/apps/parachute/chute/quicklisp-setup.lisp")
 
 (quit)

@@ -1,8 +1,9 @@
 #!/bin/bash
 #
 # create btrfs subvolume, copy $path, remove $path
+. "/opt/cloudfleet/apps/parachute/etc/cf-vars.sh"
 
-path=/opt/cloudfleet/data
+path=$CF_DATA
 path_copy=${path}.copy
 
 if [ -e ${path_copy} ]; then 
@@ -15,7 +16,7 @@ echo Stopping Cloudfleet services
 
 mv "$path" "$path_copy"
 
-btrfs subvolume create /opt/cloudfleet/data
+btrfs subvolume create $CF_DATA
 rsync -avzP "${path_copy}"/ "${path}"/
 rm -rf "${path_copy}"
 
