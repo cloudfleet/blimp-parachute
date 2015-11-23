@@ -16,7 +16,7 @@
   "/dev/urandom") ;; "/dev/random" will block
 ;; REST Server bast
 (defparameter *uri-base*
-  "http://localhost:2001/chute/blob/"
+  "http://localhost:2001/chute/blob/" ;; TEST URI
   #+nil
   "http://slack.net/")
 ;; SERVER

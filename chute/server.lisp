@@ -30,7 +30,7 @@
     (otherwise
      (format nil "Unimplemented method ~a." (hunchentoot:request-method*)))))
 
-(defparameter *last-metadata* nil)
+(defparameter *last-metadata* nil) ;; DEBUG
 (defun receive-blob-post (uri)
   ;;; TODO check that the uri is "/blob"
   ;;; Create output directory
@@ -65,7 +65,6 @@
     nil)) ;; what do we return?
 
 (defparameter *server* nil)
-(defparameter *blob-directory* (asdf:system-relative-pathname :chute "../var/blob/"))
 
 (defun running-server-p ()
   *server*)

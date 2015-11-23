@@ -8,7 +8,7 @@
 |#
 
 (defsystem :chute
-  :version "0.1.0"
+  :version "0.1.0.1"
   :perform (test-op (o c) (symbol-call :rt :do-tests))
   :depends-on (ironclad
                lparallel
@@ -29,7 +29,7 @@
                (:module source :pathname ""
                         :depends-on (package)
                         :serial t :components
-                        ((:file "config")
+                        ((:file "config-client")
                          (:file "util")
                          (:file "btrfs")
                          (:file "note")
@@ -42,7 +42,8 @@
                (:module server :pathname ""
                         :depends-on (source)
                         :serial t :components
-                        ((:file "server")))
+                        ((:file "config-server")
+                         (:file "server")))
                (:module test :pathname ""
                         :depends-on (client)
                         :serial t :components
