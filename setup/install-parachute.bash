@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 . "/opt/cloudfleet/apps/parachute/etc/cf-vars.sh"
 
 tmp=${CF_TMP}
@@ -40,26 +41,30 @@ echo ccl_uri $ccl_uri
 (cd "$tmp" && wget --continue $ccl_uri)
 file=$( basename $ccl_uri )
 mkdir -p $base
-(cd "${CF_TMP} && tar xvzf "$tmp/$file")
 
-# Install quicklisp
+ccl="$CF_APPS/ccl/$ccl_bin"
+#ccl=ccl64
+
+if [ ! -d "${CF_APPS}/ccl" ]; then
+   (cd "${CF_APPS}" && tar xvzf "$tmp/$file")
+fi
+
+# Download Quicklisp install shim
 if [ ! -r "$HOME/quicklisp.lisp" ]; then
   (cd "$HOME" && wget --continue https://beta.quicklisp.org/quicklisp.lisp)
 fi
 
-ccl="$base/ccl/$ccl_bin"
-#ccl=ccl64
-
 # Populate ASDF registry
-asdf_conf="${HOME}/.config/common-lisp/source-registry.conf.d"
-mkdir -p "$asdf_conf"
-cp chute/chute.conf "$asdf_conf"
+asdf_conf_d="${HOME}/.config/common-lisp/source-registry.conf.d"
+mkdir -p "${asdf_conf_d}" 
+rsync -avzP ${CF_APPS}/parachute/chute/chute.conf ${asdf_conf_d}/
 
-if [ ! -d "$HOME/quicklisp" ]; then 
-    $ccl --no-init --load "$chute/install-quicklisp.lisp"
-else
-    $ccl --eval "(progn (load \"$chute/quicklisp-setup.lisp\") (quit))"
+if [ ! -d $HOME/quicklisp ]; then 
+    $ccl --no-init --load "${CF_APPS}/parachute/chute/install-quicklisp.lisp"
 fi
+
+$ccl --eval '(progn (require :asdf) (asdf:system-relative-pathname (asdf:find-system :chute) \"quicklisp-setup.lisp\") (quit))'
+
 
 
 
