@@ -78,7 +78,6 @@
     (setf (nonce metadata) (nonce aes-ctr-key))
     (with-open-file (stream (merge-pathnames "index.json" blob-path) :direction :output
                             :if-exists :supersede)
-;;      (cl-json:with-substitute-printed-representation-restart (metadata stream) ;; XXX not working
       (cl-json:encode-json metadata stream))
     (values blob-path metadata)))
 
