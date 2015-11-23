@@ -1,35 +1,36 @@
 (in-package :chute)
 
-(defmethod put-shard ((file pathname) &key (uri "http://localhost:2001/blob/foo"))
+(defmethod put-shard ((file pathname) &key (uri "blob/unqualified"))
   (time 
    (drakma:http-request uri
                         :method :put
                         :content-type "application/octet-stream"
                         :content file)))
 
-(defmethod put-shard ((input stream) &key (uri "http://localhost:2001/blob/foo"))
+(defmethod put-shard ((input stream) &key (uri "blob/unqualified"))
   (time
    (drakma:http-request uri
                         :method :put
                         :content input
                         :content-type "application/octet-stream")))
 
-(defun transfer-blob (blob-directory &key (uri-base "http://localhost:2001/blob/"))
+(defun transfer-blob (blob-directory &key (post-uri *uri-base*))
   ;;; POST the metadata
-  (flet ((interpret-index-results (results)
-           (warn "Unimplemented parse of POST.")
+  (flet ((interpret-post-results (results)
+           (warn "Unimplemented parse of POST result.")
            (values
-            (format nil "~a/~a" uri-base (strip-double-slash results)))))
+            (format nil "~a/~a" post-uri (strip-double-slash results)))))
   (let ((post-index-results
-         (drakma:http-request uri-base
+         (drakma:http-request post-uri
                               :method :post
                               :content-type "application/json"
                               :content (merge-pathnames "index.json" blob-directory))))
-        ;;; Then transfer the shards
-        ;;; Only one shard for now.
-    ;;; TODO use byte-range to transfer portions
-    (let ((shard-uri (interpret-index-results post-index-results))
+    ;; Transfer the blob shards
+    ;; Only one shard for now.
+    ;;; TODO use byte-range to dynamically adjust transfer rate inside a shard
+    (let ((shard-uri (interpret-post-results post-index-results))
           (shard-0-path (merge-pathnames "0" blob-directory)))
+      (note "Putting shard to ~a" shard-uri)
       (with-open-file (shard-stream shard-0-path :element-type '(unsigned-byte 8))
         (put-shard shard-stream :uri shard-uri))))))
 

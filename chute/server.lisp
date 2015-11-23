@@ -8,11 +8,10 @@
   "Hello world!")
 
 #|
-
 @route POST "/blob/*"
 @route PUT "/blob/:domain/:node/:mount/:timestamp/"
-
 |#
+
 (define-easy-handler (blob
                       :uri (lambda (request)
                              (cl-ppcre:scan "/blob" (request-uri* request)))
@@ -33,36 +32,55 @@
 (defparameter *last-metadata* nil) ;; DEBUG
 (defun receive-blob-post (uri)
   ;;; TODO check that the uri is "/blob"
-  ;;; Create output directory
-  (chute:note "Raw post data: ~a" (raw-post-data :force-text t))
+  (note "Raw post data: ~a" (raw-post-data :force-text t))
   (let* ((metadata (cl-json:with-decoder-simple-clos-semantics
                      (cl-json:decode-json-from-string  (raw-post-data :force-text t))))
-         (relative-local-path
-          (chute:strip-double-slash (format nil "~a/~a/~a/~a/"
-                                            (chute::domain metadata)
-                                            (chute::node metadata)
-                                            (chute::mount metadata)
-                                            (chute::timestamp metadata))))
+         (relative-local-path (ensure-blob-path metadata))
          (local-path
-          (ensure-directories-exist (merge-pathnames relative-local-path chute:*blob-storage-dir*))))
+          (ensure-directories-exist   ;; Create output directory
+           (merge-pathnames relative-local-path *blob-storage-directory*))))
     (setf *last-metadata* metadata)
-    (chute:note "Metadata: ~a." metadata)
+    (note "Metadata: ~a." metadata)
 
     (with-open-file (file
                      (merge-pathnames "index.json" local-path)
                      :direction :output
                      :if-exists :supersede) ;; XXX
       (format file (raw-post-data :force-text t)))
-    (format nil "~a/~a" uri relative-local-path)))
+    (setf (hunchentoot:content-type*) "text/plain")
+    (format nil "~a/~a" uri local-path)))
 
-(defun receive-blob-put (uri)
-  (chute:note "Processing blob put for ~a" uri)
-  ;;; Get a writable stream to the object
-  (let ((octets (raw-post-data :force-binary t)))
-    (chute:note "octets: ~a..." (subseq octets 0 16))
-  ;;; Slurp bytes, writing to disk
+(defun receive-blob-put (uri &key (as-stream-p nil))
+  (note "Processing PUT for '~a'" uri)
+  (let ((output-path (ensure-blob-path uri)))
+    (note "Writing output to ~a" output-path)
+    (ensure-directories-exist output-path)
+    (if as-stream-p
+        ;; Get a writable stream to the object
+        (let ((octet-stream (raw-post-data :want-stream t)))
+          ;; octet-stream will be a FLEXI-STREAM with 
+          (note "DEBUG stream: ~a" octet-stream))
+        (let ((octets (raw-post-data :force-binary t)))
+          (note "DEBUG octets: ~a..." (subseq octets 0 16))
+          (with-open-file (output output-path
+                                  :direction :output
+                                  :if-exists :supersede
+                                  :element-type '(unsigned-byte 8))
+            (loop :for byte :across octets ;; XXX inefficient one byte reads
+               :doing (write-byte byte output)))))
+    (setf (hunchentoot:content-type*) "text/plain")
+    "false")) ;; return true when we actually can verify that a write occurred
 
-    nil)) ;; what do we return?
+(defmethod ensure-blob-path ((metadata chute:metadata))
+  (chute:strip-double-slash (format nil "~a/~a/~a/~a/"
+                                    (chute::domain metadata)
+                                    (chute::node metadata)
+                                    (chute::mount metadata)
+                                    (chute::timestamp metadata))))
+
+(defmethod ensure-blob-path ((uri string))
+  (warn "Unimplemented check of permission and hygiene for blob uri.")
+  (merge-pathnames "unknown/0" *blob-storage-directory*))
 
 (defparameter *server* nil)
 
@@ -70,13 +88,14 @@
   *server*)
 
 (defun start-server ()
-  (ensure-directories-exist chute:*blob-storage-dir*)
-  (chute:note "Storing incoming blobs under ~a" chute:*blob-storage-dir*)
+  (dolist (d `(,*blob-storage-directory* ,*log-directory*))
+    (ensure-directories-exist d))
+  (note "Storing incoming blobs under ~a" *blob-storage-directory*)
   (when (running-server-p)
     (warn "Stopping already present acceptor.")
     (stop *server*)
     (setf *server* nil))
-  (setf *server* (make-instance 'hunchentoot:easy-acceptor :port 2001))
+  (setf *server* (make-instance 'http-acceptor :port 2001))
   (start *server*))
 
 (defun stop-server ()
@@ -89,4 +108,5 @@
 (defun restart-server ()
   (stop-server)
   (start-server))
+
 

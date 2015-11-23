@@ -34,6 +34,7 @@
 
 (defpackage :chute.server
   (:use :cl :hunchentoot)
+  (:import-from #:chute #:note)
   (:export
    #:running-server-p
    #:start-server #:stop-server #:restart-server))
