@@ -13,7 +13,19 @@
              (write-char c result)))
     (get-output-stream-string result)))
        
-         
+
+(defun make-new-directory ()
+  (ensure-directories-exist *blobs-directory*)
+  (let* ((directory
+          #+ccl
+           (subseq *blobs-directory* 0 (1- (length *blobs-directory*)))
+           #-ccl *blobs-directory*)
+          (file (uiop/stream::get-temporary-file :directory directory)))
+    (delete-file file)
+    (ensure-directories-exist
+     (pathname (concatenate 'string (namestring file) "/")))))
+
+
        
        
        
