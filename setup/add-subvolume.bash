@@ -2,6 +2,9 @@
 #
 # create btrfs subvolume, copy $path, remove $path
 . "/opt/cloudfleet/apps/parachute/etc/cf-vars.sh"
+if [[ -z "${CF}" ]]; then
+   echo "Failed to source configuration" && exit 1
+fi
 
 path=$CF_DATA
 path_copy=${path}.copy
