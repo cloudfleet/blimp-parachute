@@ -10,6 +10,8 @@
                            ".abclrc"
                            #+sbcl
                            ".sbclrc"
+                           #+ecl
+                           ".eclrc"
                            (user-homedir-pathname))
                           :direction :output
                           :if-exists :supersede)
