@@ -20,7 +20,7 @@
           #+ccl
            (subseq *blobs-directory* 0 (1- (length *blobs-directory*)))
            #-ccl *blobs-directory*)
-          (file (uiop/stream::get-temporary-file :directory directory)))
+          (file (uiop/stream::get-temporary-file :prefix "blob" :directory directory)))
     (delete-file file)
     (ensure-directories-exist
      (pathname (concatenate 'string (namestring file) "/")))))

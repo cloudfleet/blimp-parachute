@@ -2,7 +2,7 @@
 ;;;; "doodles" of various tests
 
 ;;; on quoth/blimp
-(rt:deftest make-blob.1
+(rt:deftest snapshot.blob.1
     (let ((snapshots (btrfs-snapshots)))
       (unless snapshots
         (error "No snapshots to send."))
@@ -11,7 +11,7 @@
        #p"/var/tmp/blob/"))
   t)
 
-(rt:deftest make-and-decrypt-blob.2
+(rt:deftest blob.from-file.1
     (let* ((file #p"/etc/passwd")
            (blob-directory (make-blob file (make-new-directory)))
            (octets (decrypt-blob-as-octets blob-directory)))
@@ -29,7 +29,7 @@
   t t)
    
 ;;; Demonstrate that IRONCLAD AES block ciphers indeed retain state
-(rt:deftest blocks.1
+(rt:deftest aes.block-state.1
     (let ((cipher (get-cipher :aes))
           (cipher2 (get-cipher :aes))
           (plain-1 (ironclad:ascii-string-to-byte-array "this"))
@@ -46,7 +46,7 @@
       (values cipher plain-1 cipher-1 plain-2 cipher-2 cipher-12 plain-12)))
     t)
 
-(rt:deftest transfer-blob.1
+(rt:deftest blob.transfer.1
     (let ((directory (make-blob #p"/etc/passwd" (make-new-directory)))
           (already-running-server-p (chute.server:running-server-p)))
       (unless already-running-server-p
@@ -58,7 +58,7 @@
           (chute.server:stop-server))))
   t)
 
-(rt:deftest btrfs-send-snapshot.1
+(rt:deftest btrfs.send-snapshot.1
     ;;; assuming there is at least one snapshot
     (let ((snapshots (btrfs-snapshots)))
       (unless snapshots

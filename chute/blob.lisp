@@ -34,6 +34,7 @@
     :accessor size
     :documentation "Size of blob in bytes.")
    (checksum
+    :accessor checksum
     :documentation "Checksum of blob.")
    (nonce 
     :accessor nonce
@@ -56,6 +57,7 @@
          (aes-ctr-key (get-key)) 
          (cipher (cipher aes-ctr-key))
          (buffer-size 8192)
+         (digest (ironclad:make-digest :sha256))
          (buffer (make-array buffer-size :element-type '(unsigned-byte 8))))
           ;;; TODO: how do we know the total size of the snapshot
           ;;; until we read all the bytes?  Until we figure this out
@@ -73,13 +75,16 @@
                  (setf eof t))
                (incf shard-bytes bytes-read)
                (ironclad:encrypt-in-place cipher buffer :start 0 :end bytes-read)
-               (write-sequence buffer shard :start 0 :end bytes-read))))
-    (setf (size metadata) shard-bytes)
-    (setf (nonce metadata) (nonce aes-ctr-key))
+               (ironclad:update-digest digest buffer :start 0 :end bytes-read)
+               (write-sequence buffer shard :start 0 :end bytes-read)))
+    (setf (size metadata) shard-bytes
+          (nonce metadata) (nonce aes-ctr-key)
+          (checksum metadata) (ironclad:byte-array-to-hex-string
+                               (ironclad:produce-digest digest)))
     (with-open-file (stream (merge-pathnames "index.json" blob-path) :direction :output
                             :if-exists :supersede)
       (cl-json:encode-json metadata stream))
-    (values blob-path metadata)))
+    (values blob-path metadata))))
 
 ;;; XXX this will read the ENTIRE BLOB into memory before returning a result
 (defun decrypt-blob-as-octets (directory)

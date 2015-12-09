@@ -4,7 +4,7 @@
    #:client
 
    #:metadata
-   #:timestamp #:shards #:size
+   #:timestamp #:shards #:size #:checksum
 
    #:backup
    #:note
