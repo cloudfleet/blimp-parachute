@@ -81,30 +81,47 @@
           (ironclad:make-cipher :aes :mode :ctr :key (key result) :initialization-vector (iv result))))
   result)
 
-(defun encrypt-buffer (buffer stream &key cipher digest)
+
+(defun encrypt-from (stream &key
+                              (buffer (make-array (buffer-size) :element-type '(unsigned-byte 8)) buffer-p)
+                              (cipher nil cipher-p)
+                              (digest nil digest-p))
   "Encrypt bytes from STREAM with CIPHER into BUFFER updating DIGEST on encrypted contents."
-  (let ((bytes (read-sequence buffer stream)))
-    (ironclad:encrypt-in-place cipher buffer :start 0 :end bytes)
-    (ironclad:update-digest digest buffer :start 0 :end bytes)
+  (let* ((b (if  buffer-p
+                 buffer
+                 (make-array (buffer-size) :element-type '(unsigned-byte 8))))
+         (bytes (read-sequence buffer stream)))
+    (when cipher-p
+      (ironclad:encrypt-in-place cipher b :start 0 :end bytes))
+    (when digest-p
+      (ironclad:update-digest digest b :start 0 :end bytes))
     (values
      bytes
      ;;EOF 
-     (if (not (= bytes (length buffer)))
+     (if (not (= bytes (length b)))
          t
          nil)
-      buffer
+      b
       cipher
       digest)))
 
-(defun decrypt-buffer (buffer stream &key cipher digest)
-  "Decrypt bytes via CIPHER from STREAM into BUFFER updating DIGEST on unecrypted contents."
-  (let ((bytes (read-sequence buffer stream)))
-    (ironclad:decrypt-in-place cipher buffer :start 0 :end bytes)
-    (ironclad:update-digest digest buffer :start 0 :end bytes)
+(defun decrypt-from (stream &key
+                              (buffer (make-array (buffer-size) :element-type '(unsigned-byte 8)) buffer-p)
+                              (cipher nil cipher-p)
+                              (digest nil digest-p))
+  "Decrypt bytes via CIPHER from STREAM into BUFFER updating DIGEST on unencrypted contents."
+  (let* ((b (if  buffer-p
+                buffer
+                (make-array (buffer-size) :element-type '(unsigned-byte 8))))
+         (bytes (read-sequence b stream)))
+    (when cipher-p
+      (ironclad:decrypt-in-place cipher buffer :start 0 :end bytes))
+    (when digest-p
+      (ironclad:update-digest digest buffer :start 0 :end bytes))
     (values
      bytes
      ;; EOF
-     (if (not (= bytes (length buffer)))
+     (if (not (= bytes (length b)))
          t
          nil)
      buffer

@@ -2,7 +2,7 @@
 
 (defclass metadata ()
   ((version
-    :initform "2015111902"
+    :initform "2015121300"
     :accessor version
     :documentation "Version of blob metadata.")
    (prototype
@@ -38,7 +38,11 @@
     :documentation "Checksum of blob.")
    (nonce 
     :accessor nonce
-    :documentation "Nonce of block key.")))
+    :documentation "Nonce of block key.")
+   (encrypted
+    :initform t 
+    :accessor encrypted-p
+    :documentation "Whether the blob is in an encrypted state.")))
 
 (defmethod make-blob ((file pathname) blob-path)
   (with-open-file (input-stream file
@@ -72,7 +76,7 @@
          :with input-stream-eof-p = nil
          :until input-stream-eof-p
          :do (multiple-value-bind (bytes eof-p b c d)
-                 (encrypt-buffer buffer input-stream :cipher cipher :digest digest)
+                 (encrypt-from input-stream :buffer buffer :cipher cipher :digest digest)
                (declare (ignore b c d))
                (setf input-stream-eof-p eof-p)
                (incf total-shard-bytes bytes)
@@ -93,8 +97,7 @@
                      (cl-json:with-decoder-simple-clos-semantics (cl-json:decode-json stream))))
          (aes-ctr-key (make-instance 'aes-ctr-key :nonce (slot-value metadata 'nonce)))
          (cipher (cipher aes-ctr-key))
-         (buffer-size 8192)
-         (buffer (make-array buffer-size :element-type '(unsigned-byte 8))))
+         (buffer (make-array (buffer-size) :element-type '(unsigned-byte 8))))
     (with-open-file (shard (merge-pathnames "0" directory)
                            :direction :input
                            :element-type '(unsigned-byte 8))
@@ -104,7 +107,7 @@
           :with eof = nil
           :until eof
           :do (let ((bytes-read (read-sequence buffer shard)))
-                (when (not (= bytes-read buffer-size))
+                (when (not (= bytes-read (buffer-size)))
                   (setf eof t))
                 (ironclad:decrypt-in-place cipher buffer :start 0 :end bytes-read)
                 ;;; XXX one byte at a time? Optimize me!
@@ -114,11 +117,11 @@
        metadata
        cipher))))
 
-(defun make-blob/test (&key (directory (merge-pathnames "blob/" (uiop/stream:setup-temporary-directory))))
+(defun make-blob/test (&key (directory (make-new-directory)))
   "Create a test blob with random data returning the directory it was created within."
   (let ((metadata (make-instance 'metadata))
         (shard-size (random (expt 2 16)))
-        (blob-bytes 0))
+        (total-blob-bytes 0))
     (setf (size metadata) (* shard-size (shards metadata)))
     (ensure-directories-exist directory)
     (note "Creating test blob under '~a'." directory)
@@ -131,9 +134,11 @@
                                        :direction :input
                                        :element-type '(unsigned-byte 8))
                   (loop :for i :below shard-size
-                     :doing (write-byte (read-byte input) output) ;; XXX slow:  use {WRITE,READ}-SEQUENCE
-                     :doing (incf blob-bytes 1)))))
-    (setf (size metadata) blob-bytes)
+                     ;; XXX slow:  use {WRITE,READ}-SEQUENCE
+                     :doing (write-byte (read-byte input) output) 
+                     :doing (incf total-blob-bytes 1)))))
+    (setf (size metadata) blob-bytes
+          (encrypted-p metadata) nil)
     (with-open-file (index (merge-pathnames "index.json" directory)
                            :direction :output
                            :if-exists :supersede)

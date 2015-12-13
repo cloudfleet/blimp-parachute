@@ -1,7 +1,7 @@
 (in-package :chute.test)
 
-;;; on quoth/blimp
-(rt:deftest snapshot.blob.1
+;;; Working on blimp if BTRFS is present
+(rt:deftest blob.from-snapshop.1
     (let ((snapshots (btrfs-snapshots)))
       (unless snapshots
         (error "No snapshots to send."))
@@ -10,6 +10,19 @@
        #p"/var/tmp/blob/"))
   t)
 
+;;; lowlevel test of btrfs send snapshot to stream
+(rt:deftest btrfs.send-snapshot.1
+    ;;; assuming there is at least one snapshot
+    (let ((snapshots (btrfs-snapshots)))
+      (unless snapshots
+        (error "No snapshots to send."))
+      (let ((result (btrfs/send (first (btrfs-snapshots)))))
+        (and
+         (streamp result)
+         (equal (stream-element-type result) '(unsigned-byte 8)))))
+t)
+
+;;; create an encrypted blob locally from a file, then compare with original
 (rt:deftest blob.from-file.1
     (let* ((file #p"/etc/passwd")
            (blob-directory (make-blob file (make-new-directory)))
@@ -28,6 +41,7 @@
   t)
    
 ;;; Demonstrate that IRONCLAD AES block ciphers indeed retain state
+;;; TODO fix test so that it actually compares its values
 (rt:deftest aes.block-state.1
     (let ((cipher (get-cipher :aes))
           (cipher2 (get-cipher :aes))
@@ -57,16 +71,6 @@
           (chute.server:stop-server))))
   t)
 
-(rt:deftest btrfs.send-snapshot.1
-    ;;; assuming there is at least one snapshot
-    (let ((snapshots (btrfs-snapshots)))
-      (unless snapshots
-        (error "No snapshots to send."))
-      (let ((result (btrfs/send (first (btrfs-snapshots)))))
-        (and
-         (streamp result)
-         (equal (stream-element-type result) '(unsigned-byte 8)))))
-t)
 
 
 

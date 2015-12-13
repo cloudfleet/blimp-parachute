@@ -26,6 +26,8 @@
 (defparameter *blobs-directory*
   "/var/tmp/blobs/")
 
+(defun buffer-size () 8192)
+
 (defun ensure-sanity ()
   (unless (probe-file *snapshot-base*)
     (error "No directory to create snapshots at ~s." *snapshot-base*))

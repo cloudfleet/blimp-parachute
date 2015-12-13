@@ -38,14 +38,7 @@ owned by root.  Currently this is done once per node as part of
 installation when "setup/add-subvolume.bash" is executed.  It should
 be made part of the setup done by setting up the encrypted volumes.
 
-* Tasks (incomplete)
-** DONE make a hard link to btrfs, setuid
-   CLOSED: [2015-10-27 Tue 12:44]
-   - CLOSING NOTE [2015-10-27 Tue 12:44] \\
-     Done as setup/make-suid-btfs.bash
-
-** TODO parse id for PUT uri from POST
-* Transfer
+* REST API
 ** PUT n bytes in m windows
 
 Each chunk of a blob is adressed as a URI of the form:
@@ -56,15 +49,18 @@ Each chunk of a blob is adressed as a URI of the form:
 
 MIME type is "application/octet-stream".
 
-
 * Client platform arm32
 ** CCL 
 http://trac.clozure.com/ccl/wiki/PlatformNotes
 * Server platform x64
 ** SBCL
-sbcl-1.3.0 known to work
+sbcl-1.3.1 known to work
+* What is to be DONE
+** DONE make a hard link to btrfs, setuid
+   CLOSED: [2015-10-27 Tue 12:44]
+   - CLOSING NOTE [2015-10-27 Tue 12:44] \\
+     Done as setup/make-suid-btfs.bash
 
-* Bugs
 **  BTRFS/SEND
 *** DONE stdout/stderr mixing
     CLOSED: [2015-11-14 Sat 10:16]
@@ -106,15 +102,55 @@ setup
 Fortunately, CCL:RUN-PROGRAM takes an :ELEMENT-TYPE keyword which
 allows us to get octet streams out of the subprocesses.
 
+** TODO parse id for PUT uri from POST
 ** TODO Read key from key device
+Propsoal:  extract appropiate number of bytes from SHA256 of the LuKS key
 ** TODO Initialize nonce from random data
+Done.  But needs to be verified via a test.
 ** TODO Read domain from /opt/cloudfleet/data/config/blimp-vars.sh
 ** DONE MAKE-NEW-DIRECTORY 
    CLOSED: [2015-12-13 Sun 10:40]
    - CLOSING NOTE [2015-12-13 Sun 10:40] \\
      Use CL-FAD routines instead of ASDF.
 Fails until run from the REPL.  Unsure what this entails.
+** TODO Verify basic transfer
+(without byte ranges).
+
+The following needs to be implemented completely and tested:
+#+BEGIN_ASCII
+POST /blob/new
+  (index.json)                
+->>   x00 Resource created at URI
+
+
+GET /<URI>/index.json              
+->>   200 Original index.json
+
+
+PUT /<URI>/0    
+  (application/octet-bytes)
+->>   200 Ok
+
+
+GET /<URI>/0/hash/sha256 
+->>   x00 
+  (json SHA256 Hash)
+
+#+END_ASCII
+
+For Resumable transfers
+
+#+BEGIN_ASCII
+PUT /<URI>/0/<n-bytes>/<mth-window>
+->>   x00 
+
+
+GET /<URI>/0/<n-bytes>/<mth-window>/hash/sha256  
+->>   x00 
+  (json SHA256 Hash)
+#+END_ASCII
+
 * Colophon
         <mark@evenson.eu>
         Created: 01-OCT-2015
-        Revised: 23-NOV-2015
+        Revised: 13-DEC-2015
