@@ -33,6 +33,11 @@
      (ironclad:make-cipher :aes :mode :ctr
                            :key (make-array 32 :element-type '(unsigned-byte 8))
                            :initialization-vector (make-array 16 :element-type '(unsigned-byte 8))))
+    ((eq type :aes)
+     (ironclad:make-cipher :aes :mode :cfb
+                           :key (make-array 32 :element-type '(unsigned-byte 8))
+                           :initialization-vector (make-array 16 :element-type '(unsigned-byte 8))))
+     
      ((find type '(:salsa20 :salsa))
       (ironclad:make-cipher :salsa20 :mode :stream
                             :key (make-array 32 :element-type '(unsigned-byte 8))
