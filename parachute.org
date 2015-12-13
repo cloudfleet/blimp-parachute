@@ -109,6 +109,11 @@ allows us to get octet streams out of the subprocesses.
 ** TODO Read key from key device
 ** TODO Initialize nonce from random data
 ** TODO Read domain from /opt/cloudfleet/data/config/blimp-vars.sh
+** DONE MAKE-NEW-DIRECTORY 
+   CLOSED: [2015-12-13 Sun 10:40]
+   - CLOSING NOTE [2015-12-13 Sun 10:40] \\
+     Use CL-FAD routines instead of ASDF.
+Fails until run from the REPL.  Unsure what this entails.
 * Colophon
         <mark@evenson.eu>
         Created: 01-OCT-2015

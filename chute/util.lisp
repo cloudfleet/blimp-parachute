@@ -12,19 +12,15 @@
              (setf previous-char-was-slash-p (eq c #\/))
              (write-char c result)))
     (get-output-stream-string result)))
-       
 
 (defun make-new-directory ()
   (ensure-directories-exist *blobs-directory*)
-  (let* ((directory
-          #+ccl
-           (subseq *blobs-directory* 0 (1- (length *blobs-directory*)))
-           #-ccl *blobs-directory*)
-          (file (uiop/stream::get-temporary-file :prefix "blob" :directory directory)))
-    (delete-file file)
-    (ensure-directories-exist
-     (pathname (concatenate 'string (namestring file) "/")))))
-
+  (let* ((directory-as-file (pathname (cl-fad:open-temporary
+                                       :template (namestring (merge-pathnames "blob-%" *blobs-directory*)))))
+         (directory-with-file (pathname (namestring (concatenate 'string (namestring directory-as-file) "/foo")))))
+    (delete-file directory-as-file)
+    (ensure-directories-exist directory-with-file)
+    (pathname (concatenate 'string (namestring directory-as-file) "/"))))
 
        
        
