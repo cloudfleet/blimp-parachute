@@ -50,41 +50,41 @@
   (make-blob (btrfs/send snapshot-path) blob-path))
 
 (defmethod make-blob ((input-stream stream) blob-path)
-  (ensure-directories-exist blob-path)
-  (let* ((shard-bytes 0)
+  "Read from INPUT-STREAM with output at BLOB-PATH"
+  (ensure-directories-exist blob-path) ;; XXX should be done elsewhere, but I guess it can't hurt.
+  (let* ((total-shard-bytes 0)
          (metadata (make-instance 'metadata))
            ;;; TODO: initialize with AES key and random nonce
          (aes-ctr-key (get-key)) 
          (cipher (cipher aes-ctr-key))
-         (buffer-size 8192)
          (digest (ironclad:make-digest :sha256))
+         (buffer-size 8192)
          (buffer (make-array buffer-size :element-type '(unsigned-byte 8))))
           ;;; TODO: how do we know the total size of the snapshot
           ;;; until we read all the bytes?  Until we figure this out
           ;;; we cannot shard without two passes through all the data
           ;;; serialize metadata containing key
-    (with-open-file (shard (merge-pathnames "0" blob-path)
-                           :direction :output
-                           :if-exists :supersede 
-                           :element-type '(unsigned-byte 8))
+    (with-open-file (output-stream (merge-pathnames "0" blob-path)
+                                  :direction :output
+                                  :if-exists :supersede 
+                                  :element-type '(unsigned-byte 8))
       (loop
-         :with eof = nil
-         :until eof
-         :do (let ((bytes-read (read-sequence buffer input-stream :start 0 :end buffer-size)))
-               (when (not (= bytes-read buffer-size))
-                 (setf eof t))
-               (incf shard-bytes bytes-read)
-               (ironclad:encrypt-in-place cipher buffer :start 0 :end bytes-read)
-               (ironclad:update-digest digest buffer :start 0 :end bytes-read)
-               (write-sequence buffer shard :start 0 :end bytes-read)))
-    (setf (size metadata) shard-bytes
-          (nonce metadata) (nonce aes-ctr-key)
-          (checksum metadata) (ironclad:byte-array-to-hex-string
-                               (ironclad:produce-digest digest)))
-    (with-open-file (stream (merge-pathnames "index.json" blob-path) :direction :output
-                            :if-exists :supersede)
-      (cl-json:encode-json metadata stream))
-    (values blob-path metadata))))
+         :with input-stream-eof-p = nil
+         :until input-stream-eof-p
+         :do (multiple-value-bind (bytes eof-p b c d)
+                 (encrypt-buffer buffer input-stream :cipher cipher :digest digest)
+               (declare (ignore b c d))
+               (setf input-stream-eof-p eof-p)
+               (incf total-shard-bytes bytes)
+               (write-sequence buffer output-stream :start 0 :end bytes)))
+      (setf (size metadata) total-shard-bytes
+            (nonce metadata) (nonce aes-ctr-key)
+            (checksum metadata) (ironclad:byte-array-to-hex-string
+                                 (ironclad:produce-digest digest)))
+      (with-open-file (stream (merge-pathnames "index.json" blob-path) :direction :output
+                              :if-exists :supersede)
+        (cl-json:encode-json metadata stream))
+      (values blob-path metadata))))
 
 ;;; XXX this will read the ENTIRE BLOB into memory before returning a result
 (defun decrypt-blob-as-octets (directory)
@@ -98,17 +98,17 @@
     (with-open-file (shard (merge-pathnames "0" directory)
                            :direction :input
                            :element-type '(unsigned-byte 8))
-      (values 
+      (values
        (loop
           :with result = (make-array 0 :element-type '(unsigned-byte 8) :fill-pointer t :adjustable t)
           :with eof = nil
           :until eof
-          :do (let ((bytes-read (read-sequence buffer shard :start 0 :end buffer-size)))
+          :do (let ((bytes-read (read-sequence buffer shard)))
                 (when (not (= bytes-read buffer-size))
                   (setf eof t))
                 (ironclad:decrypt-in-place cipher buffer :start 0 :end bytes-read)
                 ;;; XXX one byte at a time? Optimize me!
-                (loop :for i :upto bytes-read
+                (loop :for i :below bytes-read
                    :doing (vector-push-extend (aref buffer i) result)))
           :finally (return result))
        metadata

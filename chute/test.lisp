@@ -1,5 +1,4 @@
 (in-package :chute.test)
-;;;; "doodles" of various tests
 
 ;;; on quoth/blimp
 (rt:deftest snapshot.blob.1
@@ -15,18 +14,18 @@
     (let* ((file #p"/etc/passwd")
            (blob-directory (make-blob file (make-new-directory)))
            (octets (decrypt-blob-as-octets blob-directory)))
-      (values
-       (flexi-streams:octets-to-string octets)
-       (with-open-file (stream file :direction :input :element-type '(unsigned-byte 8))
-         (loop
-            :for n :upfrom 0
-            :with byte = (read-byte stream)
-            :unless (= byte (aref octets n))
-            :return (progn (note "Mismatch at byte ~a between ~a and blob in ~a."
-                                 n file blob-directory)
-                           nil)
-            :finally (return t)))))
-  t t)
+      (with-open-file (stream file :direction :input :element-type '(unsigned-byte 8))
+        (loop
+           :for n :from 0
+           :with byte 
+           :do (setf byte (read-byte stream nil))
+           :when (null byte) ;; EOF
+           :return t
+           :unless (= byte (elt octets n))
+           :return (progn (note "Mismatch at byte ~a between ~a and blob in ~a.~&Decrypted octets:~%~a~%Original octets:~%~a~%"
+                                n file blob-directory octets (flexi-streams:octets-to-string octets))
+                          nil))))
+  t)
    
 ;;; Demonstrate that IRONCLAD AES block ciphers indeed retain state
 (rt:deftest aes.block-state.1

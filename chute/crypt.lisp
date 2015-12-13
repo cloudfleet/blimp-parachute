@@ -81,5 +81,33 @@
           (ironclad:make-cipher :aes :mode :ctr :key (key result) :initialization-vector (iv result))))
   result)
 
+(defun encrypt-buffer (buffer stream &key cipher digest)
+  "Encrypt bytes from STREAM with CIPHER into BUFFER updating DIGEST on encrypted contents."
+  (let ((bytes (read-sequence buffer stream)))
+    (ironclad:encrypt-in-place cipher buffer :start 0 :end bytes)
+    (ironclad:update-digest digest buffer :start 0 :end bytes)
+    (values
+     bytes
+     ;;EOF 
+     (if (not (= bytes (length buffer)))
+         t
+         nil)
+      buffer
+      cipher
+      digest)))
 
-
+(defun decrypt-buffer (buffer stream &key cipher digest)
+  "Decrypt bytes via CIPHER from STREAM into BUFFER updating DIGEST on unecrypted contents."
+  (let ((bytes (read-sequence buffer stream)))
+    (ironclad:decrypt-in-place cipher buffer :start 0 :end bytes)
+    (ironclad:update-digest digest buffer :start 0 :end bytes)
+    (values
+     bytes
+     ;; EOF
+     (if (not (= bytes (length buffer)))
+         t
+         nil)
+     buffer
+     cipher
+     digest)))
+     
