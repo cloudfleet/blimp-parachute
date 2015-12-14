@@ -53,18 +53,18 @@ be made part of the setup done by setting up the encrypted volumes.
 ** Current proposed 'v1'
                 POST /chute/blob/
                 (index.json)                
-                ->>   201 Resource Created 
+                ->>   201 (???) Resource Created 
                 ("/new/uri/to/use")
 
 
                 GET /<URI>/index.json              
-                ->>   200 Original 
-                (index.json)
+                ->>   200 Original or 304 Not Modified
+                (index.json) or nil
 
 
                 PUT /<URI>/0    
                 (application/octet-bytes)
-                ->>   200 Ok
+                ->>   201 Ok
                 (json: "true" or "false")
 
                 GET /<URI>/0/hash/sha256 
@@ -146,23 +146,32 @@ Done.  But needs to be verified via a test.
      Use CL-FAD routines instead of ASDF.
 Fails until run from the REPL.  Unsure what this entails.
 ** TODO Verify basic transfer
-The following needs to be implemented completely and tested
+Basic transfer of backups needs to be implemented completely and
+tested:
+
+*** REST Transfer Implementation
+Initial mplementation completed.  Mocks in place for many other
+systems.
+
+*** Tests of transfer integrity
 
 
-CHUTE.TEST::TRANSFER.BLOB.1  Transfrom a given file into a blob
+**** CHUTE.TEST::TRANSFER.BLOB.1  
+Transform a given file into a blob
 
-CHUTE.TEST::TRANSFER.BLOB.2
+**** CHUTE.TEST::TRANSFER.BLOB.2  
 
+Use results of BTRFS/SEND into a blob 
 
-
+** TODO Future interface for subaddressing components of a blob
 For resumable transfers
 
 #+BEGIN_ASCII
-PUT /<URI>/0/<n-bytes>/<mth-window>
+PUT /<URI>/0/<window-bytes>/<nth-window>
 ->>   x00 
 
 
-GET /<URI>/0/<n-bytes>/<mth-window>/hash/sha256  
+GET /<URI>/0/<window-bytes>/<nth-window>/hash/sha256  
 ->>   x00 
   (json SHA256 Hash)
 #+END_ASCII
@@ -173,4 +182,4 @@ Use HTTP 'Byte-range' header to files attached via mmap()
 * Colophon
         <mark@evenson.eu>
         Created: 01-OCT-2015
-        Revised: 13-DEC-2015
+        Revised: 15-DEC-2015

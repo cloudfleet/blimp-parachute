@@ -33,7 +33,10 @@ Table of Contents
 .. 5.6 TODO Read domain from /opt/cloudfleet/data/config/blimp-vars.sh
 .. 5.7 DONE MAKE-NEW-DIRECTORY
 .. 5.8 TODO Verify basic transfer
-.. 5.9 (at first without byte ranges).
+..... 5.8.1 REST Transfer Implementation
+..... 5.8.2 Tests of transfer integrity
+.. 5.9 TODO Future interface for subaddressing components of a blob
+.. 5.10 (at first without byte ranges).
 6 Colophon
 
 
@@ -112,14 +115,15 @@ Table of Contents
 2.1 Current proposed 'v1'
 ─────────────────────────
 
-  POST /chute/blob/ (index.json) ->> 201 Resource Created
+  POST /chute/blob/ (index.json) ->> 201 (???) Resource Created
   ("/new/uri/to/use")
 
 
-  GET /<URI>/index.json ->> 200 Original (index.json)
+  GET /<URI>/index.json ->> 200 Original or 304 Not Modified
+  (index.json) or nil
 
 
-  PUT /<URI>/0 (application/octet-bytes) ->> 200 Ok (json: "true" or
+  PUT /<URI>/0 (application/octet-bytes) ->> 201 Ok (json: "true" or
   "false")
 
   GET /<URI>/0/hash/sha256 ->> 200 (json SHA256 Hash)
@@ -243,28 +247,46 @@ Table of Contents
 5.8 TODO Verify basic transfer
 ──────────────────────────────
 
-  The following needs to be implemented completely and tested
+  Basic transfer of backups needs to be implemented completely and
+  tested:
 
 
-  CHUTE.TEST::TRANSFER.BLOB.1 Transfrom a given file into a blob
+5.8.1 REST Transfer Implementation
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
 
-  CHUTE.TEST::TRANSFER.BLOB.2
+  Initial mplementation completed.  Mocks in place for many other
+  systems.
 
 
+5.8.2 Tests of transfer integrity
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+
+◊ 5.8.2.1 CHUTE.TEST::TRANSFER.BLOB.1
+
+  Transform a given file into a blob
+
+
+◊ 5.8.2.2 CHUTE.TEST::TRANSFER.BLOB.2
+
+  Use results of BTRFS/SEND into a blob
+
+
+5.9 TODO Future interface for subaddressing components of a blob
+────────────────────────────────────────────────────────────────
 
   For resumable transfers
 
-  PUT /<URI>/0/<n-bytes>/<mth-window>
+  PUT /<URI>/0/<window-bytes>/<nth-window>
   ->>   x00 
 
 
-  GET /<URI>/0/<n-bytes>/<mth-window>/hash/sha256  
+  GET /<URI>/0/<window-bytes>/<nth-window>/hash/sha256  
   ->>   x00 
     (json SHA256 Hash)
 
 
-5.9 (at first without byte ranges).
-───────────────────────────────────
+5.10 (at first without byte ranges).
+────────────────────────────────────
 
   Use HTTP 'Byte-range' header to files attached via mmap()
 
@@ -272,4 +294,4 @@ Table of Contents
 6 Colophon
 ══════════
 
-  <mark@evenson.eu> Created: 01-OCT-2015 Revised: 13-DEC-2015
+  <mark@evenson.eu> Created: 01-OCT-2015 Revised: 15-DEC-2015
