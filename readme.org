@@ -2,9 +2,9 @@
 * Installation
 
   Running 
-
-      bash -x setup/install-parachute.bash
-
+#+BEGIN_SRC sh
+bash -x setup/install-parachute.bash
+#+END_SRC
   with the appropiate permissions should enable all the following
   subclauses to be met.
 ** Place chute.asd in ASDF3 system registry
@@ -172,15 +172,12 @@ Use results of BTRFS/SEND into a blob
 ** TODO Future interface for subaddressing components of a blob
 For resumable transfers
 
-#+BEGIN_ASCII
-PUT /<URI>/0/<window-bytes>/<nth-window>
-->>   x00 
+                PUT /<URI>/0/<window-bytes>/<nth-window>
+                ->>   20x [345]00 
 
-
-GET /<URI>/0/<window-bytes>/<nth-window>/hash/sha256  
-->>   x00 
-  (json SHA256 Hash)
-#+END_ASCII
+                GET /<URI>/0/<window-bytes>/<nth-window>/hash/sha256  
+                ->>   20x [345]xx (does 314 make sense?)
+                  (json SHA256 Hash)
 
 ** (at first without byte ranges).
 Use HTTP 'Byte-range' header to files attached via mmap() 

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>readme</title>
-<!-- 2015-12-14 Mon 14:11 -->
+<!-- 2015-12-14 Mon 14:14 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Mark Evenson" />
@@ -204,11 +204,11 @@ for the JavaScript code in this tag.
 <p>
 Running 
 </p>
+<div class="org-src-container">
 
-<p>
-bash -x setup/install-parachute.bash
-</p>
-
+<pre class="src src-sh">bash -x setup/install-parachute.bash
+</pre>
+</div>
 <p>
 with the appropiate permissions should enable all the following
 subclauses to be met.
@@ -525,6 +525,17 @@ Use results of BTRFS/SEND into a blob
 <p>
 For resumable transfers
 </p>
+
+<p>
+PUT /&lt;URI&gt;/0/&lt;window-bytes&gt;/&lt;nth-window&gt;
+-&gt;&gt;   20x <sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>00 
+</p>
+
+<p>
+GET /&lt;URI&gt;/0/&lt;window-bytes&gt;/&lt;nth-window&gt;/hash/sha256  
+-&gt;&gt;   20x <sup><a id="fnr.1.100" name="fnr.1.100" class="footref" href="#fn.1">1</a></sup>xx (does 314 make sense?)
+  (json SHA256 Hash)
+</p>
 </div>
 </div>
 
@@ -548,10 +559,18 @@ Revised: 15-DEC-2015
 </p>
 </div>
 </div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p>DEFINITION NOT FOUND.</p></div>
+
+
 </div>
+</div></div>
 <div id="postamble" class="status">
 <p class="author">Author: Mark Evenson</p>
-<p class="date">Created: 2015-12-14 Mon 14:11</p>
+<p class="date">Created: 2015-12-14 Mon 14:14</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.5.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>

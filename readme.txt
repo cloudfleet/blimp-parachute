@@ -47,9 +47,9 @@ Table of Contents
 ══════════════
 
   Running
-
-  bash -x setup/install-parachute.bash
-
+  ┌────
+  │ bash -x setup/install-parachute.bash
+  └────
   with the appropiate permissions should enable all the following
   subclauses to be met.
 
@@ -283,13 +283,10 @@ Table of Contents
 
   For resumable transfers
 
-  PUT /<URI>/0/<window-bytes>/<nth-window>
-  ->>   x00 
+  PUT /<URI>/0/<window-bytes>/<nth-window> ->> 20x [1]00
 
-
-  GET /<URI>/0/<window-bytes>/<nth-window>/hash/sha256  
-  ->>   x00 
-    (json SHA256 Hash)
+  GET /<URI>/0/<window-bytes>/<nth-window>/hash/sha256 ->> 20x [1]xx
+  (does 314 make sense?)  (json SHA256 Hash)
 
 
 5.10 (at first without byte ranges).
@@ -302,3 +299,10 @@ Table of Contents
 ══════════
 
   <mark@evenson.eu> Created: 01-OCT-2015 Revised: 15-DEC-2015
+
+
+
+Footnotes
+─────────
+
+[1] DEFINITION NOT FOUND.
