@@ -14,9 +14,10 @@ Table of Contents
 .. 1.2 Loading from ASDF
 .. 1.3 Testing from ASDF
 .. 1.4 Loading Quicklisp dependencies
-.. 1.5 TODO BTRFS volume must have ".snapshot/" directory
+.. 1.5 DONE BTRFS volume must have ".snapshot/" directory
 2 REST API
-.. 2.1 PUT n bytes in m windows
+.. 2.1 Current proposed 'v1'
+.. 2.2 PUT n bytes in m windows
 3 Client platform arm32
 .. 3.1 CCL
 4 Server platform x64
@@ -87,9 +88,12 @@ Table of Contents
   └────
 
 
-1.5 TODO BTRFS volume must have ".snapshot/" directory
+1.5 DONE BTRFS volume must have ".snapshot/" directory
 ──────────────────────────────────────────────────────
 
+  • CLOSING NOTE [2015-12-14 Mon 13:55]
+         Should have been completed in the setup procedure.  File issue
+    if found to be otherwise.
   The CHUTE:SNAPSHOT command will create snapshots under a the specified
   volume (by default "/opt/cloudfleet/data") in a sub-directory named
   ".snapshot/", i.e. for the default in
@@ -104,14 +108,30 @@ Table of Contents
 2 REST API
 ══════════
 
-2.1 PUT n bytes in m windows
+2.1 Current proposed 'v1'
+─────────────────────────
+
+  POST /chute/blob/ (index.json) ->> 201 Resource Created
+  ("/new/uri/to/use")
+
+
+  GET /<URI>/index.json ->> 200 Original (index.json)
+
+
+  PUT /<URI>/0 (application/octet-bytes) ->> 200 Ok (json: "true" or
+  "false")
+
+  GET /<URI>/0/hash/sha256 ->> 200 (json SHA256 Hash)
+
+
+2.2 PUT n bytes in m windows
 ────────────────────────────
 
   Each chunk of a blob is adressed as a URI of the form:
 
-  ┌────
-  │ .../<timestamp>/<hash>/<n-bytes>/<mth-window>
-  └────
+
+  …/<timestamp>/<hash>/<n-bytes>/<mth-window>
+
 
   MIME type is "application/octet-stream".
 
@@ -227,25 +247,6 @@ Table of Contents
   The following needs to be implemented completely and tested:
 
 
-  POST /chute/blob/
-    (index.json)                
-  ->>   201 Resource Created 
-    ("/new/uri/to/use")
-
-
-  GET /<URI>/index.json              
-  ->>   200 Original 
-    (index.json)
-
-
-  PUT /<URI>/0    
-    (application/octet-bytes)
-  ->>   200 Ok
-    (json: "true" or "false")
-
-  GET /<URI>/0/hash/sha256 
-  ->>   200 
-    (json SHA256 Hash)
 
   For resumable transfers
 

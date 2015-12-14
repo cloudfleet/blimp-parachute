@@ -34,7 +34,11 @@
        (asdf:find-system :chute) "quicklisp-setup"))
 #+END_SRC    
 
-** TODO BTRFS volume must have ".snapshot/" directory
+** DONE BTRFS volume must have ".snapshot/" directory
+   CLOSED: [2015-12-14 Mon 13:55]
+   - CLOSING NOTE [2015-12-14 Mon 13:55] \\
+     Should have been completed in the setup procedure.  File issue if
+     found to be otherwise.
 The CHUTE:SNAPSHOT command will create snapshots under a the specified
 volume (by default "/opt/cloudfleet/data") in a sub-directory named
 ".snapshot/", i.e. for the default in
@@ -46,13 +50,34 @@ installation when "setup/add-subvolume.bash" is executed.  It should
 be made part of the setup done by setting up the encrypted volumes.
 
 * REST API
+** Current proposed 'v1'
+                POST /chute/blob/
+                (index.json)                
+                ->>   201 Resource Created 
+                ("/new/uri/to/use")
+
+
+                GET /<URI>/index.json              
+                ->>   200 Original 
+                (index.json)
+
+
+                PUT /<URI>/0    
+                (application/octet-bytes)
+                ->>   200 Ok
+                (json: "true" or "false")
+
+                GET /<URI>/0/hash/sha256 
+                ->>   200 
+                (json SHA256 Hash)
+
 ** PUT n bytes in m windows
 
 Each chunk of a blob is adressed as a URI of the form:
 
-#+BEGIN_SRC
+
     .../<timestamp>/<hash>/<n-bytes>/<mth-window>
-#+END_SRC
+
 
 MIME type is "application/octet-stream".
 
@@ -127,25 +152,6 @@ The following needs to be implemented completely and tested:
 
 #+BEGIN_ASCII
 
-POST /chute/blob/
-  (index.json)                
-->>   201 Resource Created 
-  ("/new/uri/to/use")
-
-
-GET /<URI>/index.json              
-->>   200 Original 
-  (index.json)
-
-
-PUT /<URI>/0    
-  (application/octet-bytes)
-->>   200 Ok
-  (json: "true" or "false")
-
-GET /<URI>/0/hash/sha256 
-->>   200 
-  (json SHA256 Hash)
 
 #+END_ASCII
 
