@@ -41,6 +41,14 @@ Table of Contents
 1 Installation
 ══════════════
 
+  Running
+
+  bash -x setup/install-parachute.bash
+
+  with the appropiate permissions should enable all the following
+  subclauses to be met.
+
+
 1.1 Place chute.asd in ASDF3 system registry
 ────────────────────────────────────────────
 

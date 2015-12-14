@@ -1,5 +1,12 @@
 #+TITLE Parachute: a zero knowledge backup system
 * Installation
+
+  Running 
+
+      bash -x setup/install-parachute.bash
+
+  with the appropiate permissions should enable all the following
+  subclauses to be met.
 ** Place chute.asd in ASDF3 system registry
 #+BEGIN_SRC
     mkdir -p ~/.config/common-lisp/source-registry.conf.d/
