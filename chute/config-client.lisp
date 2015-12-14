@@ -5,8 +5,12 @@
 (defun serialize-mocked-p () t)
 
 (defparameter *path*
+  "/mnt/b/opt/cloudfleet/data-backup/.xx/"
+  #+nil
   "/opt/cloudfleet/data")
 (defparameter *snapshot-base*
+  "/mnt/b/opt/cloudfleet/data-backup/.xx/"
+  #+nil
   "/opt/cloudfleet/data/.snapshot/")
 (defparameter *btrfs-command*
   (asdf:system-relative-pathname :chute "../setup/btrfs"))
