@@ -33,6 +33,7 @@ Table of Contents
 .. 5.6 TODO Read domain from /opt/cloudfleet/data/config/blimp-vars.sh
 .. 5.7 DONE MAKE-NEW-DIRECTORY
 .. 5.8 TODO Verify basic transfer
+.. 5.9 (at first without byte ranges).
 6 Colophon
 
 
@@ -242,9 +243,12 @@ Table of Contents
 5.8 TODO Verify basic transfer
 ──────────────────────────────
 
-  (without byte ranges).
+  The following needs to be implemented completely and tested
 
-  The following needs to be implemented completely and tested:
+
+  CHUTE.TEST::TRANSFER.BLOB.1 Transfrom a given file into a blob
+
+  CHUTE.TEST::TRANSFER.BLOB.2
 
 
 
@@ -257,6 +261,12 @@ Table of Contents
   GET /<URI>/0/<n-bytes>/<mth-window>/hash/sha256  
   ->>   x00 
     (json SHA256 Hash)
+
+
+5.9 (at first without byte ranges).
+───────────────────────────────────
+
+  Use HTTP 'Byte-range' header to files attached via mmap()
 
 
 6 Colophon

@@ -146,14 +146,14 @@ Done.  But needs to be verified via a test.
      Use CL-FAD routines instead of ASDF.
 Fails until run from the REPL.  Unsure what this entails.
 ** TODO Verify basic transfer
-(without byte ranges).
-
-The following needs to be implemented completely and tested:
-
-#+BEGIN_ASCII
+The following needs to be implemented completely and tested
 
 
-#+END_ASCII
+CHUTE.TEST::TRANSFER.BLOB.1  Transfrom a given file into a blob
+
+CHUTE.TEST::TRANSFER.BLOB.2
+
+
 
 For resumable transfers
 
@@ -166,6 +166,9 @@ GET /<URI>/0/<n-bytes>/<mth-window>/hash/sha256
 ->>   x00 
   (json SHA256 Hash)
 #+END_ASCII
+
+** (at first without byte ranges).
+Use HTTP 'Byte-range' header to files attached via mmap() 
 
 * Colophon
         <mark@evenson.eu>
