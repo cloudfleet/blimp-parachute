@@ -73,7 +73,7 @@
             (loop :for byte :across octets ;; XXX inefficient one byte reads
                :doing (write-byte byte output)))))
     (setf (hunchentoot:content-type*) "application/json"
-          (return-code*) hunchentoot:+http-ok+)
+          (return-code*) 201)
     "true")) ;; return true when we actually can verify that a write occurred
 
 (defmethod ensure-blob-path ((metadata chute:metadata))

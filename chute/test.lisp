@@ -69,7 +69,7 @@ t)
                  (multiple-value-list
                   (transfer-blob directory))))
             ;;; TODO add other checks for successful transfer
-            (= (second results) 200))
+            (= (second results) 201))
         (unless already-running-server-p
           (chute.server:stop-server))))
   t)
