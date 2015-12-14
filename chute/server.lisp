@@ -29,7 +29,7 @@
     (otherwise
      (format nil "Unimplemented method ~a." (hunchentoot:request-method*)))))
 
-(defparameter *last-metadata* nil) ;; DEBUG
+(defparameter *debug-blob-post* nil) ;; DEBUG
 (defun receive-blob-post (uri)
   ;;; TODO check that the uri is "/blob"
   (note "Raw post data: ~a" (raw-post-data :force-text t))
@@ -38,21 +38,25 @@
          (relative-local-path (ensure-blob-path metadata))
          (local-path
           (ensure-directories-exist   ;; Create output directory
-           (merge-pathnames relative-local-path *blob-storage-directory*))))
-    (setf *last-metadata* metadata)
-    (note "Metadata: ~a." metadata)
-
+           (merge-pathnames (hunchentoot:url-decode relative-local-path) *blob-storage-directory*))))
+    (setf *debug-blob-post* (list uri metadata relative-local-path local-path))
+    (note "Blob post metadata: ~a." metadata)
     (with-open-file (file
                      (merge-pathnames "index.json" local-path)
                      :direction :output
                      :if-exists :supersede) ;; XXX
       (format file (raw-post-data :force-text t)))
     (setf (hunchentoot:content-type*) "text/plain")
-    (format nil "~a/~a" uri local-path)))
+    relative-local-path))
 
+(defvar *debug-post-request* nil)
 (defun receive-blob-put (uri &key (as-stream-p nil))
+  (setf *debug-post-request* hunchentoot:*request*)
   (note "Processing PUT for '~a'" uri)
   (let ((output-path (ensure-blob-path uri)))
+    (when (null output-path)
+      (setf (return-code*) hunchentoot:+http-bad-request+)
+      (hunchentoot:abort-request-handler))
     (note "Writing output to ~a" output-path)
     (ensure-directories-exist output-path)
     (if as-stream-p
@@ -68,19 +72,31 @@
                                   :element-type '(unsigned-byte 8))
             (loop :for byte :across octets ;; XXX inefficient one byte reads
                :doing (write-byte byte output)))))
-    (setf (hunchentoot:content-type*) "text/plain")
-    "false")) ;; return true when we actually can verify that a write occurred
+    (setf (hunchentoot:content-type*) "application/json"
+          (return-code*) hunchentoot:+http-ok+)
+    "true")) ;; return true when we actually can verify that a write occurred
 
 (defmethod ensure-blob-path ((metadata chute:metadata))
   (chute:strip-double-slash (format nil "~a/~a/~a/~a/"
                                     (chute::domain metadata)
-                                    (chute::node metadata)
+                                    (hunchentoot:url-encode (chute::node metadata))
                                     (chute::mount metadata)
                                     (chute::timestamp metadata))))
 
 (defmethod ensure-blob-path ((uri string))
-  (warn "Unimplemented check of permission and hygiene for blob uri.")
-  (merge-pathnames "unknown/0" *blob-storage-directory*))
+  "Return the path for which a blob should be stored according to URI."
+  (when (search ".." uri)
+    (note "Relative component in uri '~a' rejected." uri)
+    (return-from ensure-blob-path nil))
+  (when (let ((result (search *blob-uri-path* uri)))
+          (not (and result
+                    (= result 0))))
+    (note "Uri '~a' does not start with '~a'" uri chute:*blob-uri-path*)
+    (return-from ensure-blob-path nil))
+  (warn "Unimplemented full check of local permission and hygiene for blob uri.")
+  (merge-pathnames
+   (subseq uri (length *blob-uri-path*))
+   *blob-storage-directory*))
 
 (defparameter *server* nil)
 
@@ -95,7 +111,7 @@
     (warn "Stopping already present acceptor.")
     (stop *server*)
     (setf *server* nil))
-  (setf *server* (make-instance 'http-acceptor :port 2001))
+  (setf *server* (make-instance 'http-acceptor :port *port*))
   (start *server*))
 
 (defun stop-server ()

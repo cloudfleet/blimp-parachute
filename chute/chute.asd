@@ -21,7 +21,8 @@
                rt)
   :components ((:module package :pathname ""
                         :serial t :components
-                        ((:file "package")))
+                        ((:file "package")
+                         (:file "config-client")))
                (:module crypt :pathname ""
                         :depends-on (source)
                         :serial t :components
@@ -29,8 +30,7 @@
                (:module source :pathname ""
                         :depends-on (package)
                         :serial t :components
-                        ((:file "config-client")
-                         (:file "util")
+                        ((:file "util")
                          (:file "btrfs")
                          (:file "note")
                          (:file "blob")

@@ -65,8 +65,11 @@ t)
       (unless already-running-server-p
         (chute.server:start-server))
       (prog1
-          (multiple-value-list
-           (transfer-blob directory))
+          (let ((results
+                 (multiple-value-list
+                  (transfer-blob directory))))
+            ;;; TODO add other checks for successful transfer
+            (= (second results) 200))
         (unless already-running-server-p
           (chute.server:stop-server))))
   t)

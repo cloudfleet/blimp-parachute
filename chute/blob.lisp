@@ -137,7 +137,7 @@
                      ;; XXX slow:  use {WRITE,READ}-SEQUENCE
                      :doing (write-byte (read-byte input) output) 
                      :doing (incf total-blob-bytes 1)))))
-    (setf (size metadata) blob-bytes
+    (setf (size metadata) total-blob-bytes
           (encrypted-p metadata) nil)
     (with-open-file (index (merge-pathnames "index.json" directory)
                            :direction :output

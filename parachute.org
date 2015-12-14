@@ -117,28 +117,32 @@ Fails until run from the REPL.  Unsure what this entails.
 (without byte ranges).
 
 The following needs to be implemented completely and tested:
+
 #+BEGIN_ASCII
-POST /blob/new
+
+POST /chute/blob/
   (index.json)                
-->>   x00 Resource created at URI
+->>   201 Resource Created 
+  ("/new/uri/to/use")
 
 
 GET /<URI>/index.json              
-->>   200 Original index.json
+->>   200 Original 
+  (index.json)
 
 
 PUT /<URI>/0    
   (application/octet-bytes)
 ->>   200 Ok
-
+  (json: "true" or "false")
 
 GET /<URI>/0/hash/sha256 
-->>   x00 
+->>   200 
   (json SHA256 Hash)
 
 #+END_ASCII
 
-For Resumable transfers
+For resumable transfers
 
 #+BEGIN_ASCII
 PUT /<URI>/0/<n-bytes>/<mth-window>

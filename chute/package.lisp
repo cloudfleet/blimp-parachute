@@ -20,6 +20,8 @@
 
    #:*blob-storage-dir*
 
+   #:*blob-uri-path* #:*port*
+
    #:encrypt
 
    #:strip-double-slash
@@ -34,7 +36,10 @@
 
 (defpackage :chute.server
   (:use :cl :hunchentoot)
-  (:import-from #:chute #:note)
+  (:import-from #:chute
+                #:note
+                #:*port*
+                #:*blob-uri-path*)
   (:export
    #:running-server-p
    #:start-server #:stop-server #:restart-server))

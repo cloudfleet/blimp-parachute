@@ -14,11 +14,12 @@
   "/opt/cloudfleet/data/shared/chute/")
 (defparameter *random-device*
   "/dev/urandom") ;; "/dev/random" will block
-;; REST Server bast
-(defparameter *uri-base*
-  "http://127.0.0.1:2001/chute/blob/" ;; TEST URI
-  #+nil
-  "http://slack.net/")
+;; REST
+(defparameter *scheme* "http")
+(defparameter *host* "127.0.0.1")
+(defparameter *port* 2001)
+(defparameter *blob-uri-path* "/chute/blob/")
+
 ;; SERVER
 (defparameter *blob-storage-dir*
   (merge-pathnames "blob/storage/" (user-homedir-pathname)))
@@ -27,6 +28,12 @@
   "/var/tmp/blobs/")
 
 (defun buffer-size () 8192)
+
+(defun uri-authority ()
+  (format nil "~a:~a" *host* *port*))
+
+(defun uri-base ()
+  (format nil "~a://~a~a" *scheme* (uri-authority) *blob-uri-path*))
 
 (defun ensure-sanity ()
   (unless (probe-file *snapshot-base*)
