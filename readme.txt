@@ -27,7 +27,7 @@ Table of Contents
 .. 5.2 BTRFS/SEND
 ..... 5.2.1 DONE stdout/stderr mixing
 ..... 5.2.2 DONE Use octet streams
-.. 5.3 TODO parse id for PUT uri from POST
+.. 5.3 DONE parse id for PUT uri from POST
 .. 5.4 TODO Read key from key device
 .. 5.5 TODO Initialize nonce from random data
 .. 5.6 TODO Read domain from /opt/cloudfleet/data/config/blimp-vars.sh
@@ -215,8 +215,12 @@ Table of Contents
   allows us to get octet streams out of the subprocesses.
 
 
-5.3 TODO parse id for PUT uri from POST
+5.3 DONE parse id for PUT uri from POST
 ───────────────────────────────────────
+
+  • CLOSING NOTE [2015-12-14 Mon 14:09]
+         Finished with proper implementation of POST followed by
+    subsequent PUTs to the unspecified sub-uri namespace.
 
 
 5.4 TODO Read key from key device
@@ -234,6 +238,9 @@ Table of Contents
 
 5.6 TODO Read domain from /opt/cloudfleet/data/config/blimp-vars.sh
 ───────────────────────────────────────────────────────────────────
+
+  Best implementation: exec a bash process then read its environment
+  table
 
 
 5.7 DONE MAKE-NEW-DIRECTORY

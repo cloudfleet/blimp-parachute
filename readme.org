@@ -134,12 +134,18 @@ setup
 Fortunately, CCL:RUN-PROGRAM takes an :ELEMENT-TYPE keyword which
 allows us to get octet streams out of the subprocesses.
 
-** TODO parse id for PUT uri from POST
+** DONE parse id for PUT uri from POST
+   CLOSED: [2015-12-14 Mon 14:09]
+   - CLOSING NOTE [2015-12-14 Mon 14:09] \\
+     Finished with proper implementation of POST followed by subsequent
+     PUTs to the unspecified sub-uri namespace.
 ** TODO Read key from key device
 Propsoal:  extract appropiate number of bytes from SHA256 of the LuKS key
 ** TODO Initialize nonce from random data
 Done.  But needs to be verified via a test.
 ** TODO Read domain from /opt/cloudfleet/data/config/blimp-vars.sh
+
+Best implementation:  exec a bash process then read its environment table
 ** DONE MAKE-NEW-DIRECTORY 
    CLOSED: [2015-12-13 Sun 10:40]
    - CLOSING NOTE [2015-12-13 Sun 10:40] \\
