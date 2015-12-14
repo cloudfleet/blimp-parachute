@@ -13,15 +13,16 @@ if [ -O btrfs ]; then
     exit 1
 fi
 
-BTFS=/sbin/btrfs
+BTRFS=/sbin/btrfs
 
-if [ -x "$BTRFS" ]; then
+if [ ! -x "$BTRFS" ]; then
     echo no btrfs executable found at "$BTRFS".  Install btrfs-tools under Linux.
     exit 1
 fi
 
 target="$PWD/btrfs"
+ln_type="-s"
 
-ln "$BTRFS" "$target"  && chmod u+s "$target" && echo Created setuid at "$target" && exit 0
+ln "$ln_type" "$BTRFS" "$target"  && chmod u+s "$target" && echo Created setuid at "$target" && exit 0
 
 
