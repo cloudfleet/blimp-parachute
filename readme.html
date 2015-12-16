@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>readme</title>
-<!-- 2015-12-14 Mon 14:14 -->
+<!-- 2015-12-16 Wed 13:07 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Mark Evenson" />
@@ -148,13 +148,12 @@ for the JavaScript code in this tag.
 <li><a href="#sec-1-2">1.2. Loading from ASDF</a></li>
 <li><a href="#sec-1-3">1.3. Testing from ASDF</a></li>
 <li><a href="#sec-1-4">1.4. Loading Quicklisp dependencies</a></li>
-<li><a href="#sec-1-5">1.5. <span class="done DONE">DONE</span> BTRFS volume must have ".snapshot/" directory</a></li>
 </ul>
 </li>
 <li><a href="#sec-2">2. REST API</a>
 <ul>
-<li><a href="#sec-2-1">2.1. Current proposed 'v1'</a></li>
-<li><a href="#sec-2-2">2.2. PUT n bytes in m windows</a></li>
+<li><a href="#sec-2-1">2.1. Current version 'v1'</a></li>
+<li><a href="#sec-2-2">2.2. Basic transfer of opaque binary data</a></li>
 </ul>
 </li>
 <li><a href="#sec-3">3. Client platform arm32</a>
@@ -169,26 +168,27 @@ for the JavaScript code in this tag.
 </li>
 <li><a href="#sec-5">5. What is to be DONE</a>
 <ul>
-<li><a href="#sec-5-1">5.1. <span class="done DONE">DONE</span> make a hard link to btrfs, setuid</a></li>
-<li><a href="#sec-5-2">5.2. BTRFS/SEND</a>
+<li><a href="#sec-5-1">5.1. <span class="done DONE">DONE</span> BTRFS volume must have ".snapshot/" directory</a></li>
+<li><a href="#sec-5-2">5.2. <span class="done DONE">DONE</span> make a hard link to btrfs, setuid</a></li>
+<li><a href="#sec-5-3">5.3. BTRFS/SEND</a>
 <ul>
-<li><a href="#sec-5-2-1">5.2.1. <span class="done DONE">DONE</span> stdout/stderr mixing</a></li>
-<li><a href="#sec-5-2-2">5.2.2. <span class="done DONE">DONE</span> Use octet streams</a></li>
+<li><a href="#sec-5-3-1">5.3.1. <span class="done DONE">DONE</span> stdout/stderr mixing</a></li>
+<li><a href="#sec-5-3-2">5.3.2. <span class="done DONE">DONE</span> Use octet streams</a></li>
 </ul>
 </li>
-<li><a href="#sec-5-3">5.3. <span class="done DONE">DONE</span> parse id for PUT uri from POST</a></li>
-<li><a href="#sec-5-4">5.4. <span class="todo TODO">TODO</span> Read key from key device</a></li>
-<li><a href="#sec-5-5">5.5. <span class="todo TODO">TODO</span> Initialize nonce from random data</a></li>
-<li><a href="#sec-5-6">5.6. <span class="todo TODO">TODO</span> Read domain from /opt/cloudfleet/data/config/blimp-vars.sh</a></li>
-<li><a href="#sec-5-7">5.7. <span class="done DONE">DONE</span> MAKE-NEW-DIRECTORY</a></li>
-<li><a href="#sec-5-8">5.8. <span class="todo TODO">TODO</span> Verify basic transfer</a>
+<li><a href="#sec-5-4">5.4. <span class="done DONE">DONE</span> parse id for PUT uri from POST</a></li>
+<li><a href="#sec-5-5">5.5. <span class="todo TODO">TODO</span> Read key from key device</a></li>
+<li><a href="#sec-5-6">5.6. <span class="todo TODO">TODO</span> Initialize nonce from random data</a></li>
+<li><a href="#sec-5-7">5.7. <span class="todo TODO">TODO</span> Read domain from /opt/cloudfleet/data/config/blimp-vars.sh</a></li>
+<li><a href="#sec-5-8">5.8. <span class="done DONE">DONE</span> MAKE-NEW-DIRECTORY</a></li>
+<li><a href="#sec-5-9">5.9. <span class="todo TODO">TODO</span> Verify basic transfer</a>
 <ul>
-<li><a href="#sec-5-8-1">5.8.1. REST Transfer Implementation</a></li>
-<li><a href="#sec-5-8-2">5.8.2. Tests of transfer integrity</a></li>
+<li><a href="#sec-5-9-1">5.9.1. REST Transfer Implementation</a></li>
+<li><a href="#sec-5-9-2">5.9.2. Tests of transfer integrity</a></li>
 </ul>
 </li>
-<li><a href="#sec-5-9">5.9. <span class="todo TODO">TODO</span> Future interface for subaddressing components of a blob</a></li>
-<li><a href="#sec-5-10">5.10. (at first without byte ranges).</a></li>
+<li><a href="#sec-5-10">5.10. <span class="todo TODO">TODO</span> Future interface for subaddressing components of a blob</a></li>
+<li><a href="#sec-5-11">5.11. (at first without byte ranges).</a></li>
 </ul>
 </li>
 <li><a href="#sec-6">6. Colophon</a></li>
@@ -206,7 +206,7 @@ Running
 </p>
 <div class="org-src-container">
 
-<pre class="src src-sh">bash -x setup/install-parachute.bash
+<pre class="src src-sh" id="Basic-installation-of-parachute-in-one-command">bash -x setup/install-parachute.bash
 </pre>
 </div>
 <p>
@@ -217,7 +217,7 @@ subclauses to be met.
 <div id="outline-container-sec-1-1" class="outline-3">
 <h3 id="sec-1-1"><span class="section-number-3">1.1</span> Place chute.asd in ASDF3 system registry</h3>
 <div class="outline-text-3" id="text-1-1">
-<pre class="example">
+<pre class="example" id="Configuration-of-ASDF3-system-registry-to-find-blimp-parachute">
 mkdir -p ~/.config/common-lisp/source-registry.conf.d/
 cp chute.conf ~/.config/common-lisp/source-registry.conf.d/
 </pre>
@@ -255,84 +255,66 @@ wget https://beta.quicklisp.org/quicklisp.lisp
 </pre>
 </div>
 </div>
+</div>
 
-<div id="outline-container-sec-1-5" class="outline-3">
-<h3 id="sec-1-5"><span class="section-number-3">1.5</span> <span class="done DONE">DONE</span> BTRFS volume must have ".snapshot/" directory</h3>
-<div class="outline-text-3" id="text-1-5">
-<ul class="org-ul">
-<li>CLOSING NOTE <span class="timestamp-wrapper"><span class="timestamp">[2015-12-14 Mon 13:55]</span></span> <br  />
-     Should have been completed in the setup procedure.  File issue if
-found to be otherwise.
-</li>
-</ul>
-<p>
-The CHUTE:SNAPSHOT command will create snapshots under a the specified
-volume (by default "<i>opt/cloudfleet/data") in a sub-directory named
-".snapshot</i>", i.e. for the default in
-"<i>opt/cloudfleet/data</i>.snapshot/&lt;TIMESTAMP&gt;".
-</p>
-
-<p>
-Therefore, the "<i>opt/cloudfleet/data</i>.snapshot/" must exist and be
-owned by root.  Currently this is done once per node as part of
-installation when "setup/add-subvolume.bash" is executed.  It should
-be made part of the setup done by setting up the encrypted volumes.
-</p>
-</div>
-</div>
-</div>
 
 <div id="outline-container-sec-2" class="outline-2">
 <h2 id="sec-2"><span class="section-number-2">2</span> REST API</h2>
 <div class="outline-text-2" id="text-2">
 </div><div id="outline-container-sec-2-1" class="outline-3">
-<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Current proposed 'v1'</h3>
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Current version 'v1'</h3>
 <div class="outline-text-3" id="text-2-1">
-<p>
-POST <i>chute/blob</i>
+<pre class="example" id="Fundamental-Chute-REST-API">
+POST /chute/blob/
 (index.json)                
--&gt;&gt;   201 (???) Resource Created 
+-&gt;&gt;   201 Resource Created or [45]xx Error
 ("/new/uri/to/use")
-</p>
 
 
-<p>
 GET /&lt;URI&gt;/index.json              
--&gt;&gt;   200 Original or 304 Not Modified
+nil
+-&gt;&gt;   200 Original or 304 Not Modified or [45]xx Error
 (index.json) or nil
-</p>
 
 
-<p>
 PUT /&lt;URI&gt;/0    
 (application/octet-bytes)
 -&gt;&gt;   201 Ok
-(json: "true" or "false")
-</p>
+(json) "true" or "false" 
 
-<p>
 GET /&lt;URI&gt;/0/hash/sha256 
 -&gt;&gt;   200 
-(json SHA256 Hash)
+(json) SHA256 Hash
+</pre>
+
+<p>
+Authentication to be handled via HTTP Headers submitted to
+```spire.marina.io``` API.
 </p>
 </div>
 </div>
 
 <div id="outline-container-sec-2-2" class="outline-3">
-<h3 id="sec-2-2"><span class="section-number-3">2.2</span> PUT n bytes in m windows</h3>
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Basic transfer of opaque binary data</h3>
 <div class="outline-text-3" id="text-2-2">
+<p>
+PUT with 'Byte-range' headers n bytes in m windows.  Use timing of
+previous sessions to dynamically expand/contract number of bytes in
+each PUT request.
+</p>
+
 <p>
 Each chunk of a blob is adressed as a URI of the form:
 </p>
 
 
 <p>
-&#x2026;/&lt;timestamp&gt;/&lt;hash&gt;/&lt;n-bytes&gt;/&lt;mth-window&gt;
+&#x2026;/&lt;domain&gt;/&lt;node&gt;/&lt;mount-path&gt;/&lt;timestamp&gt;/&lt;n-byte-chunks&gt;/&lt;mth-chunk&gt;
 </p>
 
 
 <p>
-MIME type is "application/octet-stream".
+MIME type for PUT content is "application/octet-stream".
 </p>
 </div>
 </div>
@@ -366,8 +348,33 @@ sbcl-1.3.1 known to work
 <h2 id="sec-5"><span class="section-number-2">5</span> What is to be DONE</h2>
 <div class="outline-text-2" id="text-5">
 </div><div id="outline-container-sec-5-1" class="outline-3">
-<h3 id="sec-5-1"><span class="section-number-3">5.1</span> <span class="done DONE">DONE</span> make a hard link to btrfs, setuid</h3>
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> <span class="done DONE">DONE</span> BTRFS volume must have ".snapshot/" directory</h3>
 <div class="outline-text-3" id="text-5-1">
+<ul class="org-ul">
+<li>CLOSING NOTE <span class="timestamp-wrapper"><span class="timestamp">[2015-12-14 Mon 13:55]</span></span> <br  />
+     Should have been completed in the setup procedure.  File issue if
+found to be otherwise.
+</li>
+</ul>
+<p>
+The CHUTE:SNAPSHOT command will create snapshots under a the specified
+volume (by default "<i>opt/cloudfleet/data") in a sub-directory named
+".snapshot</i>", i.e. for the default in
+"<i>opt/cloudfleet/data</i>.snapshot/&lt;TIMESTAMP&gt;".
+</p>
+
+<p>
+Therefore, the "<i>opt/cloudfleet/data</i>.snapshot/" must exist and be
+owned by root.  Currently this is done once per node as part of
+installation when "setup/add-subvolume.bash" is executed.  It should
+be made part of the setup done by setting up the encrypted volumes.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> <span class="done DONE">DONE</span> make a hard link to btrfs, setuid</h3>
+<div class="outline-text-3" id="text-5-2">
 <ul class="org-ul">
 <li>CLOSING NOTE <span class="timestamp-wrapper"><span class="timestamp">[2015-10-27 Tue 12:44]</span></span> <br  />
      Done as setup/make-suid-btfs.bash
@@ -376,12 +383,12 @@ sbcl-1.3.1 known to work
 </div>
 </div>
 
-<div id="outline-container-sec-5-2" class="outline-3">
-<h3 id="sec-5-2"><span class="section-number-3">5.2</span> BTRFS/SEND</h3>
-<div class="outline-text-3" id="text-5-2">
-</div><div id="outline-container-sec-5-2-1" class="outline-4">
-<h4 id="sec-5-2-1"><span class="section-number-4">5.2.1</span> <span class="done DONE">DONE</span> stdout/stderr mixing</h4>
-<div class="outline-text-4" id="text-5-2-1">
+<div id="outline-container-sec-5-3" class="outline-3">
+<h3 id="sec-5-3"><span class="section-number-3">5.3</span> BTRFS/SEND</h3>
+<div class="outline-text-3" id="text-5-3">
+</div><div id="outline-container-sec-5-3-1" class="outline-4">
+<h4 id="sec-5-3-1"><span class="section-number-4">5.3.1</span> <span class="done DONE">DONE</span> stdout/stderr mixing</h4>
+<div class="outline-text-4" id="text-5-3-1">
 <ul class="org-ul">
 <li>CLOSING NOTE <span class="timestamp-wrapper"><span class="timestamp">[2015-11-14 Sat 10:16]</span></span> <br  />
       Fixed by specifying separate error/output arguments to CCL:RUN-PROGAM
@@ -394,9 +401,9 @@ SBCL/CCL returning different starts of output stream.  CCL contains
 </div>
 </div>
 
-<div id="outline-container-sec-5-2-2" class="outline-4">
-<h4 id="sec-5-2-2"><span class="section-number-4">5.2.2</span> <span class="done DONE">DONE</span> Use octet streams</h4>
-<div class="outline-text-4" id="text-5-2-2">
+<div id="outline-container-sec-5-3-2" class="outline-4">
+<h4 id="sec-5-3-2"><span class="section-number-4">5.3.2</span> <span class="done DONE">DONE</span> Use octet streams</h4>
+<div class="outline-text-4" id="text-5-3-2">
 <ul class="org-ul">
 <li>CLOSING NOTE <span class="timestamp-wrapper"><span class="timestamp">[2015-11-19 Thu 10:47]</span></span> <br  />
       Resolved by use of octets streams directly on MAKE-BLOB
@@ -433,9 +440,9 @@ allows us to get octet streams out of the subprocesses.
 </div>
 </div>
 
-<div id="outline-container-sec-5-3" class="outline-3">
-<h3 id="sec-5-3"><span class="section-number-3">5.3</span> <span class="done DONE">DONE</span> parse id for PUT uri from POST</h3>
-<div class="outline-text-3" id="text-5-3">
+<div id="outline-container-sec-5-4" class="outline-3">
+<h3 id="sec-5-4"><span class="section-number-3">5.4</span> <span class="done DONE">DONE</span> parse id for PUT uri from POST</h3>
+<div class="outline-text-3" id="text-5-4">
 <ul class="org-ul">
 <li>CLOSING NOTE <span class="timestamp-wrapper"><span class="timestamp">[2015-12-14 Mon 14:09]</span></span> <br  />
      Finished with proper implementation of POST followed by subsequent
@@ -444,33 +451,33 @@ PUTs to the unspecified sub-uri namespace.
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-5-4" class="outline-3">
-<h3 id="sec-5-4"><span class="section-number-3">5.4</span> <span class="todo TODO">TODO</span> Read key from key device</h3>
-<div class="outline-text-3" id="text-5-4">
+<div id="outline-container-sec-5-5" class="outline-3">
+<h3 id="sec-5-5"><span class="section-number-3">5.5</span> <span class="todo TODO">TODO</span> Read key from key device</h3>
+<div class="outline-text-3" id="text-5-5">
 <p>
 Propsoal:  extract appropiate number of bytes from SHA256 of the LuKS key
 </p>
 </div>
 </div>
-<div id="outline-container-sec-5-5" class="outline-3">
-<h3 id="sec-5-5"><span class="section-number-3">5.5</span> <span class="todo TODO">TODO</span> Initialize nonce from random data</h3>
-<div class="outline-text-3" id="text-5-5">
+<div id="outline-container-sec-5-6" class="outline-3">
+<h3 id="sec-5-6"><span class="section-number-3">5.6</span> <span class="todo TODO">TODO</span> Initialize nonce from random data</h3>
+<div class="outline-text-3" id="text-5-6">
 <p>
 Done.  But needs to be verified via a test.
 </p>
 </div>
 </div>
-<div id="outline-container-sec-5-6" class="outline-3">
-<h3 id="sec-5-6"><span class="section-number-3">5.6</span> <span class="todo TODO">TODO</span> Read domain from /opt/cloudfleet/data/config/blimp-vars.sh</h3>
-<div class="outline-text-3" id="text-5-6">
+<div id="outline-container-sec-5-7" class="outline-3">
+<h3 id="sec-5-7"><span class="section-number-3">5.7</span> <span class="todo TODO">TODO</span> Read domain from /opt/cloudfleet/data/config/blimp-vars.sh</h3>
+<div class="outline-text-3" id="text-5-7">
 <p>
 Best implementation:  exec a bash process then read its environment table
 </p>
 </div>
 </div>
-<div id="outline-container-sec-5-7" class="outline-3">
-<h3 id="sec-5-7"><span class="section-number-3">5.7</span> <span class="done DONE">DONE</span> MAKE-NEW-DIRECTORY</h3>
-<div class="outline-text-3" id="text-5-7">
+<div id="outline-container-sec-5-8" class="outline-3">
+<h3 id="sec-5-8"><span class="section-number-3">5.8</span> <span class="done DONE">DONE</span> MAKE-NEW-DIRECTORY</h3>
+<div class="outline-text-3" id="text-5-8">
 <ul class="org-ul">
 <li>CLOSING NOTE <span class="timestamp-wrapper"><span class="timestamp">[2015-12-13 Sun 10:40]</span></span> <br  />
      Use CL-FAD routines instead of ASDF.
@@ -481,18 +488,18 @@ Fails until run from the REPL.  Unsure what this entails.
 </p>
 </div>
 </div>
-<div id="outline-container-sec-5-8" class="outline-3">
-<h3 id="sec-5-8"><span class="section-number-3">5.8</span> <span class="todo TODO">TODO</span> Verify basic transfer</h3>
-<div class="outline-text-3" id="text-5-8">
+<div id="outline-container-sec-5-9" class="outline-3">
+<h3 id="sec-5-9"><span class="section-number-3">5.9</span> <span class="todo TODO">TODO</span> Verify basic transfer</h3>
+<div class="outline-text-3" id="text-5-9">
 <p>
 Basic transfer of backups needs to be implemented completely and
 tested:
 </p>
 </div>
 
-<div id="outline-container-sec-5-8-1" class="outline-4">
-<h4 id="sec-5-8-1"><span class="section-number-4">5.8.1</span> REST Transfer Implementation</h4>
-<div class="outline-text-4" id="text-5-8-1">
+<div id="outline-container-sec-5-9-1" class="outline-4">
+<h4 id="sec-5-9-1"><span class="section-number-4">5.9.1</span> REST Transfer Implementation</h4>
+<div class="outline-text-4" id="text-5-9-1">
 <p>
 Initial mplementation completed.  Mocks in place for many other
 systems.
@@ -500,17 +507,17 @@ systems.
 </div>
 </div>
 
-<div id="outline-container-sec-5-8-2" class="outline-4">
-<h4 id="sec-5-8-2"><span class="section-number-4">5.8.2</span> Tests of transfer integrity</h4>
-<div class="outline-text-4" id="text-5-8-2">
-</div><ol class="org-ol"><li><a id="sec-5-8-2-1" name="sec-5-8-2-1"></a>CHUTE.TEST::TRANSFER.BLOB.1<br  /><div class="outline-text-5" id="text-5-8-2-1">
+<div id="outline-container-sec-5-9-2" class="outline-4">
+<h4 id="sec-5-9-2"><span class="section-number-4">5.9.2</span> Tests of transfer integrity</h4>
+<div class="outline-text-4" id="text-5-9-2">
+</div><ol class="org-ol"><li><a id="sec-5-9-2-1" name="sec-5-9-2-1"></a>CHUTE.TEST::TRANSFER.BLOB.1<br  /><div class="outline-text-5" id="text-5-9-2-1">
 <p>
 Transform a given file into a blob
 </p>
 </div>
 </li>
 
-<li><a id="sec-5-8-2-2" name="sec-5-8-2-2"></a>CHUTE.TEST::TRANSFER.BLOB.2<br  /><div class="outline-text-5" id="text-5-8-2-2">
+<li><a id="sec-5-9-2-2" name="sec-5-9-2-2"></a>CHUTE.TEST::TRANSFER.BLOB.2<br  /><div class="outline-text-5" id="text-5-9-2-2">
 <p>
 Use results of BTRFS/SEND into a blob 
 </p>
@@ -519,31 +526,30 @@ Use results of BTRFS/SEND into a blob
 </div>
 </div>
 
-<div id="outline-container-sec-5-9" class="outline-3">
-<h3 id="sec-5-9"><span class="section-number-3">5.9</span> <span class="todo TODO">TODO</span> Future interface for subaddressing components of a blob</h3>
-<div class="outline-text-3" id="text-5-9">
+<div id="outline-container-sec-5-10" class="outline-3">
+<h3 id="sec-5-10"><span class="section-number-3">5.10</span> <span class="todo TODO">TODO</span> Future interface for subaddressing components of a blob</h3>
+<div class="outline-text-3" id="text-5-10">
 <p>
 For resumable transfers
 </p>
 
-<p>
-PUT /&lt;URI&gt;/0/&lt;window-bytes&gt;/&lt;nth-window&gt;
--&gt;&gt;   20x <sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>00 
-</p>
+<pre class="example" id="REST-for-resumable-transfers">
+PUT /&lt;URI&gt;/0/&lt;chunk-bytes&gt;/&lt;nth-chunk&gt;
+-&gt;&gt;   201 on success or [345]00 
+  (json) "true" or "false"
 
-<p>
-GET /&lt;URI&gt;/0/&lt;window-bytes&gt;/&lt;nth-window&gt;/hash/sha256  
--&gt;&gt;   20x <sup><a id="fnr.1.100" name="fnr.1.100" class="footref" href="#fn.1">1</a></sup>xx (does 314 make sense?)
-  (json SHA256 Hash)
-</p>
+GET /&lt;URI&gt;/0/&lt;chunk-bytes&gt;/&lt;nth-chunk&gt;/hash/sha256  
+-&gt;&gt;   20x [345]xx (does 314 make sense?)
+  (json) SHA256 Hash
+</pre>
 </div>
 </div>
 
-<div id="outline-container-sec-5-10" class="outline-3">
-<h3 id="sec-5-10"><span class="section-number-3">5.10</span> (at first without byte ranges).</h3>
-<div class="outline-text-3" id="text-5-10">
+<div id="outline-container-sec-5-11" class="outline-3">
+<h3 id="sec-5-11"><span class="section-number-3">5.11</span> (at first without byte ranges).</h3>
+<div class="outline-text-3" id="text-5-11">
 <p>
-Use HTTP 'Byte-range' header to files attached via mmap() 
+Implementation use HTTP 'Byte-range' header to files attached/detatched via mmap().
 </p>
 </div>
 </div>
@@ -552,25 +558,12 @@ Use HTTP 'Byte-range' header to files attached via mmap()
 <div id="outline-container-sec-6" class="outline-2">
 <h2 id="sec-6"><span class="section-number-2">6</span> Colophon</h2>
 <div class="outline-text-2" id="text-6">
-<p>
-&lt;mark@evenson.eu&gt;
-Created: 01-OCT-2015
-Revised: 15-DEC-2015
-</p>
 </div>
 </div>
-<div id="footnotes">
-<h2 class="footnotes">Footnotes: </h2>
-<div id="text-footnotes">
-
-<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p>DEFINITION NOT FOUND.</p></div>
-
-
 </div>
-</div></div>
 <div id="postamble" class="status">
 <p class="author">Author: Mark Evenson</p>
-<p class="date">Created: 2015-12-14 Mon 14:14</p>
+<p class="date">Created: 2015-12-16 Wed 13:07</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.5.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>

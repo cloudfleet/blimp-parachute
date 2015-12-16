@@ -2,12 +2,14 @@
 * Installation
 
   Running 
+#+NAME:  Basic installation of parachute in one command
 #+BEGIN_SRC sh
 bash -x setup/install-parachute.bash
 #+END_SRC
   with the appropiate permissions should enable all the following
   subclauses to be met.
 ** Place chute.asd in ASDF3 system registry
+#+NAME: Configuration of ASDF3 system registry to find blimp-parachute
 #+BEGIN_SRC
     mkdir -p ~/.config/common-lisp/source-registry.conf.d/
     cp chute.conf ~/.config/common-lisp/source-registry.conf.d/
@@ -34,6 +36,57 @@ bash -x setup/install-parachute.bash
        (asdf:find-system :chute) "quicklisp-setup"))
 #+END_SRC    
 
+
+* REST API
+** Current version 'v1'
+#+NAME: Fundamental Chute REST API
+#+BEGIN_SRC
+                POST /chute/blob/
+                (index.json)                
+                ->>   201 Resource Created or [45]xx Error
+                ("/new/uri/to/use")
+
+
+                GET /<URI>/index.json              
+                nil
+                ->>   200 Original or 304 Not Modified or [45]xx Error
+                (index.json) or nil
+
+
+                PUT /<URI>/0    
+                (application/octet-bytes)
+                ->>   201 Ok
+                (json) "true" or "false" 
+
+                GET /<URI>/0/hash/sha256 
+                ->>   200 
+                (json) SHA256 Hash
+#+END_SRC
+
+Authentication to be handled via HTTP Headers submitted to
+```spire.marina.io``` API.
+
+** Basic transfer of opaque binary data
+
+PUT with 'Byte-range' headers n bytes in m windows.  Use timing of
+previous sessions to dynamically expand/contract number of bytes in
+each PUT request.
+
+Each chunk of a blob is adressed as a URI of the form:
+
+
+    .../<domain>/<node>/<mount-path>/<timestamp>/<n-byte-chunks>/<mth-chunk>
+
+
+MIME type for PUT content is "application/octet-stream".
+
+* Client platform arm32
+** CCL 
+http://trac.clozure.com/ccl/wiki/PlatformNotes
+* Server platform x64
+** SBCL
+sbcl-1.3.1 known to work
+* What is to be DONE
 ** DONE BTRFS volume must have ".snapshot/" directory
    CLOSED: [2015-12-14 Mon 13:55]
    - CLOSING NOTE [2015-12-14 Mon 13:55] \\
@@ -49,45 +102,6 @@ owned by root.  Currently this is done once per node as part of
 installation when "setup/add-subvolume.bash" is executed.  It should
 be made part of the setup done by setting up the encrypted volumes.
 
-* REST API
-** Current proposed 'v1'
-                POST /chute/blob/
-                (index.json)                
-                ->>   201 (???) Resource Created 
-                ("/new/uri/to/use")
-
-
-                GET /<URI>/index.json              
-                ->>   200 Original or 304 Not Modified
-                (index.json) or nil
-
-
-                PUT /<URI>/0    
-                (application/octet-bytes)
-                ->>   201 Ok
-                (json: "true" or "false")
-
-                GET /<URI>/0/hash/sha256 
-                ->>   200 
-                (json SHA256 Hash)
-
-** PUT n bytes in m windows
-
-Each chunk of a blob is adressed as a URI of the form:
-
-
-    .../<timestamp>/<hash>/<n-bytes>/<mth-window>
-
-
-MIME type is "application/octet-stream".
-
-* Client platform arm32
-** CCL 
-http://trac.clozure.com/ccl/wiki/PlatformNotes
-* Server platform x64
-** SBCL
-sbcl-1.3.1 known to work
-* What is to be DONE
 ** DONE make a hard link to btrfs, setuid
    CLOSED: [2015-10-27 Tue 12:44]
    - CLOSING NOTE [2015-10-27 Tue 12:44] \\
@@ -172,17 +186,25 @@ Use results of BTRFS/SEND into a blob
 ** TODO Future interface for subaddressing components of a blob
 For resumable transfers
 
-                PUT /<URI>/0/<window-bytes>/<nth-window>
-                ->>   20x [345]00 
+#+NAME: REST for resumable transfers
+#+BEGIN_SRC
 
-                GET /<URI>/0/<window-bytes>/<nth-window>/hash/sha256  
+                PUT /<URI>/0/<chunk-bytes>/<nth-chunk>
+                ->>   201 on success or [345]00 
+                  (json) "true" or "false"
+
+                GET /<URI>/0/<chunk-bytes>/<nth-chunk>/hash/sha256  
                 ->>   20x [345]xx (does 314 make sense?)
-                  (json SHA256 Hash)
+                  (json) SHA256 Hash
+#+END_SRC
 
 ** (at first without byte ranges).
-Use HTTP 'Byte-range' header to files attached via mmap() 
+Implementation use HTTP 'Byte-range' header to files attached/detatched via mmap().
 
 * Colophon
+#+BEGIN_ASCII
         <mark@evenson.eu>
         Created: 01-OCT-2015
-        Revised: 15-DEC-2015
+        Revised: 16-DEC-2015
+#+END_ASCII
+
