@@ -8,11 +8,11 @@
    (prototype
     :initform '(("lispClass" ."metadata") ("lispPackage". "chute")))
    (node
-    :initform "urn:chute:node:0"
+    :initform (engineroom-node)
     :accessor node
     :documentation "Node creating this blob.")
    (domain
-    :initform "example.com"
+    :initform (engineroom-domain)
     :accessor domain
     :documentation "Domain creating this blob.")
    (mount

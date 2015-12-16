@@ -1,14 +1,18 @@
+#+abcl
+(dolist (require '(:abcl-contrib :quicklisp-abcl))
+  (require require))
+
 (require :asdf)
 (in-package :asdf)
 
 #| b0rked:  just load chute-quickload.lisp where possible
 (eval-when (:compile-toplevel :execute)
   (load (asdf:system-relative-pathname (asdf:find-system :chute)
-                                       "chute-quickload")))
+                                       "quicklisp-setup")))
 |#
 
 (defsystem :chute
-  :version "0.1.0.1"
+  :version "0.2.0.0"
   :perform (test-op (o c) (symbol-call :rt :do-tests))
   :depends-on (ironclad
                lparallel
@@ -22,7 +26,8 @@
   :components ((:module package :pathname ""
                         :serial t :components
                         ((:file "package")
-                         (:file "config-client")))
+                         (:file "config-client")
+                         (:file "engineroom")))
                (:module crypt :pathname ""
                         :depends-on (source)
                         :serial t :components
