@@ -1,0 +1,19 @@
+# -*- Mode: n3 -*-
+
+@prefix chute:           <https://chute.not.org#> .
+@prefix rdf:             <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+ 
+chute:blob rdfs:label "Data comes in blobs." .
+chute:metadata rdfs:label "Blobs have metadata." .
+chute:snapshot rdfs:label "Blobs can be created by snapshoting a world." .
+chute:transfer rdfs:label "Blobs can be transferred between peers." .
+
+# Implementation
+chute:guardian rdfs:label "Quis custodiet ipsos custodes?" .
+chute:contract rdfs:label "Blobs are stored under contracts." .
+
+# Architecture
+chute:mirrorworld rdfs:label "An ordered collection of blobs." .
+
+<> rdfs:seeAlso <https://github.com/cloudfleet/tree/master/blimp-parachute/model/chute.n3> .
