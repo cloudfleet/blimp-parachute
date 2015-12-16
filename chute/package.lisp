@@ -3,15 +3,15 @@
   (:export
    #:client
 
+   #:snapshot
+   #:transfer
+
    #:metadata
    #:timestamp #:shards #:size #:checksum
 
-   #:backup
-   #:note
-
    #:transfer-blob #:put-file 
 
-   #:snapshot
+   #:note
 
    #:make-blob #:make-blob/test
    #:decrypt-blob-as-octets
@@ -27,6 +27,8 @@
    #:strip-double-slash
 
    #:make-new-directory
+
+   #:aes-ctr ;; State of AES-CTR with 16 byte window index
 
    #:btrfs-snapshots
    #:btrfs/subvolume/snapshot

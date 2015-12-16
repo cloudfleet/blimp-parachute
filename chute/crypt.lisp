@@ -44,10 +44,10 @@
                             :initialization-vector (make-array 12 :element-type '(unsigned-byte 8)))))))
 
 (defun get-key ()
-  "Return an AES-CTR-KEY ready to be used."
+  "Return an AES-CTR ready to be used."
   ;;; TODO read in key from known location
   ;;; TODO use a random nonce
-  (make-instance 'aes-ctr-key :nonce #(2 0 0 0 0 0 0 1)))
+  (make-instance 'aes-ctr :nonce #(2 0 0 0 0 0 0 1)))
 
 ;;; XXX currently unused
 (defun %get-some-stream-octets (stream size) 
@@ -60,7 +60,7 @@
 
 (defclass key () nil)
 
-(defclass aes-ctr-key (key)
+(defclass aes-ctr (key)
   ((key :accessor key
         :type '((unsigned-byte 8) 32)
         :initform (make-array 32 :element-type '(unsigned-byte 8)))
@@ -71,7 +71,7 @@
    (cipher :accessor cipher)))
            
 
-(defmethod shared-initialize :after ((result aes-ctr-key) slot-names &key (nonce nil nonce-p))
+(defmethod shared-initialize :after ((result aes-ctr) slot-names &key (nonce nil nonce-p))
   (declare (ignore slot-names))
   (unless nonce-p
     (error "No nonce supplied for initialization."))

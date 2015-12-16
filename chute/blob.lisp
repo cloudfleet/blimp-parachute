@@ -59,8 +59,8 @@
   (let* ((total-shard-bytes 0)
          (metadata (make-instance 'metadata))
            ;;; TODO: initialize with AES key and random nonce
-         (aes-ctr-key (get-key)) 
-         (cipher (cipher aes-ctr-key))
+         (aes-ctr (get-key)) 
+         (cipher (cipher aes-ctr))
          (digest (ironclad:make-digest :sha256))
          (buffer-size 8192)
          (buffer (make-array buffer-size :element-type '(unsigned-byte 8))))
@@ -82,7 +82,7 @@
                (incf total-shard-bytes bytes)
                (write-sequence buffer output-stream :start 0 :end bytes)))
       (setf (size metadata) total-shard-bytes
-            (nonce metadata) (nonce aes-ctr-key)
+            (nonce metadata) (nonce aes-ctr)
             (checksum metadata) (ironclad:byte-array-to-hex-string
                                  (ironclad:produce-digest digest)))
       (with-open-file (stream (merge-pathnames "index.json" blob-path) :direction :output
@@ -95,8 +95,8 @@
   "Decrypt the blob in DIRECTORY as a stream of bytes."
   (let* ((metadata (with-open-file (stream (merge-pathnames "index.json" directory))
                      (cl-json:with-decoder-simple-clos-semantics (cl-json:decode-json stream))))
-         (aes-ctr-key (make-instance 'aes-ctr-key :nonce (slot-value metadata 'nonce)))
-         (cipher (cipher aes-ctr-key))
+         (aes-ctr (make-instance 'aes-ctr :nonce (slot-value metadata 'nonce)))
+         (cipher (cipher aes-ctr))
          (buffer (make-array (buffer-size) :element-type '(unsigned-byte 8))))
     (with-open-file (shard (merge-pathnames "0" directory)
                            :direction :input
