@@ -11,11 +11,11 @@
     ;;; TODO implement Guardian, resubmit snapshot and transfer tasks as necessary
     (values
      backup-channel
-     (lparallel:submit-task backup-channel
+     (lparallel:submit-task channel
                             #'snapshot) 
-     (lparallel:submit-task backup-channel
+     (lparallel:submit-task channel
                             #'transfer)
-     (lparallel:submit-task backup-channel
+     (lparallel:submit-task channel
                             (lambda () (sleep 360) (note "Slept for an hour.  Whatsup?"))))))
 
 
