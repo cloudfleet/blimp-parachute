@@ -27,21 +27,27 @@
   ;;; TODO: initialize cipher correctly
   (declare (keyword arg))
   (let ((type arg))
-  (cond
-    ((and (keywordp type)
-          (eq type :aes-ctr))
-     (ironclad:make-cipher :aes :mode :ctr
-                           :key (make-array 32 :element-type '(unsigned-byte 8))
-                           :initialization-vector (make-array 16 :element-type '(unsigned-byte 8))))
-    ((eq type :aes)
-     (ironclad:make-cipher :aes :mode :cfb
-                           :key (make-array 32 :element-type '(unsigned-byte 8))
-                           :initialization-vector (make-array 16 :element-type '(unsigned-byte 8))))
-     
-     ((find type '(:salsa20 :salsa))
-      (ironclad:make-cipher :salsa20 :mode :stream
-                            :key (make-array 32 :element-type '(unsigned-byte 8))
-                            :initialization-vector (make-array 12 :element-type '(unsigned-byte 8)))))))
+    (cond
+      ((and (keywordp type)
+            (eq type :aes-ctr))
+       (let ((key (or (engineroom-key)
+                      (make-array 32 :element-type '(unsigned-byte 8)))))
+         (ironclad:make-cipher :aes :mode :ctr
+                               :key key
+                               :initialization-vector
+                               (make-array 16 :element-type '(unsigned-byte 8)))))
+      ((eq type :aes)
+       (let ((key (or (engineroom-key)
+                      (make-array 32 :element-type '(unsigned-byte 8)))))
+         (ironclad:make-cipher :aes :mode :cfb
+                               :key key
+                               :initialization-vector
+                               (make-array 16 :element-type '(unsigned-byte 8)))))
+      ((find type '(:salsa20 :salsa))
+       (ironclad:make-cipher :salsa20 :mode :stream
+                             :key (make-array 32 :element-type '(unsigned-byte 8))
+                             :initialization-vector
+                             (make-array 12 :element-type '(unsigned-byte 8)))))))
 
 (defun get-key ()
   "Return an AES-CTR ready to be used."
@@ -63,7 +69,9 @@
 (defclass aes-ctr (key)
   ((key :accessor key
         :type '((unsigned-byte 8) 32)
-        :initform (make-array 32 :element-type '(unsigned-byte 8)))
+        :initform (or
+                   (engineroom-key)
+                   (make-array 32 :element-type '(unsigned-byte 8))))
    (nonce :accessor nonce
           :type '((unsigned-byte 8) 8))
    (initialization-vector :accessor iv
