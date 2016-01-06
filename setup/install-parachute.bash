@@ -23,7 +23,7 @@ config_arm(){
 
 config_not_arm(){
     ccl_uri=${ccl_x86_uri}
-    ccl_bin="lx86c64"
+    ccl_bin="lx86cl64"
     ccl="$CF_APPS/ccl/$ccl_bin"
 }
 
