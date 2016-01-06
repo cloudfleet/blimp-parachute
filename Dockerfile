@@ -2,9 +2,9 @@
 #
 # <http://docs.docker.com/engine/reference/builder/>
 
-LABEL "VERSION" "0.0.1"
-
 FROM debian
+
+LABEL "VERSION" "0.0.1"
 
 # Install dependencies
 RUN apt-get install -y screen wget btrfs-tools
