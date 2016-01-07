@@ -38,7 +38,7 @@ bash -x setup/install-parachute.bash
 
 * Building
 To build an image on arm32 with Docker installed:
-#+BEGIN_SRC 
+#+BEGIN_SRC sh
 
     bash make-arm32-dockerfile.bash 
     sudo docker build --file Dockerfile-arm32  . 
