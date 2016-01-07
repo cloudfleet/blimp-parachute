@@ -36,7 +36,14 @@ bash -x setup/install-parachute.bash
        (asdf:find-system :chute) "quicklisp-setup"))
 #+END_SRC    
 
+* Building
+To build an image on arm32 with Docker installed:
+#+BEGIN_SRC 
 
+    bash make-arm32-dockerfile.bash 
+    sudo docker build --file Dockerfile-arm32  . 
+
+#+END_SRC
 * REST API
 ** Current version 'v1'
 #+NAME: Fundamental Chute REST API
