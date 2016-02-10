@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# TODO
+#    Work out what happens on non-ARM
+
 set -x
 . "/opt/cloudfleet/apps/parachute/etc/cf-vars.sh" 
 if [[ -z "${CF}" ]]; then
@@ -46,6 +50,15 @@ fi
 
 mkdir -p $base
 
+test_ccl() {
+    ${CF_APPS}/ccl/armcl --no-init --eval '(quit)'
+}
+
+recompile_ccl () {
+    apt-get install -y make m4 binutils gcc
+    (cd ${CF_APPS}/ccl/lisp-kernel/linuxarm && make clean && make)
+}
+
 # Install CCL
 if [[ ! -z $ccl_uri ]]; then
     echo Installing CCL from _uri $ccl_uri
@@ -54,7 +67,15 @@ if [[ ! -z $ccl_uri ]]; then
     if [ ! -d "${CF_APPS}/ccl" ]; then
         (cd "${CF_APPS}" && tar xvzf "$tmp/$file")
     fi
-
+    test_ccl
+    if [[ $? -ne 0 ]]; then
+        recompile_ccl
+        test_ccl
+        if [[ $? -ne 0 ]]; then
+            echo "Failed to recompile CCL."
+            exit 1
+        fi
+    fi
 fi 
 
 # Download Quicklisp install shim
@@ -72,7 +93,6 @@ if [ ! -d $HOME/quicklisp ]; then
 fi
 
 $ccl --eval '(progn (require :asdf) (load (asdf:system-relative-pathname (asdf:find-system :chute) "quicklisp-setup.lisp")) (quit))'
-
 
 
 
