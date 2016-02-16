@@ -1,67 +1,62 @@
 #!/bin/bash
-#
-# TODO
-#    Work out what happens on non-ARM
 
 set -x
+
 . "/opt/cloudfleet/apps/parachute/etc/cf-vars.sh" 
 if [[ -z "${CF}" ]]; then
    echo "Failed to source configuration" && exit 1
 fi
 
-
 tmp=${CF_TMP}
 base=${CF_APPS}/parachute
 chute="$base/chute"
 
-ccl_arm_uri=ftp://ftp.clozure.com/pub/release/1.11/ccl-1.11-linuxarm.tar.gz
-ccl_x86_uri=ftp://ftp.clozure.com/pub/release/1.11/ccl-1.11-linuxx86.tar.gz
+ccl_uri_base=ftp://ftp.clozure.com/pub/release/1.11/
 
-ccl_uri=""
-
-config_arm(){
-    ccl_uri=${ccl_arm_uri}
-    ccl_bin="armcl"
-    ccl="$CF_APPS/ccl/$ccl_bin"
-}
-
-config_not_arm(){
-    ccl_uri=${ccl_x86_uri}
-    ccl_bin="lx86cl64"
-    ccl="$CF_APPS/ccl/$ccl_bin"
-}
-
-if hash dpkg 2>/dev/null; then # if dpkg available
-    if [ "`dpkg --print-architecture`" = "armhf" ]; then
-        echo Configuring for Linux ARM
-        config_arm
-    else
-        echo Configuring for Linux x64
-        config_not_arm
-    fi
-else
-    if [ $( uname -s ) =  "Darwin" ]; then
-        echo Configuring for OS X
-        ccl_uri=""
-        ccl_bin=ccl64
-        ccl=ccl64
-    fi
-fi
+case `uname -s` in
+    Darwin)
+        ccl_uri=${ccl_uri_base}/ccl-1.11-darwinx86.tar.gz
+        ;;
+    Linux)
+        case `uname -m` in
+            *86*)
+                ccl_uri=${ccl_uri_base}/ccl-1.11-linuxx86.tar.gz
+                ;;
+            *arm*)
+                ccl_uri=${ccl_uri_base}/ccl-1.11-linuxarm.tar.gz
+                ;;
+        esac
+        ;;
+    FreeBSD)
+        ccl_uri=${ccl_uri_base}/ccl-1.11-freebsdx86.tar.gz
+        ;;
+    *)
+        echo "Can't determine host OS."
+        exit 1
+        ;;
+esac
 
 mkdir -p $base
+export CCL_DEFAULT_DIRECTORY=${CF_APPS}/ccl
+if [[ $(uname -m) == "x86_64" ]]; then 
+    CCL=${CCL_DEFAULT_DIRECTORY}/scripts/ccl64
+else
+    CCL=${CCL_DEFAULT_DIRECTORY}/scripts/ccl
+fi
 
 test_ccl() {
-    ${CF_APPS}/ccl/armcl --no-init --eval '(quit)'
+    $CCL --no-init --eval '(quit)'
 }
 
 recompile_ccl () {
-    apt-get install -y make m4 binutils gcc
+    apt-get install -y make m4 
+    # XXX remove the hard coding of Linux ARM recompilation
     (cd ${CF_APPS}/ccl/lisp-kernel/linuxarm && make clean && make)
 }
 
 # Install CCL
 if [[ ! -z $ccl_uri ]]; then
-    echo Installing CCL from _uri $ccl_uri
+    echo Installing CCL from uri $ccl_uri
     (cd "$tmp" && wget --continue $ccl_uri)
     file=$( basename $ccl_uri )
     if [ ! -d "${CF_APPS}/ccl" ]; then
@@ -78,8 +73,8 @@ if [[ ! -z $ccl_uri ]]; then
     fi
 fi 
 
-# Download Quicklisp install shim
-if [ ! -r "$HOME/quicklisp.lisp" ]; then
+# Download Quicklisp installation code
+if [[ ! -r "$HOME/quicklisp.lisp" ]]; then
   (cd "$HOME" && wget --continue https://beta.quicklisp.org/quicklisp.lisp)
 fi
 
@@ -88,13 +83,6 @@ asdf_conf_d="${HOME}/.config/common-lisp/source-registry.conf.d"
 mkdir -p "${asdf_conf_d}" 
 rsync -avzP ${CF_APPS}/parachute/chute/chute.conf ${asdf_conf_d}/
 
-if [ ! -d $HOME/quicklisp ]; then 
-    $ccl --no-init --load "${CF_APPS}/parachute/chute/install-quicklisp.lisp"
-fi
-
-$ccl --eval '(progn (require :asdf) (load (asdf:system-relative-pathname (asdf:find-system :chute) "quicklisp-setup.lisp")) (quit))'
-
-
-
-
+# Install Quicklisp and the dependencies needed
+$CCL --no-init --load "${CF_APPS}/parachute/chute/install-quicklisp.lisp"
 

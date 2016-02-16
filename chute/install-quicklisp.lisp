@@ -16,14 +16,15 @@
                           :direction :output
                           :if-exists :supersede)
   (write '(progn
-           (setf *load-verbose* t))
+           (setf *load-verbose* t)
            (require :asdf)
            (let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp"
                                                   (user-homedir-pathname))))
              (when (probe-file quicklisp-init)
-               (load quicklisp-init)))
-           :stream rc-init)
-;;; TODOD parse variables in <file:../etc/cf-vars.sh>
-(load "/opt/cloudfleet/apps/parachute/chute/quicklisp-setup.lisp")
+               (load quicklisp-init))))
+           :stream rc-init))
+;;; TODO parse variables in <file:../etc/cf-vars.sh>
+(require :asdf)
+(load (asdf:system-relative-pathname (asdf:find-system :chute) "quicklisp-setup.lisp"))
 
 (quit)
