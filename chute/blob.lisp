@@ -18,7 +18,7 @@
    (mount
     :initform *path*
     :accessor mount
-    :documentation "Mount point of blob.")
+    :documentation "Filesystem mount point of blob.")
    (timestamp
     :reader timestamp
     :initform (simple-date-time:|yyyymmddThhmmssZ| (simple-date-time:now)))

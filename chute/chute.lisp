@@ -10,14 +10,13 @@
     (note "Performing single backup task.")
     ;;; TODO implement Guardian, resubmit snapshot and transfer tasks as necessary
     (values
-     backup-channel
+     channel
      (lparallel:submit-task channel
                             #'snapshot) 
      (lparallel:submit-task channel
                             #'transfer)
      (lparallel:submit-task channel
                             (lambda () (sleep 360) (note "Slept for an hour.  Whatsup?"))))))
-
 
 (defun transfer ()
   "Main task for transferring backups.  To be run periodically on queue."

@@ -5,13 +5,11 @@
 (defun serialize-mocked-p () t)
 
 (defparameter *path*
-  "/mnt/b/opt/cloudfleet/data-backup/.xx/"
-  #+nil
-  "/opt/cloudfleet/data")
+  "/opt/cloudfleet/data/"
+  "Mount point of filesystem to create snapshots from.")
 (defparameter *snapshot-base*
-  "/mnt/b/opt/cloudfleet/data-backup/.xx/"
-  #+nil
-  "/opt/cloudfleet/data/.snapshot/")
+  "/opt/cloudfleet/data/.snapshot/"
+  "Base location to name snapshots.")
 (defparameter *btrfs-command*
   (asdf:system-relative-pathname :chute "../setup/btrfs"))
 (defparameter *keystore*
