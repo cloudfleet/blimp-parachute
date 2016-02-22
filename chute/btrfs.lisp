@@ -48,7 +48,10 @@
        :for line :in (cl-ppcre:split "\\n" show)
        :with snapshot-region = nil
        :when snapshot-region
-       :collect (concatenate 'string path "/" (string-trim '(#\Space #\Tab) line))
+       :collect (concatenate 'string
+                             (string-right-trim "/" path)
+                             "/"
+                             (string-trim '(#\Space #\Tab) line))
        :when (cl-ppcre:scan "Snapshot\\(s\\):" line)
        :do (setf snapshot-region t))))
 
