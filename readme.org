@@ -26,14 +26,21 @@ bash -x setup/install-parachute.bash
 #+END_SRC    
 
 ** Loading Quicklisp dependencies
+1.  From the shell, download the Quicklisp install shim.
+#+BEGIN_SRC sh
+  wget https://beta.quicklisp.org/quicklisp.lisp
+#+END_SRC  
 
-#+BEGIN_SRC
-     wget https://beta.quicklisp.org/quicklisp.lisp
-     (load "~/quicklisp.lisp")
-#+END_SRC    
-#+BEGIN_SRC
-    (load (asdf:system-relative-pathname 
-       (asdf:find-system :chute) "quicklisp-setup"))
+2.  From a Common Lisp implementation, execute the shim.
+#+BEGIN_SRC lisp
+  (load "~/quicklisp.lisp")
+  (quicklisp-quickstart:install)
+#+END_SRC
+
+3.  Install the Quicklisp packages needed by chute.
+#+BEGIN_SRC lisp
+ (load (asdf:system-relative-pathname 
+    (asdf:find-system :chute) "quicklisp-setup.lisp"))
 #+END_SRC    
 
 * Building
