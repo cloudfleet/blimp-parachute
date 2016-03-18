@@ -57,6 +57,10 @@
                         :serial t :components
                         ((:file "config-server")
                          (:file "server")))
+               (:module osx :pathname ""
+                        :depends-on (source)
+                        :serial t :components
+                        ((:file "osx")))
                (:module test :pathname ""
                         :depends-on (server api crypt)
                         :serial t :components

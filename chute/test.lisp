@@ -82,7 +82,7 @@ t)
       (prog1
           (let ((results
                  (multiple-value-list
-                  (cloudfleet/transfer-blob directory))))
+                  (transfer-blob/http directory))))
             ;;; TODO add other checks for successful transfer
             (= (second results) 201))
         (unless already-running-server-p

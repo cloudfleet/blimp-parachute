@@ -215,6 +215,9 @@ For resumable transfers
 ** (at first without byte ranges).
 Implementation use HTTP 'Byte-range' header to files attached/detatched via mmap().
 
+* Notes
+** Osicat failing to grovel
+<https://github.com/osicat/osicat/pull/11/files>
 * Colophon
 #+BEGIN_ASCII
         <mark@evenson.eu>

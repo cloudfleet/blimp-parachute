@@ -1,4 +1,4 @@
-(in-package :chute.server)
+1(in-package :chute.server)
 
 (define-easy-handler (index :uri "/"
                             :default-request-type :get)
@@ -50,31 +50,37 @@
     relative-local-path))
 
 (defvar *debug-post-request* nil)
-(defun receive-blob-put (uri &key (as-stream-p nil))
+(defvar *debug-post-request* nil)
+(defun receive-blob-put (uri)
   (setf *debug-post-request* hunchentoot:*request*)
   (note "Processing PUT for '~a'" uri)
   (let ((output-path (ensure-blob-path uri)))
     (when (null output-path)
       (setf (return-code*) hunchentoot:+http-bad-request+)
       (hunchentoot:abort-request-handler))
-    (note "Writing output to ~a" output-path)
+    (note "Writing data to '~a'" output-path)
     (ensure-directories-exist output-path)
-    (if as-stream-p
-        ;; Get a writable stream to the object
-        (let ((octet-stream (raw-post-data :want-stream t)))
-          ;; octet-stream will be a FLEXI-STREAM with 
-          (note "DEBUG stream: ~a" octet-stream))
-        (let ((octets (raw-post-data :force-binary t)))
-          (note "DEBUG octets: ~a..." (subseq octets 0 16))
-          (with-open-file (output output-path
-                                  :direction :output
-                                  :if-exists :supersede
-                                  :element-type '(unsigned-byte 8))
-            (loop :for byte :across octets ;; XXX inefficient one byte reads
-               :doing (write-byte byte output)))))
-    (setf (hunchentoot:content-type*) "application/json"
+    (let* ((octet-stream (raw-post-data :want-stream t))
+           (total-bytes 0)
+           (buffer-size 8192)
+           (buffer (make-array buffer-size :element-type '(unsigned-byte 8))))
+      (with-open-file (output output-path
+                              :direction :output
+                              :if-exists :supersede
+                              :element-type '(unsigned-byte 8))
+        (loop
+           :with input-stream-eof-p = nil
+           :until input-stream-eof-p
+           :do (let ((bytes (read-sequence buffer octet-stream)))
+                 (write-sequence buffer output :start 0 :end bytes)
+                 (incf total-bytes bytes)
+                 (when (not (= bytes (length buffer)))
+                   (setf input-stream-eof-p t))))
+        (note "DEBUG Finished reading ~a bytes" total-bytes)))
+      
+  (setf (hunchentoot:content-type*) "application/json"
           (return-code*) 201)
-    "true")) ;; return true when we actually can verify that a write occurred
+    "true")) ;; TODO return true when we actually can verify that a write occurred
 
 (defmethod ensure-blob-path ((metadata chute:metadata))
   (chute:strip-double-slash (format nil "~a/~a/~a/~a/"
