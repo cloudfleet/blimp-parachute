@@ -4,7 +4,8 @@
         "lispClass": "client",
         "lispPackage":"chute"
     },
-    "path": "/opt/cloudfleet/data/"
+    "path": "/opt/cloudfleet/data/",
+    "api.port": 2002
 }
 
     

@@ -10,7 +10,9 @@
     :initform '(("lispClass" ."client") ("lispPackage". "chute")))
    (path
     :initform "/opt/cloudfleet/data"
-    :accessor path)))
+    :accessor path)
+   (api.port
+    :accessor api.port)))
 
 (defparameter *client-config* nil)
 (defun get-client-config (&key (force nil))
@@ -35,7 +37,7 @@
 (defparameter *random-device*
   "/dev/urandom") ;; "/dev/random" will block
 
-;; REST contract
+;; REST contract with CloudFleet backup server
 (defparameter *scheme* "http")
 (defparameter *host* "127.0.0.1")
 (defparameter *port* 2001)

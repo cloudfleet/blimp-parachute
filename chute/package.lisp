@@ -30,6 +30,8 @@
 
    #:aes-ctr ;; State of AES-CTR with 16 byte window index
 
+   #:start-api-server #:stop-api-server #:restart-api-server
+
    #:btrfs-snapshots
    #:btrfs/subvolume/snapshot
    #:btrfs/send
@@ -48,4 +50,9 @@
 
 (defpackage :chute.test
   (:use :cl :chute :chute.server))
+
+(restas:define-module #:chute.api
+  (:use #:cl #:chute)
+  (:nicknames #:api))
+
 

@@ -9,6 +9,7 @@
                   :lparallel
                   :simple-date-time :cl-json
                   :hunchentoot
+                  :restas :cl-who
                   :drakma
                   :osicat
                   :rt))

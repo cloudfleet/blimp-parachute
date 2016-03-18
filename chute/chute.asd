@@ -19,9 +19,14 @@
                simple-date-time
                cl-json
                hunchentoot
+               restas
+               cl-who
+               
                drakma
+
                #-(or solaris)
                osicat
+
                rt)
   :components ((:module package :pathname ""
                         :serial t :components
@@ -40,6 +45,11 @@
                          (:file "note")
                          (:file "blob")
                          (:file "chute")))
+               (:module api :pathname ""
+                        :depends-on (source)
+                        :serial t :components
+                        ((:file "api-server")
+                         (:file "api")))
                (:module client :pathname ""
                         :depends-on (source)
                         :serial t :components
