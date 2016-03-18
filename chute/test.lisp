@@ -47,26 +47,32 @@ t)
                                   n file blob-directory octets (flexi-streams:octets-to-string octets))
                             nil)))))
   t)
-p
-;;; Demonstrate that IRONCLAD AES block ciphers indeed retain state
-;;; TODO fix test so that it actually compares its values
-(push 'aes.block-state.1 rt::*expected-failures*)
+
+;;;  Simple test that AES block ciphers indeed retain state
+;;;    D( E(x1) || E(x2) ) == x1 || x2
 (rt:deftest aes.block-state.1
-    (let ((cipher (get-cipher :aes))
-          (cipher2 (get-cipher :aes))
+    (let ((key-1 (get-cipher :aes-ctr))
+          (key-2 (get-cipher :aes-ctr))
           (plain-1 (ironclad:ascii-string-to-byte-array "this"))
           (cipher-1 (make-array 4 :element-type '(unsigned-byte 8)))
           (plain-2 (ironclad:ascii-string-to-byte-array "open"))
-          (cipher-2 (make-array 4 :element-type '(unsigned-byte 8))))
-    (ironclad:encrypt cipher plain-1 cipher-1)
-    (ironclad:encrypt cipher plain-2 cipher-2)
-    (let ((cipher-12 (make-array 8 :element-type '(unsigned-byte 8)))
+          (cipher-2 (make-array 4 :element-type '(unsigned-byte 8)))
           (plain-12 (make-array 8 :element-type '(unsigned-byte 8))))
-      (replace cipher-12 cipher-1 :start1 0 :end1 4 :start2 0)
-      (replace cipher-12 cipher-2 :start1 4 :end1 8 :start2 0)
-      (ironclad:decrypt cipher2 cipher-12 plain-12)
-      (values cipher plain-1 cipher-1 plain-2 cipher-2 cipher-12 plain-12)))
-    t)
+      (ironclad:encrypt key-1 plain-1 cipher-1)
+      (ironclad:encrypt key-1 plain-2 cipher-2)
+      (ironclad:decrypt key-2
+                        (concatenate '(vector (unsigned-byte 8) *) cipher-1 cipher-2)
+                        plain-12)
+      (values
+       (= (+ (length plain-1) (length plain-2))
+          (length plain-12))
+       (loop
+          :for i :across (concatenate '(vector (unsigned-byte 8) *) plain-1 plain-2)
+          :for j :across plain-12
+          :unless (eq i j)
+          :return nil
+          :finally (return t))))
+    t t)
 
 (rt:deftest blob.http.transfer.1
     (let ((directory (make-blob #p"/etc/passwd" (make-new-directory)))
