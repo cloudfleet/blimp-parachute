@@ -13,7 +13,7 @@
 ;;; XXX How to get key if USB cf-key has been unmounted
 ;;; XXX how to read key when owned by root
 (defun engineroom-key ()
-  (let ((key-file #p"/mnt/storage-key/key"))
+  (let ((key-file #p"/opt/cloudfleet/data/shared/crypt/storage-key"))
     (unless (probe-file key-file)
       (warn "No key file found at '~a'." key-file)
       (return-from engineroom-key nil))
