@@ -54,28 +54,30 @@ To build an image on arm32 with Docker installed:
 * REST API
 ** Current version 'v1'
 #+NAME: Fundamental Chute REST API
-#+BEGIN_SRC
-                POST /chute/blob/
-                (index.json)                
-                ->>   201 Resource Created or [45]xx Error
-                ("/new/uri/to/use")
+#+BEGIN_ASCII
+    -->  POST /chute/blob/
+    (index.json)                
+    <--  201 Resource Created or [45]xx Error
+    ("/new/uri/to/use")
 
 
-                GET /<URI>/index.json              
-                nil
-                ->>   200 Original or 304 Not Modified or [45]xx Error
-                (index.json) or nil
+    -->  GET /chute/blob/<URI>/index.json              
+    nil
+    <--  200 Original or 304 Not Modified or [45]xx Error
+    (index.json) or nil
 
 
-                PUT /<URI>/0    
-                (application/octet-bytes)
-                ->>   201 Ok
-                (json) "true" or "false" 
+    -->  PUT /chute/blob/<URI>/0    
+    (application/octet-bytes)
+    <--  201 Ok
+    (json) "true" or "false" 
 
-                GET /<URI>/0/hash/sha256 
-                ->>   200 
-                (json) SHA256 Hash
-#+END_SRC
+
+    -->  GET /chute/blob/<URI>/0
+    <--  200 
+    (json) SHA256 Hash
+
+#+END_ASCII
 
 Authentication to be handled via HTTP Headers submitted to
 ```spire.marina.io``` API.

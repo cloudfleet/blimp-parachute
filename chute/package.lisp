@@ -6,7 +6,7 @@
    #:metadata
    #:timestamp #:shards #:size #:checksum
 
-   #:transfer-blob #:put-file 
+   #:transfer-blob/http #:put-file 
 
    #:note
 

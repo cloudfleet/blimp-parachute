@@ -1,46 +1,50 @@
-1(in-package :chute.server)
+(in-package :chute.server)
 
-(define-easy-handler (index :uri "/"
-                            :default-request-type :get)
+(defvar *debug-last-request* nil)
+
+(define-easy-handler
+    (index :uri "/"
+           :default-request-type :get)
     nil
+
   (chute:note "uri: ~a" (request-uri*))
   (setf (content-type*) "text/plain")
   "Hello world!")
 
-#|
-@route POST "/blob/*"
-@route PUT "/blob/:domain/:node/:mount/:timestamp/"
-|#
-
-(define-easy-handler (blob
-                      :uri (lambda (request)
-                             (cl-ppcre:scan "/blob" (request-uri* request)))
-                      :default-request-type :post)
+(define-easy-handler
+    (blob
+     :uri (lambda (request)
+            (cl-ppcre:scan (format nil "^~a" *blob-uri-path*) (request-uri* request))))
     nil
 
-  (chute:note "uri: ~a" (request-uri*))
+  (setf *debug-last-request* *request*)
+  (chute:note "Request uri: '~a'" (request-uri*))
+
   (case (hunchentoot:request-method*)
     (:post
      (receive-blob-post (request-uri*)))
     (:get
-     "Unimplemented.")
+     (setf (return-code*) +http-not-implemented+)
+      (hunchentoot:abort-request-handler))
     (:put
      (receive-blob-put (request-uri*)))
     (otherwise
      (format nil "Unimplemented method ~a." (hunchentoot:request-method*)))))
 
-(defparameter *debug-blob-post* nil) ;; DEBUG
 (defun receive-blob-post (uri)
-  ;;; TODO check that the uri is "/blob"
-  (note "Raw post data: ~a" (raw-post-data :force-text t))
+    (unless (string-equal uri
+                        *blob-uri-path*)
+      (setf (return-code*) hunchentoot:+http-bad-request+)
+      (note "ERROR: POST request to invalid uri.")
+      (hunchentoot:abort-request-handler))
+  (note "DEBUG: Raw POST data: ~a" (raw-post-data :force-text t))
   (let* ((metadata (cl-json:with-decoder-simple-clos-semantics
-                     (cl-json:decode-json-from-string  (raw-post-data :force-text t))))
-         (relative-local-path (ensure-blob-path metadata))
+                     (cl-json:decode-json-from-string (raw-post-data :force-text t))))
+         (relative-local-path (blob-path metadata))
          (local-path
-          (ensure-directories-exist   ;; Create output directory
-           (merge-pathnames (hunchentoot:url-decode relative-local-path) *blob-storage-directory*))))
-    (setf *debug-blob-post* (list uri metadata relative-local-path local-path))
-    (note "Blob post metadata: ~a." metadata)
+          (ensure-directories-exist   
+           (merge-pathnames relative-local-path *blob-storage-directory*))))
+    (note "POST metadata parsed as: ~a." metadata)
     (with-open-file (file
                      (merge-pathnames "index.json" local-path)
                      :direction :output
@@ -49,10 +53,7 @@
     (setf (hunchentoot:content-type*) "text/plain")
     relative-local-path))
 
-(defvar *debug-post-request* nil)
-(defvar *debug-post-request* nil)
 (defun receive-blob-put (uri)
-  (setf *debug-post-request* hunchentoot:*request*)
   (note "Processing PUT for '~a'" uri)
   (let ((output-path (ensure-blob-path uri)))
     (when (null output-path)
@@ -82,26 +83,26 @@
           (return-code*) 201)
     "true")) ;; TODO return true when we actually can verify that a write occurred
 
-(defmethod ensure-blob-path ((metadata chute:metadata))
-  (chute:strip-double-slash (format nil "~a/~a/~a/~a/"
-                                    (chute::domain metadata)
-                                    (hunchentoot:url-encode (chute::node metadata))
-                                    (chute::mount metadata)
-                                    (chute::timestamp metadata))))
+(defun blob-path (metadata)
+  (format nil "~a/~a/"
+          (chute::domain metadata)
+          (ironclad:byte-array-to-hex-string
+           (ironclad:digest-sequence :sha256
+                                     (flexi-streams:string-to-octets
+                                      (cl-json:encode-json-to-string metadata))))))
 
-(defmethod ensure-blob-path ((uri string))
-  "Return the path for which a blob should be stored according to URI."
-  (when (search ".." uri)
-    (note "Relative component in uri '~a' rejected." uri)
+(defun ensure-blob-path (path)
+  (when (search ".." path)
+    (note "Relative component in path '~a' rejected." path)
     (return-from ensure-blob-path nil))
-  (when (let ((result (search *blob-uri-path* uri)))
+  (when (let ((result (search *blob-uri-path* path)))
           (not (and result
                     (= result 0))))
-    (note "Uri '~a' does not start with '~a'" uri chute:*blob-uri-path*)
+    (note "Path '~a' does not start with '~a'" path chute:*blob-uri-path*)
     (return-from ensure-blob-path nil))
   (warn "Unimplemented full check of local permission and hygiene for blob uri.")
   (merge-pathnames
-   (subseq uri (length *blob-uri-path*))
+   (subseq path (length *blob-uri-path*))
    *blob-storage-directory*))
 
 (defparameter *server* nil)
