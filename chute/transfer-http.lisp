@@ -20,7 +20,7 @@
   (let ((blob-path (uiop:temporary-directory)))
     ;; serialize encrypted blob to path
     (make-blob snapshot-path blob-path)     
-    (cloudfleet/transfer-blob blob-path)))
+    (transfer-blob/http blob-path)))
 
 (defun transcribe-transfers ()
   (let (transfers)

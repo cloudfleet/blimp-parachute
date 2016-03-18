@@ -12,10 +12,10 @@
                            *btrfs-command*
                            path snapshot-path)))
     (uiop:run-program snapshot :output output :error error)
-    (values 
+    (values
+     snapshot-path
      (get-output-stream-string output)
-     (get-output-stream-string error)
-     snapshot-path)))
+     (get-output-stream-string error))))
 
 (defun snapshot-directory (path)
   (format nil "~a/.snapshot/" (string-right-trim "/" path)))
