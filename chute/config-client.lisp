@@ -50,8 +50,8 @@
 (defparameter *blob-storage-dir*
   (merge-pathnames "blob/storage/" (user-homedir-pathname)))
 ;; CLIENT
-(defparameter *blobs-directory*
-  "/var/tmp/blobs/")
+(defparameter *tmp-directory* "/mnt/storage/tmp/")
+(defparameter *blobs-directory* (merge-pathnames "blobs/" *tmp-directory*))
 
 (defun buffer-size () 8192)
 

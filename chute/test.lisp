@@ -13,7 +13,7 @@
           (error "No snapshots to send."))
         (make-blob
          (first snapshots)
-         #p"/var/tmp/blob/")))
+         chute::*blobs-directory*)))
   t)
 
 ;;; lowlevel test of btrfs send snapshot to stream
