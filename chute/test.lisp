@@ -1,45 +1,53 @@
 (in-package :chute.test)
 
+(defmacro with-cloudfleet-config (&body body)
+  `(progn
+     (get-client-config :file "client-config.json" :force t)
+     ,@body))
+
 ;;; Working on blimp if BTRFS is present
 (rt:deftest btrfs.snapshot.make-blob.1
-    (let ((snapshots (btrfs-snapshots)))
-      (unless snapshots
-        (error "No snapshots to send."))
-      (make-blob
-       (first snapshots)
-       #p"/var/tmp/blob/"))
+    (with-cloudfleet-config
+      (let ((snapshots (btrfs-snapshots)))
+        (unless snapshots
+          (error "No snapshots to send."))
+        (make-blob
+         (first snapshots)
+         #p"/var/tmp/blob/")))
   t)
 
 ;;; lowlevel test of btrfs send snapshot to stream
 (rt:deftest btrfs.send-snapshot.1
+    (with-cloudfleet-config
     ;;; assuming there is at least one snapshot
-    (let ((snapshots (btrfs-snapshots)))
-      (unless snapshots
-        (error "No snapshots to send."))
-      (let ((result (btrfs/send (first (btrfs-snapshots)))))
-        (and
-         (streamp result)
-         (equal (stream-element-type result) '(unsigned-byte 8)))))
+      (let ((snapshots (btrfs-snapshots)))
+        (unless snapshots
+          (error "No snapshots to send."))
+        (let ((result (btrfs/send (first (btrfs-snapshots)))))
+          (and
+           (streamp result)
+           (equal (stream-element-type result) '(unsigned-byte 8))))))
 t)
 
 ;;; create an encrypted blob locally from a file, then compare with original
 (rt:deftest make-blob.from-file.1
-    (let* ((file #p"/etc/passwd")
-           (blob-directory (make-blob file (make-new-directory)))
-           (octets (decrypt-blob-as-octets blob-directory)))
-      (with-open-file (stream file :direction :input :element-type '(unsigned-byte 8))
-        (loop
-           :for n :from 0
-           :with byte 
-           :do (setf byte (read-byte stream nil))
-           :when (null byte) ;; EOF
-           :return t
-           :unless (= byte (elt octets n))
-           :return (progn (note "Mismatch at byte ~a between ~a and blob in ~a.~&Decrypted octets:~%~a~%Original octets:~%~a~%"
-                                n file blob-directory octets (flexi-streams:octets-to-string octets))
-                          nil))))
+    (with-cloudfleet-config
+      (let* ((file #p"/etc/passwd")
+             (blob-directory (make-blob file (make-new-directory)))
+             (octets (decrypt-blob-as-octets blob-directory)))
+        (with-open-file (stream file :direction :input :element-type '(unsigned-byte 8))
+          (loop
+             :for n :from 0
+             :with byte 
+             :do (setf byte (read-byte stream nil))
+             :when (null byte) ;; EOF
+             :return t
+             :unless (= byte (elt octets n))
+             :return (progn (note "Mismatch at byte ~a between ~a and blob in ~a.~&Decrypted octets:~%~a~%Original octets:~%~a~%"
+                                  n file blob-directory octets (flexi-streams:octets-to-string octets))
+                            nil)))))
   t)
-   
+p
 ;;; Demonstrate that IRONCLAD AES block ciphers indeed retain state
 ;;; TODO fix test so that it actually compares its values
 (push 'aes.block-state.1 rt::*expected-failures*)
