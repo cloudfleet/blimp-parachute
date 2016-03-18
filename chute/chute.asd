@@ -33,10 +33,6 @@
                         ((:file "package")
                          (:file "config-client")
                          (:file "engineroom")))
-               (:module crypt :pathname ""
-                        :depends-on (source)
-                        :serial t :components
-                        ((:file "crypt")))
                (:module source :pathname ""
                         :depends-on (package)
                         :serial t :components
@@ -44,23 +40,25 @@
                          (:file "btrfs")
                          (:file "note")
                          (:file "blob")
-                         (:file "chute")))
+                         (:file "chute")
+                         (:file "client")
+                         (:file "transfer-http")))
+               (:module crypt :pathname ""
+                        :depends-on (source)
+                        :serial t :components
+                        ((:file "crypt")))
                (:module api :pathname ""
                         :depends-on (source)
                         :serial t :components
                         ((:file "api-server")
                          (:file "api")))
-               (:module client :pathname ""
-                        :depends-on (source)
-                        :serial t :components
-                        ((:file "client")))
                (:module server :pathname ""
                         :depends-on (source)
                         :serial t :components
                         ((:file "config-server")
                          (:file "server")))
                (:module test :pathname ""
-                        :depends-on (client)
+                        :depends-on (server api crypt)
                         :serial t :components
                         ((:file "test")))))
 

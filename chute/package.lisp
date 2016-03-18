@@ -3,9 +3,6 @@
   (:export
    #:client
 
-   #:snapshot
-   #:transfer
-
    #:metadata
    #:timestamp #:shards #:size #:checksum
 
@@ -31,6 +28,8 @@
    #:aes-ctr ;; State of AES-CTR with 16 byte window index
 
    #:start-api-server #:stop-api-server #:restart-api-server
+
+   #:get-client-config
 
    #:btrfs-snapshots
    #:btrfs/subvolume/snapshot

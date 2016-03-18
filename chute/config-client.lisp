@@ -12,14 +12,17 @@
     :initform "/opt/cloudfleet/data"
     :accessor path)
    (api.port
-    :accessor api.port)))
-
+    :accessor api.port)
+   (transfer-method
+    :accessor transfer-method)))
+  
 (defparameter *client-config* nil)
-(defun get-client-config (&key (force nil))
+(defun get-client-config (&key (file "client-config.json") (force nil))
   (when (or (not *client-config*)
             force )
     (setf *client-config*
-          (with-open-file (config (asdf:system-relative-pathname :chute "../etc/client-config.json"))
+          (with-open-file (config (asdf:system-relative-pathname :chute
+                                                                 (format nil "../etc/~a" file)))
             (cl-json:with-decoder-simple-clos-semantics
               (cl-json:decode-json config)))))
   *client-config*)

@@ -54,7 +54,7 @@
   (make-blob (btrfs/send snapshot-path) blob-path))
 
 (defmethod make-blob ((input-stream stream) blob-path)
-  "Read from INPUT-STREAM with output at BLOB-PATH"
+  "Make blob from INPUT-STREAM with output at BLOB-PATH"
   (ensure-directories-exist blob-path) ;; XXX should be done elsewhere, but I guess it can't hurt.
   (let* ((total-shard-bytes 0)
          (metadata (make-instance 'metadata))

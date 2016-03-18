@@ -1,40 +1,30 @@
 (in-package :chute)
 
-(defun client ()
-  "Main loop for client."
-  (note "Client starting up.")
+(defun client (&key (config "client-config.json"))
+  "Main entrypoint for client."
+  (note "Starting client configured via ~a" config)
+  (get-client-config :file config :force t)
+  (start-api-server)
   (if lparallel:*kernel*
       (warn "lparallel kernel unexpectedly present.")
       (setf lparallel:*kernel* (lparallel:make-kernel 3)))
   (let ((channel (lparallel:make-channel)))
-    (note "Performing single backup task.")
-    ;;; TODO implement Guardian, resubmit snapshot and transfer tasks as necessary
     (values
      channel
      (lparallel:submit-task channel
-                            #'snapshot) 
+                            #'snapshot-task) 
      (lparallel:submit-task channel
-                            #'transfer)
+                            #'transfer-task)
      (lparallel:submit-task channel
                             (lambda () (sleep 360) (note "Slept for an hour.  Whatsup?"))))))
 
-(defun transfer ()
-  "Main task for transferring backups.  To be run periodically on queue."
-  (let ((snapshot-path (progn
-                         (unless (first (btrfs-snapshots))
-                           (warn "Transfer task found no snapshot to transfer.  Creating one.")
-                           (snapshot))
-                         (last (btrfs-snapshots))))
-        (blob-path (uiop:temporary-directory)))
-    (make-blob snapshot-path blob-path)     ;; serialize encrypted blob to path
-    (prog1
-        (transfer-blob blob-path)     ;; get blob off system
-      (warn "Unimplemented cleanup of blob at ~a" blob-path))))
+(defun transfer-task ()
+  "Main task for transferring backups.")
 
-(defun snapshot ()
+(defun snapshot-task ()
   "Make snapshot of configured btrfs subvolume, returning path of generated snapshot."
   (multiple-value-bind (out err snap-path)
       (btrfs/subvolume/snapshot :path (path (get-client-config)))
-    (note "Snapshot ~a with output ~a and error ~a" snap-path out err)
+    (note "Snapshot of '~a' with output ~&~a~& and error~&~a~&" snap-path out err)
     snap-path))
 

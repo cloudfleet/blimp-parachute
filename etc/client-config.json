@@ -5,7 +5,8 @@
         "lispPackage":"chute"
     },
     "path": "/opt/cloudfleet/data/",
-    "api.port": 2002
+    "api.port": 2002,
+    "transfer-method": "http"
 }
 
     

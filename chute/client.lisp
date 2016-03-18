@@ -15,7 +15,7 @@
                         :content-type "application/octet-stream")))
 
 (defvar *debug-post-results* nil)
-(defun transfer-blob (blob-directory &key (post-uri (uri-base)))
+(defun transfer-blob/http (blob-directory &key (post-uri (uri-base)))
   ;;; POST the metadata
   (flet ((interpret-post-results (results)
            (warn "Unimplemented parse of POST result.")

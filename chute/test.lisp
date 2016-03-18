@@ -1,7 +1,7 @@
 (in-package :chute.test)
 
 ;;; Working on blimp if BTRFS is present
-(rt:deftest blob.from-snapshop.1
+(rt:deftest btrfs.snapshot.make-blob.1
     (let ((snapshots (btrfs-snapshots)))
       (unless snapshots
         (error "No snapshots to send."))
@@ -23,7 +23,7 @@
 t)
 
 ;;; create an encrypted blob locally from a file, then compare with original
-(rt:deftest blob.from-file.1
+(rt:deftest make-blob.from-file.1
     (let* ((file #p"/etc/passwd")
            (blob-directory (make-blob file (make-new-directory)))
            (octets (decrypt-blob-as-octets blob-directory)))
@@ -42,6 +42,7 @@ t)
    
 ;;; Demonstrate that IRONCLAD AES block ciphers indeed retain state
 ;;; TODO fix test so that it actually compares its values
+(push 'aes.block-state.1 rt::*expected-failures*)
 (rt:deftest aes.block-state.1
     (let ((cipher (get-cipher :aes))
           (cipher2 (get-cipher :aes))
@@ -59,7 +60,7 @@ t)
       (values cipher plain-1 cipher-1 plain-2 cipher-2 cipher-12 plain-12)))
     t)
 
-(rt:deftest blob.transfer.1
+(rt:deftest blob.http.transfer.1
     (let ((directory (make-blob #p"/etc/passwd" (make-new-directory)))
           (already-running-server-p (chute.server:running-server-p)))
       (unless already-running-server-p
@@ -67,7 +68,7 @@ t)
       (prog1
           (let ((results
                  (multiple-value-list
-                  (transfer-blob directory))))
+                  (cloudfleet/transfer-blob directory))))
             ;;; TODO add other checks for successful transfer
             (= (second results) 201))
         (unless already-running-server-p
