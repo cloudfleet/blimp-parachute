@@ -14,17 +14,31 @@
      (lparallel:submit-task channel
                             #'snapshot-task) 
      (lparallel:submit-task channel
-                            #'transfer-task)
-     (lparallel:submit-task channel
-                            (lambda () (sleep 360) (note "Slept for an hour.  Whatsup?"))))))
+                            #'transfer-task))))
+
+(defun snapshot-task ()
+  (flet ((snapshot ()
+           (multiple-value-bind (out err snap-path)
+               (btrfs/subvolume/snapshot :path (path (get-client-config)))
+             (note "Snapshot of '~a' with output ~&~a~& and error~&~a~&" snap-path out err)
+             snap-path)))
+    (unless (btrfs-snapshots)
+      (snapshot))
+    (loop
+       :doing (progn
+                (multiple-value-bind (sec min hour date month year daylight-p zone)
+                    (get-decoded-time)
+                  (when (and (= min 0)
+                             (= hour 0))
+                    (snapshot)
+                    (sleep 60))
+                  (sleep 31))))))
 
 (defun transfer-task ()
   "Main task for transferring backups.")
 
-(defun snapshot-task ()
-  "Make snapshot of configured btrfs subvolume, returning path of generated snapshot."
-  (multiple-value-bind (out err snap-path)
-      (btrfs/subvolume/snapshot :path (path (get-client-config)))
-    (note "Snapshot of '~a' with output ~&~a~& and error~&~a~&" snap-path out err)
-    snap-path))
+
+     
+       
+  
 
