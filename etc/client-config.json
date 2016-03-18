@@ -1,0 +1,10 @@
+{
+    "version": "2016022600",
+    "prototype": {
+        "lispClass": "client",
+        "lispPackage":"chute"
+    },
+    "path": "/opt/cloudfleet/data/"
+}
+
+    

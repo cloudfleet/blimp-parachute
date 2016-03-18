@@ -2,12 +2,12 @@
 ;;;; BTRFS specific code
 ;;;; (swap in ZFS as an exercise?)
 
-(defun btrfs/subvolume/snapshot (&key (path *path*))
+(defun btrfs/subvolume/snapshot (&key (path (path (get-client-config))))
   (ensure-sanity)
   (let* ((output (make-string-output-stream))
          (error (make-string-output-stream))
          (timestamp (simple-date-time:|yyyymmddThhmmssZ| (simple-date-time:now)))
-         (snapshot-path (concatenate 'string *snapshot-base* timestamp))
+         (snapshot-path (format nil "~a/~a" (snapshot-directory path) timestamp))
          (snapshot (format nil "~a subvolume snapshot -r ~a ~a"
                            *btrfs-command*
                            path snapshot-path)))
@@ -17,8 +17,11 @@
      (get-output-stream-string error)
      snapshot-path)))
 
+(defun snapshot-directory (path)
+  (format nil "~a/.snapshot/" path))
+
 ;;; TODO Need command to figure out latest generation
-(defun btrfs/subvolume/find-new (&key (path *path*) (generation 0))
+(defun btrfs/subvolume/find-new (&key (path (path (get-client-config))) (generation 0))
   (ensure-sanity)
   (let* ((o (make-string-output-stream))
          (find-new (format nil "~a subvolume find-new ~a ~a"
@@ -27,7 +30,7 @@
     (uiop:run-program find-new :output o)
     (get-output-stream-string o)))
 
-(defun btrfs/subvolume/show (&key (path *path*))
+(defun btrfs/subvolume/show (&key (path (path (get-client-config))))
   (ensure-sanity)
   (with-output-to-string (output)
     (with-output-to-string (error)
@@ -41,7 +44,7 @@
             (return-from btrfs/subvolume/show (values nil output error)))))
       (values output error))))
 
-(defun btrfs-snapshots (&key (path *path*))
+(defun btrfs-snapshots (&key (path (path (get-client-config))))
   "List all available snapshots which exist for PATH."
   (let ((show (btrfs/subvolume/show :path path)))
     (loop

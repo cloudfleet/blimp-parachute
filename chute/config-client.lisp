@@ -1,22 +1,41 @@
 (in-package :chute)
 
-(defun mocked-p () t)
+(defclass config () ())
 
-(defun serialize-mocked-p () t)
+(defclass client (config)
+  ((version
+    :initform "2016022600"
+    :accessor version)
+   (prototype
+    :initform '(("lispClass" ."client") ("lispPackage". "chute")))
+   (path
+    :initform "/opt/cloudfleet/data"
+    :accessor path)))
 
-(defparameter *path*
-  "/opt/cloudfleet/data/"
-  "Mount point of filesystem to create snapshots from.")
-(defparameter *snapshot-base*
-  "/opt/cloudfleet/data/.snapshot/"
-  "Base location to name snapshots.")
+(defparameter *client-config* nil)
+(defun get-client-config (&key (force nil))
+  (when (or (not *client-config*)
+            force )
+    (setf *client-config*
+          (with-open-file (config (asdf:system-relative-pathname :chute "../etc/client-config.json"))
+            (cl-json:with-decoder-simple-clos-semantics
+              (cl-json:decode-json config)))))
+  *client-config*)
+            
+;; (defparameter *path*
+;;   "/opt/cloudfleet/data/"
+;;   "Mount point of filesystem to create snapshots from.")
+;; (defparameter *snapshot-base*
+;;   "/opt/cloudfleet/data/.snapshot/"
+;;   "Base location to name snapshots.")
 (defparameter *btrfs-command*
   (asdf:system-relative-pathname :chute "../setup/btrfs"))
 (defparameter *keystore*
   "/opt/cloudfleet/data/shared/chute/")
 (defparameter *random-device*
   "/dev/urandom") ;; "/dev/random" will block
-;; REST
+
+;; REST contract
 (defparameter *scheme* "http")
 (defparameter *host* "127.0.0.1")
 (defparameter *port* 2001)
@@ -38,8 +57,12 @@
   (format nil "~a://~a~a" *scheme* (uri-authority) *blob-uri-path*))
 
 (defun ensure-sanity ()
-  (unless (probe-file *snapshot-base*)
-    (error "No directory to create snapshots at ~s." *snapshot-base*))
+  (let* ((path (path (get-client-config)))
+         (snapshot (snapshot-directory path)))
+    (unless (probe-file path)
+      (error "The path to backup doesn't exist at '~a.'" path))
+    (unless (probe-file snapshot)
+      (error "The path to create snapshots doesn't exist in ~a." snapshot)))
   (unless (probe-file *btrfs-command*)
     (error "No setuid btrfs found at ~s." *btrfs-command*))
   #+abcl

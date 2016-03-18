@@ -16,7 +16,7 @@
     :accessor domain
     :documentation "Domain creating this blob.")
    (mount
-    :initform *path*
+    :initform (path (get-client-config))
     :accessor mount
     :documentation "Filesystem mount point of blob.")
    (timestamp

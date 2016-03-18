@@ -32,9 +32,9 @@
       (warn "Unimplemented cleanup of blob at ~a" blob-path))))
 
 (defun snapshot ()
-  "Make snapshot of btfs volume at *path*, returning path of generated snapshot."
+  "Make snapshot of configured btrfs subvolume, returning path of generated snapshot."
   (multiple-value-bind (out err snap-path)
-      (btrfs/subvolume/snapshot :path *path*)
+      (btrfs/subvolume/snapshot :path (path (get-client-config)))
     (note "Snapshot ~a with output ~a and error ~a" snap-path out err)
     snap-path))
 
