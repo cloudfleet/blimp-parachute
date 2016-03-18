@@ -4,7 +4,6 @@
 
 ;;; Currently takes a full snaphot
 (defun btrfs/subvolume/snapshot (&key (path (path (get-client-config))))
-  (ensure-sanity)
   (let* ((output (make-string-output-stream))
          (error (make-string-output-stream))
          (timestamp (simple-date-time:|yyyymmddThhmmssZ| (simple-date-time:now)))
@@ -23,7 +22,6 @@
 
 ;;; TODO Need command to figure out latest generation
 (defun btrfs/subvolume/find-new (&key (path (path (get-client-config))) (generation 0))
-  (ensure-sanity)
   (let* ((o (make-string-output-stream))
          (find-new (format nil "~a subvolume find-new ~a ~a"
                            *btrfs-command*
@@ -31,8 +29,8 @@
     (uiop:run-program find-new :output o)
     (get-output-stream-string o)))
 
-(defun btrfs/subvolume/show (&key (path (path (get-client-config))))
-  (ensure-sanity)
+(defun btrfs/subvolume/show (&key
+                               (path (path (get-client-config))))
   (with-output-to-string (output)
     (with-output-to-string (error)
       (let ((command (format nil "~a subvolume show ~a"
@@ -61,7 +59,6 @@
 
 (defun btrfs/send (snapshot-path)
   "Returns the stream containing the output of the btrfs/send operation on SNAPSHOT-PATH."
-  (ensure-sanity)
   (let ((command (format nil "~A" *btrfs-command*))
         (args (list "send" snapshot-path)))
     (handler-case
