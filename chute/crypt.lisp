@@ -52,8 +52,11 @@
 (defun get-key ()
   "Return an AES-CTR ready to be used."
   ;;; TODO read in key from known location
-  ;;; TODO use a random nonce
-  (make-instance 'aes-ctr :nonce #(2 0 0 0 0 0 0 1)))
+  (let ((nonce (make-array 8 :element-type '(unsigned-byte 8))))
+    (with-open-file (random "/dev/urandom"  :element-type '(unsigned-byte 8))
+      (loop :for i :below 8
+         :doing (setf (aref nonce i) (read-byte random))))
+    (make-instance 'aes-ctr :nonce nonce)))
 
 ;;; XXX currently unused
 (defun %get-some-stream-octets (stream size) 
@@ -63,7 +66,6 @@
     (setf (ironclad::buffer stream) (subseq buffer size index))
     (subseq buffer 0 size)))
 
-
 (defclass key () nil)
 
 (defclass aes-ctr (key)
@@ -71,7 +73,9 @@
         :type '((unsigned-byte 8) 32)
         :initform (or
                    (engineroom-key)
-                   (make-array 32 :element-type '(unsigned-byte 8))))
+                   (progn
+                     (warn "Creating null key.")
+                     (make-array 32 :element-type '(unsigned-byte 8)))))
    (nonce :accessor nonce
           :type '((unsigned-byte 8) 8))
    (initialization-vector :accessor iv
