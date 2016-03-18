@@ -2,12 +2,13 @@
 ;;;; BTRFS specific code
 ;;;; (swap in ZFS as an exercise?)
 
+;;; Currently takes a full snaphot
 (defun btrfs/subvolume/snapshot (&key (path (path (get-client-config))))
   (ensure-sanity)
   (let* ((output (make-string-output-stream))
          (error (make-string-output-stream))
          (timestamp (simple-date-time:|yyyymmddThhmmssZ| (simple-date-time:now)))
-         (snapshot-path (format nil "~a/~a" (snapshot-directory path) timestamp))
+         (snapshot-path (format nil "~a~a" (snapshot-directory path) timestamp))
          (snapshot (format nil "~a subvolume snapshot -r ~a ~a"
                            *btrfs-command*
                            path snapshot-path)))
@@ -18,7 +19,7 @@
      snapshot-path)))
 
 (defun snapshot-directory (path)
-  (format nil "~a/.snapshot/" path))
+  (format nil "~a/.snapshot/" (string-right-trim "/" path)))
 
 ;;; TODO Need command to figure out latest generation
 (defun btrfs/subvolume/find-new (&key (path (path (get-client-config))) (generation 0))

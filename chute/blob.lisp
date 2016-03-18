@@ -45,6 +45,7 @@
     :documentation "Whether the blob is in an encrypted state.")))
 
 (defmethod make-blob ((file pathname) blob-path)
+  "Create blob from FILE at BLOB-PATH."
   (with-open-file (input-stream file
                                 :direction :input
                                 :element-type '(unsigned-byte 8))

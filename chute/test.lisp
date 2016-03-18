@@ -12,8 +12,8 @@
         (unless snapshots
           (error "No snapshots to send."))
         (make-blob
-         (first snapshots)
-         chute::*blobs-directory*)))
+         (first (reverse snapshots))
+         (make-new-directory))))
   t)
 
 ;;; lowlevel test of btrfs send snapshot to stream
