@@ -15,15 +15,15 @@
     (:html
      (:body
       (:h1 "Snapshot")
-      (:div :id "create"
+      (:div :id "snapshot-create"
             (:h2 "Create")
             (:form :method :post
-                   (:input :type "submit" :value "Take new snapshot")))
-      (:div :id "existing"
+                   (:input :id "snapshot-create-submit" :type "submit" :value "Take new snapshot")))
+      (:div :id "snapshot-list"
             (:h2 "Existing Snapshots")
             (:ul
              (loop :for snapshot :in (btrfs-snapshots)
-                :do (who:htm (:li (who:str snapshot))))))))))
+                :do (who:htm (:li :class "snapshot-list-item" (who:str snapshot))))))))))
 
 (restas:define-route %snapshot.post ("/snapshot" :method :post)
   (btrfs/subvolume/snapshot)
