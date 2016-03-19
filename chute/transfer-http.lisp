@@ -28,6 +28,6 @@
       (push
        (make-instance 'transfer-http
                       :snapshot snapshot)
-       transfers)
-      transfers)))
+       transfers))
+      transfers))
 
