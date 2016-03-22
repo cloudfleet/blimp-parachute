@@ -32,6 +32,7 @@
    #:get-client-config
 
    #:btrfs-snapshots
+   #:btrfs-snapshot-info
    #:btrfs/subvolume/snapshot
    #:btrfs/send
    #:btrfs/subvolume/show

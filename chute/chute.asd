@@ -12,10 +12,11 @@
 |#
 
 (defsystem :chute
-  :version "0.2.0.0"
+  :version "0.3.0.0"
   :perform (test-op (o c) (symbol-call :rt :do-tests))
   :depends-on (ironclad
                lparallel
+               cl-date-time-parser
                simple-date-time
                cl-json
                hunchentoot

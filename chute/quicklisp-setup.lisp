@@ -7,6 +7,7 @@
 
 (dolist (system '(:ironclad
                   :lparallel
+                  :cl-date-time-parser
                   :simple-date-time :cl-json
                   :hunchentoot
                   :restas :cl-who

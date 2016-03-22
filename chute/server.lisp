@@ -24,8 +24,7 @@
     (:post
      (receive-blob-post (request-uri*)))
     (:get
-     (setf (return-code*) +http-not-implemented+)
-      (hunchentoot:abort-request-handler))
+     (receive-blob-get (request-uri*)))
     (:put
      (receive-blob-put (request-uri*)))
     (otherwise
@@ -78,10 +77,9 @@
                  (when (not (= bytes (length buffer)))
                    (setf input-stream-eof-p t))))
         (note "DEBUG Finished reading ~a bytes" total-bytes)))
-      
   (setf (hunchentoot:content-type*) "application/json"
           (return-code*) 201)
-    "true")) ;; TODO return true when we actually can verify that a write occurred
+    "true"))
 
 (defun blob-path (metadata)
   (format nil "~a/~a/"
@@ -104,6 +102,22 @@
   (merge-pathnames
    (subseq path (length *blob-uri-path*))
    *blob-storage-directory*))
+
+#|
+    -->  GET /chute/blob/<URI>/index.json              
+    nil
+    <--  200 Original or 304 Not Modified or [45]xx Error
+    (index.json) or nil
+
+    -->  GET /chute/blob/<URI>/0
+    <--  200 
+    (json) SHA256 Hash
+|#
+
+(defun receive-blob-get (path)
+  (warn "Unimplemented RECIEVE-BLOB-PUT.")
+  (setf (return-code*) +http-not-implemented+)
+  (hunchentoot:abort-request-handler))
 
 (defparameter *server* nil)
 

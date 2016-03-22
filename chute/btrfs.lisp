@@ -89,3 +89,22 @@
       (t (error)
         (note "btrfs send failed with '~a'." error)
         (return-from btrfs/send nil)))))
+
+(defun btrfs-snapshot-info (path)
+  (let ((show (btrfs/subvolume/show :path path))
+        (result (make-hash-table :test 'equal)))
+    (loop
+       :for line :in (cl-ppcre:split "\\n" show)
+       :do (multiple-value-bind (match-p matches)
+               (cl-ppcre:scan-to-strings "^\\t([^:]+):\\s+(.+)$" line)
+             (when match-p 
+               (setf (gethash (aref matches 0) result)
+                     (aref matches 1)))))
+    result))
+
+             
+        
+       
+
+
+                     

@@ -15,13 +15,13 @@
                         :content-type "application/octet-stream")))
 
 (defvar *debug-post-results* nil)
+(defun parse-post-result (results)
+  (setf *debug-post-results* results)
+  (format nil "~a~a" post-uri results))
+
 (defun transfer-blob/http (blob-directory &key (post-uri (uri-base)))
   ;;; POST the metadata
-  (flet ((interpret-post-results (results)
-           (warn "Unimplemented parse of POST result.")
-           (setf *debug-post-results* results)
-           (format nil "~a~a" post-uri results)))
-  (let ((post-index-results
+  (let ((post-result
          (drakma:http-request post-uri
                               :method :post
                               :content-type "application/json"
@@ -29,11 +29,11 @@
     ;; Transfer the blob shards
     ;; Only one shard for now.
     ;;; TODO use byte-range to dynamically adjust transfer rate inside a shard
-    (let ((shard-uri (format nil "~a0" (interpret-post-results post-index-results)))
+    (let ((shard-uri (format nil "~a0" (parse-post-result post-result)))
           (shard-0-path (merge-pathnames "0" blob-directory)))
       (note "Putting shard to ~a" shard-uri)
       (with-open-file (shard-stream shard-0-path :element-type '(unsigned-byte 8))
-        (put-shard shard-stream :uri shard-uri))))))
+        (put-shard shard-stream :uri shard-uri)))))
 
 
  
