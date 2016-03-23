@@ -20,7 +20,7 @@
     :accessor mount
     :documentation "Filesystem mount point of blob.")
    (timestamp
-    :reader timestamp
+    :accessor timestamp
     :initform (simple-date-time:|yyyymmddThhmmssZ| (simple-date-time:now)))
    (parent
     :initform nil
@@ -50,16 +50,30 @@
                                 :direction :input
                                 :element-type '(unsigned-byte 8))
     (make-blob input-stream blob-path)))
-  
+
 (defmethod make-blob ((snapshot-path string) blob-path)
-  (make-blob (btrfs/send snapshot-path) blob-path))
+  (prog1
+      (make-blob (btrfs/send snapshot-path) blob-path)
+    ;; The following shenanigans are just to set the blob timestamp to
+    ;; the creation time.  Obviously we should redo the API for making
+    ;; a blob somehow.
+    (let ((transfer (make-transfer snapshot-path))
+          (metadata (with-open-file (stream (merge-pathnames "index.json" blob-path))
+                      (cl-json:with-decoder-simple-clos-semantics (cl-json:decode-json stream)))))
+      (setf (timestamp metadata)
+            (creation-time transfer)
+
+            (mount metadata)
+            (snapshot-mount snapshot-path))
+      (with-open-file (stream (merge-pathnames "index.json" blob-path) :direction :output
+                              :if-exists :supersede)
+        (cl-json:encode-json metadata stream)))))
 
 (defmethod make-blob ((input-stream stream) blob-path)
   "Make blob from INPUT-STREAM with output at BLOB-PATH"
   (ensure-directories-exist blob-path) ;; XXX should be done elsewhere, but I guess it can't hurt.
   (let* ((total-shard-bytes 0)
          (metadata (make-instance 'metadata))
-           ;;; TODO: initialize with AES key and random nonce
          (aes-ctr (get-key)) 
          (cipher (cipher aes-ctr))
          (digest (ironclad:make-digest :sha256))
@@ -93,7 +107,7 @@
 
 ;;; XXX this will read the ENTIRE BLOB into memory before returning a result
 (defun decrypt-blob-as-octets (directory)
-  "Decrypt the blob in DIRECTORY as a stream of bytes."
+  "Decrypt the blob in DIRECTORY as a stream of bytes"
   (let* ((metadata (with-open-file (stream (merge-pathnames "index.json" directory))
                      (cl-json:with-decoder-simple-clos-semantics (cl-json:decode-json stream))))
          (aes-ctr (make-instance 'aes-ctr :nonce (slot-value metadata 'nonce)))

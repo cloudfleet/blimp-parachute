@@ -4,7 +4,7 @@
   ((snapshot
     :accessor snapshot
     :initarg :snapshot
-    :documentation "Local snapshot corresponding to this transfer.")
+    :documentation "Local snapshot path corresponding to this transfer.")
    (creation-time
     :accessor creation-time
     :initform nil

@@ -28,6 +28,7 @@
        :doing (progn
                 (multiple-value-bind (sec min hour date month year daylight-p zone)
                     (get-decoded-time)
+                  (declare (ignore sec date month year daylight-p zone))
                   (when (and (= min 0)
                              (= hour 0))
                     (snapshot)

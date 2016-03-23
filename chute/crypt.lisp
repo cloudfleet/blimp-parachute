@@ -51,7 +51,6 @@
 
 (defun get-key ()
   "Return an AES-CTR ready to be used."
-  ;;; TODO read in key from known location
   (let ((nonce (make-array 8 :element-type '(unsigned-byte 8))))
     (with-open-file (random "/dev/urandom"  :element-type '(unsigned-byte 8))
       (loop :for i :below 8

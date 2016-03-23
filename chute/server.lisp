@@ -115,6 +115,7 @@
 |#
 
 (defun receive-blob-get (path)
+  (declare (ignore path))
   (warn "Unimplemented RECIEVE-BLOB-PUT.")
   (setf (return-code*) +http-not-implemented+)
   (hunchentoot:abort-request-handler))

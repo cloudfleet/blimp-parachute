@@ -17,8 +17,15 @@
      (get-output-stream-string output)
      (get-output-stream-string error))))
 
+(defvar *snapshot-prefix* "/.snapshot/")
+
 (defun snapshot-directory (path)
-  (format nil "~a/.snapshot/" (string-right-trim "/" path)))
+  "Return the location for accumulating snapshots for PATH"
+  (concatenate 'string (string-right-trim "/" path) *snapshot-prefix*))
+
+(defun snapshot-mount (snapshot-path)
+  "Given a full SNAPSHOT-PATH return the mount point"
+  (subseq snapshot-path 0 (1+ (search *snapshot-prefix* snapshot-path))))
 
 ;;; TODO Need command to figure out latest generation
 (defun btrfs/subvolume/find-new (&key (path (path (get-client-config))) (generation 0))
