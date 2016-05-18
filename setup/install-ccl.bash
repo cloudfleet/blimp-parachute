@@ -6,6 +6,7 @@ case `uname -s` in
         ccl_uri=${ccl_uri_base}/ccl-1.11-darwinx86.tar.gz
         ;;
     Linux)
+        apt-get install -y wget 
         case `uname -m` in
             *86*)
                 ccl_uri=${ccl_uri_base}/ccl-1.11-linuxx86.tar.gz
