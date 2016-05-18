@@ -12,7 +12,8 @@
                   :hunchentoot
                   :restas :cl-who
                   :drakma
-                  :osicat
+                  #+nil 
+                  :osicat ;; To use for shared memory access, currently unused
                   :rt))
   (ql:quickload system))
 

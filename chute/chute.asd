@@ -25,8 +25,10 @@
                
                drakma
 
+               #| Unused: problems under linux/sbcl and solaris/*
                #-(or solaris)
                osicat
+               |#
 
                rt)
   :components ((:module package :pathname ""
