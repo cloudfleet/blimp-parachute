@@ -1,8 +1,12 @@
-#+abcl
-(dolist (require '(:abcl-contrib :quicklisp-abcl))
-  (require require))
-
 (require :asdf)
+
+#+abcl
+(eval-when (:load-toplevel :execute)
+  (dolist (required '(:abcl-contrib
+                      :quicklisp-abcl
+                      :jna))
+    (require required)))
+
 (in-package :asdf)
 
 #| b0rked:  just load chute-quickload.lisp where possible
