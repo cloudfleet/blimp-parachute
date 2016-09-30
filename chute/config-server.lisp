@@ -1,4 +1,4 @@
-(in-package :chute.server)
+(in-package :chute/server)
 
 (defparameter *blob-storage-directory*
   (asdf:system-relative-pathname :chute "../var/blob/"))

@@ -9,12 +9,6 @@
 
 (in-package :asdf)
 
-#| b0rked:  just load chute-quickload.lisp where possible
-(eval-when (:compile-toplevel :execute)
-  (load (asdf:system-relative-pathname (asdf:find-system :chute)
-                                       "quicklisp-setup")))
-|#
-
 (defsystem :chute
   :version "0.3.0.0"
   :perform (test-op (o c) (symbol-call :rt :do-tests))
@@ -44,7 +38,7 @@
                         :depends-on (package)
                         :serial t :components
                         ((:file "util")
-                         (:file "btrfs")
+                         (:file "btrfs") (:file "zfs")
                          (:file "note")
                          (:file "blob")
                          (:file "chute")

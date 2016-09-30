@@ -1,4 +1,4 @@
-(in-package :chute)
+(in-package :chute/btrfs)
 ;;;; BTRFS specific code
 ;;;; (swap in ZFS as an exercise?)
 

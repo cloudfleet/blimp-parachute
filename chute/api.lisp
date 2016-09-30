@@ -1,4 +1,4 @@
-(in-package :api)
+(in-package :chute/api)
 
 (restas:define-route %index ("")
   (who:with-html-output-to-string (o)

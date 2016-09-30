@@ -1,4 +1,5 @@
 (defpackage :chute
+  (:nicknames #:parachute #:cloudfleet-parachute #:cloudfleet-chute)
   (:use :cl)
   (:export
    #:client
@@ -29,16 +30,10 @@
 
    #:start-api-server #:stop-api-server #:restart-api-server
 
-   #:get-client-config
+   #:get-client-config))
 
-   #:btrfs-snapshots
-   #:btrfs-snapshot-info
-   #:btrfs/subvolume/snapshot
-   #:btrfs/send
-   #:btrfs/subvolume/show
-   #:btrfs/subvolume/find-new))
 
-(defpackage :chute.server
+(defpackage :chute/server
   (:use :cl :hunchentoot)
   (:import-from #:chute
                 #:note
@@ -48,11 +43,21 @@
    #:running-server-p
    #:start-server #:stop-server #:restart-server))
 
-(defpackage :chute.test
-  (:use :cl :chute :chute.server))
+(defpackage :chute/test
+  (:use :cl :chute :chute/server))
 
-(restas:define-module #:chute.api
-  (:use #:cl #:chute)
-  (:nicknames #:api))
+(restas:define-module #:chute/api
+  (:use #:cl #:chute))
 
-
+(defpackage :chute/btrfs
+  (:use :cl :chute)
+  (:export
+   #:btrfs-snapshots
+   #:btrfs-snapshot-info
+   #:btrfs/subvolume/snapshot
+   #:btrfs/send
+   #:btrfs/subvolume/show
+   #:btrfs/subvolume/find-new))
+   
+(defpackage :chute/zfs
+  (:use :cl :chute))

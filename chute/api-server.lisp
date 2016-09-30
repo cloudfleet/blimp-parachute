@@ -10,7 +10,7 @@
 
 (defun start-api-server ()
   (ensure-directories-exist (asdf:system-relative-pathname :chute "../var/log/"))
-  (restas:start (find-package :api)
+  (restas:start (find-package :chute/api)
                 :port (api.port (get-client-config))
                 :acceptor-class 'http-acceptor))
 

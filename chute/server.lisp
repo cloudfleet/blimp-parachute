@@ -1,4 +1,4 @@
-(in-package :chute.server)
+(in-package :chute/server)
 
 (defvar *debug-last-request* nil)
 

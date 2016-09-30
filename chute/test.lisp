@@ -1,4 +1,4 @@
-(in-package :chute.test)
+(in-package :chute/test)
 
 (defmacro with-cloudfleet-config (&body body)
   `(progn
@@ -76,9 +76,9 @@ t)
 
 (rt:deftest blob.http.transfer.1
     (let ((directory (make-blob #p"/etc/passwd" (make-new-directory)))
-          (already-running-server-p (chute.server:running-server-p)))
+          (already-running-server-p (chute/server:running-server-p)))
       (unless already-running-server-p
-        (chute.server:start-server))
+        (chute/server:start-server))
       (prog1
           (let ((results
                  (multiple-value-list
@@ -86,7 +86,7 @@ t)
             ;;; TODO add other checks for successful transfer
             (= (second results) 201))
         (unless already-running-server-p
-          (chute.server:stop-server))))
+          (chute/server:stop-server))))
   t)
 
 
