@@ -2,7 +2,7 @@
 
 (defmacro with-cloudfleet-config (&body body)
   `(progn
-     (get-client-config :file "client-config.json" :force t)
+     (chute/config:default :file "client-config.json" :force t)
      ,@body))
 
 ;;; Working on blimp if BTRFS is present
@@ -51,8 +51,8 @@ t)
 ;;;  Simple test that AES block ciphers indeed retain state
 ;;;    D( E(x1) || E(x2) ) == x1 || x2
 (rt:deftest aes.block-state.1
-    (let ((key-1 (get-cipher :aes-ctr))
-          (key-2 (get-cipher :aes-ctr))
+    (let ((key-1 (chute/crypt:get-cipher :aes-ctr))
+          (key-2 (chute/crypt:get-cipher :aes-ctr))
           (plain-1 (ironclad:ascii-string-to-byte-array "this"))
           (cipher-1 (make-array 4 :element-type '(unsigned-byte 8)))
           (plain-2 (ironclad:ascii-string-to-byte-array "open"))

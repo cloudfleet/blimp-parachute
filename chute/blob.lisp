@@ -8,15 +8,15 @@
    (prototype
     :initform '(("lispClass" ."metadata") ("lispPackage". "chute")))
    (node
-    :initform (engineroom-node)
+    :initform (chute/io.cloudfleet:engineroom-node)
     :accessor node
     :documentation "Node creating this blob.")
    (domain
-    :initform (engineroom-domain)
+    :initform (chute/io.cloudfleet:engineroom-domain)
     :accessor domain
     :documentation "Domain creating this blob.")
    (mount
-    :initform (path (get-client-config))
+    :initform (chute/config:path (chute/config:default))
     :accessor mount
     :documentation "Filesystem mount point of blob.")
    (timestamp
@@ -53,7 +53,7 @@
 
 (defmethod make-blob ((snapshot-path string) blob-path)
   (prog1
-      (make-blob (btrfs/send snapshot-path) blob-path)
+      (make-blob (chute/fs:send snapshot-path) blob-path)
     ;; The following shenanigans are just to set the blob timestamp to
     ;; the creation time.  Obviously we should redo the API for making
     ;; a blob somehow.
@@ -64,7 +64,7 @@
             (creation-time transfer)
 
             (mount metadata)
-            (snapshot-mount snapshot-path))
+            (chute/fs:snapshot/mount snapshot-path))
       (with-open-file (stream (merge-pathnames "index.json" blob-path) :direction :output
                               :if-exists :supersede)
         (cl-json:encode-json metadata stream)))))
@@ -74,8 +74,8 @@
   (ensure-directories-exist blob-path) ;; XXX should be done elsewhere, but I guess it can't hurt.
   (let* ((total-shard-bytes 0)
          (metadata (make-instance 'metadata))
-         (aes-ctr (get-key)) 
-         (cipher (cipher aes-ctr))
+         (aes-ctr (chute/crypt:get-key)) 
+         (cipher (chute/crypt:get-cipher aes-ctr))
          (digest (ironclad:make-digest :sha256))
          (buffer-size 8192)
          (buffer (make-array buffer-size :element-type '(unsigned-byte 8))))
@@ -91,7 +91,7 @@
          :with input-stream-eof-p = nil
          :until input-stream-eof-p
          :do (multiple-value-bind (bytes eof-p b c d)
-                 (encrypt-from input-stream :buffer buffer :cipher cipher :digest digest)
+                 (chute/crypt:encrypt-from input-stream :buffer buffer :cipher cipher :digest digest)
                (declare (ignore b c d))
                (setf input-stream-eof-p eof-p)
                (incf total-shard-bytes bytes)
@@ -111,8 +111,9 @@
   (let* ((metadata (with-open-file (stream (merge-pathnames "index.json" directory))
                      (cl-json:with-decoder-simple-clos-semantics (cl-json:decode-json stream))))
          (aes-ctr (make-instance 'aes-ctr :nonce (slot-value metadata 'nonce)))
-         (cipher (cipher aes-ctr))
-         (buffer (make-array (buffer-size) :element-type '(unsigned-byte 8))))
+         (cipher (chute/crypt:get-cipher aes-ctr))
+         (buffer (make-array (chute/config:buffer-size)
+                             :element-type '(unsigned-byte 8))))
     (with-open-file (shard (merge-pathnames "0" directory)
                            :direction :input
                            :element-type '(unsigned-byte 8))
@@ -122,7 +123,7 @@
           :with eof = nil
           :until eof
           :do (let ((bytes-read (read-sequence buffer shard)))
-                (when (not (= bytes-read (buffer-size)))
+                (when (not (= bytes-read (chute/config:buffer-size)))
                   (setf eof t))
                 (ironclad:decrypt-in-place cipher buffer :start 0 :end bytes-read)
                 ;;; XXX one byte at a time? Optimize me!
@@ -145,7 +146,7 @@
                                       :direction :output
                                       :element-type '(unsigned-byte 8)
                                       :if-exists :supersede)
-                (with-open-file (input *random-device*
+                (with-open-file (input chute/config:*random-device*
                                        :direction :input
                                        :element-type '(unsigned-byte 8))
                   (loop :for i :below shard-size

@@ -32,14 +32,14 @@
 
 (defun transcribe-transfers ()
   (let (transfers)
-    (dolist (snapshot (btrfs-snapshots))
+    (dolist (snapshot (chute/fs:snapshots))
       (push
        (make-transfer snapshot)
        transfers))
     transfers))
 
 (defun make-transfer (path)
-  (let* ((info (btrfs-snapshot-info path))
+  (let* ((info (chute/fs:snapshot/info path))
          (date-string (gethash "Creation time" info))
          (result (make-instance 'transfer-http :snapshot path)))
     (setf (creation-time result)

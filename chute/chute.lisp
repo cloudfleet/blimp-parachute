@@ -1,9 +1,9 @@
 (in-package :chute)
 
 (defun client (&key (config "client-config.json"))
-  "Main entrypoint for client."
+  "Boot the chute client computation locally."
   (note "Starting client configured via ~a" config)
-  (get-client-config :file config :force t)
+  (chute/config:default :file config :force t)
   (start-api-server)
   (if lparallel:*kernel*
       (warn "lparallel kernel unexpectedly present.")
@@ -19,11 +19,11 @@
 (defun snapshot-task ()
   (flet ((snapshot ()
            (multiple-value-bind (out err snap-path)
-               (btrfs/subvolume/snapshot :path (path (get-client-config)))
+               (chute/fs:snapshot :path (chute/config:path (chute/config:default)))
              (note "Snapshot of '~a' with output ~&~a~& and error~&~a~&" snap-path out err)
              snap-path)))
-    (unless (btrfs-snapshots)
-      (snapshot))
+    (unless (chute/fs:snapshots)
+      (chute/fs:snapshot))
     (loop
        :doing (progn
                 (multiple-value-bind (sec min hour date month year daylight-p zone)
@@ -36,7 +36,8 @@
                   (sleep 31))))))
 
 (defun transfer-task ()
-  "Main task for transferring backups.")
+  (warn "Main task for transferring backups."))
+
 
 
      

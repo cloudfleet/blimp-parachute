@@ -22,11 +22,11 @@
       (:div :id "snapshot-list"
             (:h2 "Existing Snapshots")
             (:ul
-             (loop :for snapshot :in (btrfs-snapshots)
+             (loop :for snapshot :in (chute/fs:snapshots)
                 :do (who:htm (:li :class "snapshot-list-item" (who:str snapshot))))))))))
 
 (restas:define-route %snapshot.post ("/snapshot" :method :post)
-  (btrfs/subvolume/snapshot)
+  (chute/fs:snapshot)
   (restas:redirect '%snapshot))
 
   

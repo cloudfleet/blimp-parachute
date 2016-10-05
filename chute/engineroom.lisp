@@ -1,4 +1,4 @@
-(in-package :chute)
+(in-package :chute/io.cloudfleet)
 
 (defun engineroom-domain ()
   "Return the dns domain for the node as configured in cloudfleet/engineroom"

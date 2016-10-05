@@ -17,12 +17,12 @@
 (defvar *debug-post-results* nil)
 (defun parse-post-result (results)
   (setf *debug-post-results* results)
-  (format nil "~a~a" (uri-base) results))
+  (format nil "~a~a" (chute/config:uri-base) results))
 
 (defun transfer-blob/http (blob-directory)
   ;;; POST the metadata
   (let ((post-result
-         (drakma:http-request (uri-base)
+         (drakma:http-request (chute/config:uri-base)
                               :method :post
                               :content-type "application/json"
                               :content (merge-pathnames "index.json" blob-directory))))

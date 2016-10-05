@@ -3,13 +3,13 @@
 ;;;; (swap in ZFS as an exercise?)
 
 ;;; Currently takes a full snaphot
-(defun btrfs/subvolume/snapshot (&key (path (path (get-client-config))))
+(defun subvolume/snapshot (&key (path (chute/config:default)))
   (let* ((output (make-string-output-stream))
          (error (make-string-output-stream))
          (timestamp (simple-date-time:|yyyymmddThhmmssZ| (simple-date-time:now)))
          (snapshot-path (format nil "~a~a" (snapshot-directory path) timestamp))
          (snapshot (format nil "~a subvolume snapshot -r ~a ~a"
-                           *btrfs-command*
+                           chute/config:*btrfs-command*
                            path snapshot-path)))
     (uiop:run-program snapshot :output output :error error)
     (values
@@ -23,36 +23,39 @@
   "Return the location for accumulating snapshots for PATH"
   (concatenate 'string (string-right-trim "/" path) *snapshot-prefix*))
 
-(defun snapshot-mount (snapshot-path)
+(defun snapshot/mount (snapshot-path)
   "Given a full SNAPSHOT-PATH return the mount point"
   (subseq snapshot-path 0 (1+ (search *snapshot-prefix* snapshot-path))))
 
 ;;; TODO Need command to figure out latest generation
-(defun btrfs/subvolume/find-new (&key (path (path (get-client-config))) (generation 0))
+(defun subvolume/find-new (&key
+                             (path (chute/config:path (chute/config:default)))
+                             (generation 0))
   (let* ((o (make-string-output-stream))
          (find-new (format nil "~a subvolume find-new ~a ~a"
-                           *btrfs-command*
+                           chute/config:*btrfs-command*
                            path generation)))
     (uiop:run-program find-new :output o)
     (get-output-stream-string o)))
 
-(defun btrfs/subvolume/show (&key
-                               (path (path (get-client-config))))
+(defun subvolume/show (&key
+                         (path (chute/config:path (chute/config:default))))
   (with-output-to-string (output)
     (with-output-to-string (error)
       (let ((command (format nil "~a subvolume show ~a"
-                             *btrfs-command*
+                             chute/config:*btrfs-command*
                              path)))
         (handler-case 
             (uiop:run-program command :output output :error error)
           (t (e)
             (declare (ignore e))
-            (return-from btrfs/subvolume/show (values nil output error)))))
+            (return-from subvolume/show (values nil output error)))))
       (values output error))))
 
-(defun btrfs-snapshots (&key (path (path (get-client-config))))
+(defun snapshots (&key
+                    (path (chute/config:path (chute/config:default))))
   "List all available snapshots which exist for PATH."
-  (let ((show (btrfs/subvolume/show :path path)))
+  (let ((show (subvolume/show :path path)))
     (loop
        :for line :in (cl-ppcre:split "\\n" show)
        :with snapshot-region = nil
@@ -64,9 +67,9 @@
        :when (cl-ppcre:scan "Snapshot\\(s\\):" line)
        :do (setf snapshot-region t))))
 
-(defun btrfs/send (snapshot-path)
+(defun send (snapshot-path)
   "Returns the stream containing the output of the btrfs/send operation on SNAPSHOT-PATH."
-  (let ((command (format nil "~A" *btrfs-command*))
+  (let ((command (format nil "~A" chute/config:*btrfs-command*))
         (args (list "send" snapshot-path)))
     (handler-case
         (let ((result
@@ -95,10 +98,10 @@
           (values result))
       (t (error)
         (note "btrfs send failed with '~a'." error)
-        (return-from btrfs/send nil)))))
+        (return-from send nil)))))
 
-(defun btrfs-snapshot-info (path)
-  (let ((show (btrfs/subvolume/show :path path))
+(defun snapshot-info (path)
+  (let ((show (subvolume/show :path path))
         (result (make-hash-table :test 'equal)))
     (loop
        :for line :in (cl-ppcre:split "\\n" show)
@@ -109,9 +112,10 @@
                      (aref matches 1)))))
     result))
 
-             
-        
-       
-
-
-                     
+(defun snapshot/info (path)
+  `(:mount
+    ,(chute/btrfs:snapshot/mount path)
+    :snapshots-directory
+    ,(chute/btrfs:snapshot-directory path)
+    :snapshots
+    ,(snapshot-info path)))

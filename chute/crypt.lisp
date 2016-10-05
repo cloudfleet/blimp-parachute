@@ -1,4 +1,4 @@
-(in-package :chute)
+(in-package :chute/crypt)
 
 (defun encrypt-output (send-output
                        &key (cipher (get-cipher :aes)))
@@ -30,14 +30,14 @@
     (cond
       ((and (keywordp type)
             (eq type :aes-ctr))
-       (let ((key (or (engineroom-key)
+       (let ((key (or (chute/io.cloudfleet:engineroom-key)
                       (make-array 32 :element-type '(unsigned-byte 8)))))
          (ironclad:make-cipher :aes :mode :ctr
                                :key key
                                :initialization-vector
                                (make-array 16 :element-type '(unsigned-byte 8)))))
       ((eq type :aes)
-       (let ((key (or (engineroom-key)
+       (let ((key (or (chute/io.cloudfleet:engineroom-key)
                       (make-array 32 :element-type '(unsigned-byte 8)))))
          (ironclad:make-cipher :aes :mode :cfb
                                :key key
@@ -71,7 +71,7 @@
   ((key :accessor key
         :type '((unsigned-byte 8) 32)
         :initform (or
-                   (engineroom-key)
+                   (chute/io.cloudfleet:engineroom-key)
                    (progn
                      (warn "Creating null key.")
                      (make-array 32 :element-type '(unsigned-byte 8)))))
@@ -99,13 +99,14 @@
 
 
 (defun encrypt-from (stream &key
-                              (buffer (make-array (buffer-size) :element-type '(unsigned-byte 8)) buffer-p)
+                              (buffer (make-array (chute/config:buffer-size)
+                                                  :element-type '(unsigned-byte 8)) buffer-p)
                               (cipher nil cipher-p)
                               (digest nil digest-p))
   "Encrypt bytes from STREAM with CIPHER into BUFFER updating DIGEST on encrypted contents."
   (let* ((b (if  buffer-p
                  buffer
-                 (make-array (buffer-size) :element-type '(unsigned-byte 8))))
+                 (make-array (chute/config:buffer-size) :element-type '(unsigned-byte 8))))
          (bytes (read-sequence buffer stream)))
     (when cipher-p
       (ironclad:encrypt-in-place cipher b :start 0 :end bytes))
@@ -122,13 +123,14 @@
       digest)))
 
 (defun decrypt-from (stream &key
-                              (buffer (make-array (buffer-size) :element-type '(unsigned-byte 8)) buffer-p)
+                              (buffer (make-array (chute/config:buffer-size)
+                                                  :element-type '(unsigned-byte 8)) buffer-p)
                               (cipher nil cipher-p)
                               (digest nil digest-p))
   "Decrypt bytes via CIPHER from STREAM into BUFFER updating DIGEST on unencrypted contents."
   (let* ((b (if  buffer-p
                 buffer
-                (make-array (buffer-size) :element-type '(unsigned-byte 8))))
+                (make-array (chute/config:buffer-size) :element-type '(unsigned-byte 8))))
          (bytes (read-sequence b stream)))
     (when cipher-p
       (ironclad:decrypt-in-place cipher buffer :start 0 :end bytes))

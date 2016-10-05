@@ -2,3 +2,7 @@
 
 (eval-when (:execute)
   (warn "ZFS unimplemented"))
+
+(defclass zfs (fs)
+  ((unimplemented)))
+

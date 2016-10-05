@@ -133,7 +133,7 @@
     (warn "Stopping already present acceptor.")
     (stop *server*)
     (setf *server* nil))
-  (setf *server* (make-instance 'http-acceptor :port *port*))
+  (setf *server* (make-instance 'http-acceptor :port chute/server:*port*))
   (start *server*))
 
 (defun stop-server ()

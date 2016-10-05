@@ -14,10 +14,15 @@
     (get-output-stream-string result)))
 
 (defun make-new-directory ()
-  (ensure-directories-exist *blobs-directory*)
-  (let* ((directory-as-file (pathname (cl-fad:open-temporary
-                                       :template (namestring (merge-pathnames "blob-%" *blobs-directory*)))))
-         (directory-with-file (pathname (namestring (concatenate 'string (namestring directory-as-file) "/foo")))))
+  (let* ((var-root
+          (ensure-directories-exist chute/config:*blobs-directory*))
+         (directory-as-file
+          (pathname (cl-fad:open-temporary
+                     :template (namestring (merge-pathnames "blob-%" var-root)))))
+         (directory-with-file
+          (pathname (namestring (concatenate 'string
+                                             (namestring directory-as-file)
+                                             "/foo")))))
     (delete-file directory-as-file)
     (ensure-directories-exist directory-with-file)
     (pathname (concatenate 'string (namestring directory-as-file) "/"))))

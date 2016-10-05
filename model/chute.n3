@@ -25,4 +25,13 @@ chute:time
 chute:mirrorworld
   rdfs:label "An ordered collection of blobs." .
 
+# Implementation
+
+chute:btrfs
+  rdfs:label "An implementation of snapshoting worldlines from BTRFS filesystems." .
+
+chute:zfs
+  rdfs:label "An implementation of snapshoting worldlines from ZFS filesystems." .
+
 <> rdfs:seeAlso <https://github.com/cloudfleet/tree/master/blimp-parachute/model/chute.n3> .
+

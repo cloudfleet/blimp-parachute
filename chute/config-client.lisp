@@ -1,6 +1,7 @@
-(in-package :chute)
+(in-package :chute/config)
+(defparameter *client-config* nil)
 
-(defclass config () ())
+(defclass config (chute-model) ())
 
 (defclass client (config)
   ((version
@@ -9,15 +10,16 @@
    (prototype
     :initform '(("lispClass" ."client") ("lispPackage". "chute")))
    (path
-    :initform "/opt/cloudfleet/data"
+    :initform (or (truename #p"/opt/io/cloudfleet/data")
+                  #+abcl
+                  (truename #p"https://api.cloudfleet.io/client/config"))
     :accessor path)
    (api.port
     :accessor api.port)
    (transfer-method
     :accessor transfer-method)))
-  
-(defparameter *client-config* nil)
-(defun get-client-config (&key (file "client-config.json") (force nil))
+
+(defun default (&key (file "client-config.json") (force nil))
   (when (or (not *client-config*)
             force )
     (setf *client-config*
@@ -61,9 +63,10 @@
 (defun uri-base ()
   (format nil "~a://~a~a" *scheme* (uri-authority) *blob-uri-path*))
 
+#+nil
 (defun ensure-sanity ()
-  (let* ((path (path (get-client-config)))
-         (snapshot (snapshot-directory path)))
+  (let* ((path (chute/config:path (chute/config:default)))
+         (snapshot (assoc :snapshots-directory (chute/fs:snapshot/info path))))
     (unless (probe-file path)
       (error "The path to backup doesn't exist at '~a.'" path))
     (unless (probe-file snapshot)

@@ -10,7 +10,7 @@
 (in-package :asdf)
 
 (defsystem :chute
-  :version "0.3.0.0"
+  :version "0.4.0"
   :perform (test-op (o c) (symbol-call :rt :do-tests))
   :depends-on (ironclad
                lparallel
@@ -31,14 +31,18 @@
                rt)
   :components ((:module package :pathname ""
                         :serial t :components
-                        ((:file "package")
-                         (:file "config-client")
-                         (:file "engineroom")))
-               (:module source :pathname ""
+                        ((:file "package")))
+               (:module config :pathname ""
                         :depends-on (package)
                         :serial t :components
+                        ((:file "macos")
+                         (:file "config-client")
+                         (:file "config-server")))
+               (:module source :pathname ""
+                        :depends-on (config)
+                        :serial t :components
                         ((:file "util")
-                         (:file "btrfs") (:file "zfs")
+                         (:file "fs") (:file "btrfs") (:file "zfs")
                          (:file "note")
                          (:file "blob")
                          (:file "chute")
@@ -56,12 +60,15 @@
                (:module server :pathname ""
                         :depends-on (source)
                         :serial t :components
-                        ((:file "config-server")
-                         (:file "server")))
+                        ((:file "server")))
+               (:module io.cloudfleet :pathname ""
+                        :depends-on (source)
+                        :serial t :components
+                        ((:file "engineroom")))
                (:module osx :pathname ""
                         :depends-on (source)
                         :serial t :components
-                        ((:file "osx")))
+                        ((:file "macos")))
                (:module test :pathname ""
                         :depends-on (server api crypt)
                         :serial t :components
