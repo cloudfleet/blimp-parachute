@@ -12,6 +12,7 @@
                   :hunchentoot
                   :restas :cl-who
                   :drakma
+                  :prove
                   #+nil 
                   :osicat ;; To use for shared memory access, currently unused
                   :rt))

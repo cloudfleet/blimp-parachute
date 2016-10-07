@@ -10,6 +10,7 @@
 (in-package :asdf)
 
 (defsystem :chute
+
   :version "0.4.0"
   :perform (test-op (o c) (symbol-call :rt :do-tests))
   :depends-on (ironclad
@@ -73,5 +74,14 @@
                         :depends-on (server api crypt)
                         :serial t :components
                         ((:file "test")))))
+
+;;; I'm an evil runtime thingie: figure out how to eliminate me
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (let ((quicklisp-dependencies (asdf:system-relative-pathname :chute "quicklisp-setup.lisp")))
+    (format t "~&Doing a QL:QUICKLOAD across all dependencies declared in <file:~a> ...~^"
+            quicklisp-dependencies)
+    (load quicklisp-dependencies)
+    (format t "~&DONE executing QL:QUICKLOAD forms from <file:~a>.~^"
+            quicklisp-dependencies)))
 
 
