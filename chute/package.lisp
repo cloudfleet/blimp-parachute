@@ -52,7 +52,7 @@
 
    #:with-cloudfleet-config
 
-   #:version  #:path #:api.port #:transfer-method
+   #:version  #:path #:api.port #:transfer-method #:backing-store
    #:default-mount))
 
 (defpackage :chute/server
@@ -94,6 +94,9 @@
    #:subvolume/find-new))
    
 (defpackage :chute/zfs
+  (:use :cl :chute))
+
+(defpackage :chute/rsync
   (:use :cl :chute))
 
 (defpackage :chute/io.cloudfleet

@@ -29,7 +29,10 @@
                         :depends-on (config)
                         :serial t :components
                         ((:file "util")
-                         (:file "fs") (:file "btrfs") (:file "zfs")
+                         (:file "fs")
+                         (:file "btrfs")
+                         (:file "zfs")
+                         (:file "rsync")
                          (:file "note")
                          (:file "blob")
                          (:file "chute")
@@ -68,6 +71,7 @@
 			  :pathname "t/"
 			  :components
 			  ((:test-file "aes")
+                           (:test-file "type")
 			   (:test-file "snapshot")
 			   (:test-file "config")
 			   (:test-file "test")))))

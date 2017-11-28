@@ -17,8 +17,12 @@
                   #+abcl
                   (probe-file #p"https://api.cloudfleet.io/client/config"))
     :accessor path)
+   (backing-store
+    :documentation "Locally available filesystem abstractions for snapshoting."
+    :initform (alexandria:random-elt '(:btrfs :zfs :rsync)))
    (api.port
-    :accessor api.port)
+    :accessor api.port
+    :initform 2020)
    (transfer-method
     :accessor transfer-method)))
 
