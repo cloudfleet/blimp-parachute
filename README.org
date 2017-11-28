@@ -220,6 +220,8 @@ Implementation use HTTP 'Byte-range' header to files attached/detatched via mmap
 ** TODO Tests for use cases
 ** TODO Metadata transcriptions
 *** URI Scheme for previous link
+** TODO Generalize filesytem snapshoting abstraction 
+Implement ZFS.
 * Notes
 ** Osicat failing to grovel
 <https://github.com/osicat/osicat/pull/11/files>
@@ -227,6 +229,6 @@ Implementation use HTTP 'Byte-range' header to files attached/detatched via mmap
 #+BEGIN_ASCII
         <mark@evenson.eu>
         Created: 01-OCT-2015
-        Revised: 28-AUG-2016
+        Revised: <2017-11-28 Tue 09:53>
 #+END_ASCII
 

@@ -14,6 +14,7 @@
     (get-output-stream-string result)))
 
 (defun make-new-directory ()
+  "Make a new temporary directory within CHUTE/CONFIG:*BLOBS-DIRECTORY*."
   (let* ((var-root
           (ensure-directories-exist chute/config:*blobs-directory*))
          (directory-as-file

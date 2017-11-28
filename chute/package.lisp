@@ -19,6 +19,8 @@
 
    #:strip-double-slash
 
+   #:chute-model
+
    #:make-new-directory
 
    #:start-api-server #:stop-api-server #:restart-api-server))
@@ -45,6 +47,11 @@
    #:*random-device*
    #:buffer-size
 
+   #:config
+   #:client
+
+   #:with-cloudfleet-config
+
    #:version  #:path #:api.port #:transfer-method
    #:default-mount))
 
@@ -57,9 +64,6 @@
    #:*port*
    #:running-server-p
    #:start-server #:stop-server #:restart-server))
-
-(defpackage :chute/test
-  (:use :cl :chute :chute/server))
 
 (defpackage :chute/fs
   (:use :cl :chute)

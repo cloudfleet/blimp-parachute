@@ -1,14 +1,5 @@
-(require :asdf)
-
-#+abcl ;; automagically make Quicklisp available under ABCL
-(eval-when (:load-toplevel :execute)
-  (dolist (required '(:abcl-contrib :quicklisp-abcl))
-    (require required)))
-
-(in-package :asdf)
-
-(defsystem :chute
-  :version "0.4.0"
+(defsystem chute
+  :version "0.5.0"
   :perform (test-op (o c) (symbol-call :rt :do-tests))
   :depends-on (ironclad
                lparallel
@@ -24,8 +15,12 @@
   :components ((:module package :pathname ""
                         :serial t :components
                         ((:file "package")))
-               (:module config :pathname ""
+	       (:module model :pathname ""
                         :depends-on (package)
+                        :components
+                        ((:file "model")))
+               (:module config :pathname ""
+                        :depends-on (model)
                         :serial t :components
                         ((:file "macos")
                          (:file "config-client")
@@ -60,10 +55,22 @@
                (:module osx :pathname ""
                         :depends-on (source)
                         :serial t :components
-                        ((:file "macos")))
-               (:module test :pathname ""
-                        :depends-on (server api crypt)
-                        :serial t :components
-                        ((:file "test")))))
+                        ((:file "macos"))))
+    :in-order-to ((asdf:test-op (asdf:test-op chute/t))))
+
+(defsystem chute/t
+    :defsystem-depends-on (prove-asdf)
+    :depends-on (prove
+		 chute)
+    :perform (asdf:test-op (op c)
+			   (uiop:symbol-call :prove-asdf 'run-test-system c))
+    :components ((:module test
+			  :pathname "t/"
+			  :components
+			  ((:test-file "aes")
+			   (:test-file "snapshot")
+			   (:test-file "config")
+			   (:test-file "test")))))
+
 
 

@@ -1,7 +1,9 @@
-(in-package :chute/config)
+(in-package chute/config)
+
 (defparameter *client-config* nil)
 
-(defclass config (chute-model) ())
+(defclass config ()
+  ())
 
 (defclass client (config)
   ((version
@@ -10,9 +12,10 @@
    (prototype
     :initform '(("lispClass" ."client") ("lispPackage". "chute")))
    (path
-    :initform (or (truename #p"/opt/io/cloudfleet/data")
+    :documentation "Location of data for client."
+    :initform (or (probe-file #p"/opt/io/cloudfleet/data")
                   #+abcl
-                  (truename #p"https://api.cloudfleet.io/client/config"))
+                  (probe-file #p"https://api.cloudfleet.io/client/config"))
     :accessor path)
    (api.port
     :accessor api.port)
@@ -62,6 +65,11 @@
 
 (defun uri-base ()
   (format nil "~a://~a~a" *scheme* (uri-authority) *blob-uri-path*))
+
+(defmacro with-cloudfleet-config (&body body)
+  `(progn
+     (chute/config:default :file "client-config.json" :force t)
+     ,@body))
 
 #+nil
 (defun ensure-sanity ()
