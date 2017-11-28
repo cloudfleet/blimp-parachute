@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # create btrfs subvolume, copy $path, remove $path
 . "/opt/cloudfleet/apps/parachute/etc/cf-vars.sh"

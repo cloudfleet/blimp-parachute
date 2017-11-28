@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
-# Create suid btrfs for use by chute in current directory
+# Create suid zfs for use by chute in current directory
 
 # as root...
 if [ $(id -u) != 0 ]; then

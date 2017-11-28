@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ccl_uri_base=ftp://ftp.clozure.com/pub/release/1.11/
 
 case `uname -s` in

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 . "/opt/cloudfleet/apps/parachute/etc/cf-vars.sh"
 
 export CCL_DEFAULT_DIRECTORY=${CF_APPS}/ccl
