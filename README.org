@@ -1,45 +1,45 @@
-#+TITLE Parachute: a zero knowledge backup system
+#+TITLE: Parachute: a zero knowledge backup system
 * Installation
 
   Running 
 #+NAME:  Basic installation of parachute in one command
-#+BEGIN_SRC sh
-bash -x setup/install-parachute.bash
+#+BEGIN_SRC shell
+bash -x ./setup/install-parachute.bash
 #+END_SRC
   with the appropiate permissions should enable all the following
   subclauses to be met.
 ** Place chute.asd in ASDF3 system registry
 #+NAME: Configuration of ASDF3 system registry to find blimp-parachute
-#+BEGIN_SRC
-    mkdir -p ~/.config/common-lisp/source-registry.conf.d/
-    cp chute.conf ~/.config/common-lisp/source-registry.conf.d/
+#+BEGIN_SRC shell
+bash -x ./chute/configure-asdf.bash
 #+END_SRC    
 
 ** Loading from ASDF
-#+BEGIN_SRC
-    (asdf:load-system :chute)
+#+BEGIN_SRC lisp
+(asdf:load-system :chute)
 #+END_SRC    
-
+   
 ** Testing from ASDF
-#+BEGIN_SRC
-    (asdf:test-system :chute)
+#+BEGIN_SRC lisp
+(asdf:test-system :chute)
 #+END_SRC    
 
 ** Loading Quicklisp dependencies
 1.  From the shell, download the Quicklisp install shim.
-#+BEGIN_SRC sh
-  wget https://beta.quicklisp.org/quicklisp.lisp
+#+BEGIN_SRC shell
+wget https://beta.quicklisp.org/quicklisp.lisp
 #+END_SRC  
 
 2.  From a Common Lisp implementation, execute the shim.
 #+BEGIN_SRC lisp
-  (load "~/quicklisp.lisp")
-  (quicklisp-quickstart:install)
+(load "~/quicklisp.lisp")
+(quicklisp-quickstart:install)
+(ql:add-to-init-file)
 #+END_SRC
 
 3.  Install the Quicklisp packages needed by chute.
 #+BEGIN_SRC lisp
- (load (asdf:system-relative-pathname 
+(load (asdf:system-relative-pathname 
     (asdf:find-system :chute) "quicklisp-setup.lisp"))
 #+END_SRC    
 
@@ -54,7 +54,7 @@ To build an image on arm32 with Docker installed:
 * REST API
 ** Current version 'v1'
 #+NAME: Fundamental Chute REST API
-#+BEGIN_ASCII
+#+BEGIN_EXAMPLE
     -->  POST /chute/blob/
     (index.json)                
     <--  201 Resource Created or [45]xx Error
@@ -77,7 +77,7 @@ To build an image on arm32 with Docker installed:
     <--  200 
     (json) SHA256 Hash
 
-#+END_ASCII
+#+END_EXAMPLE
 
 Authentication to be handled via HTTP Headers submitted to
 ```spire.marina.io``` API.
@@ -150,7 +150,7 @@ Unfortunately, this doesn't seem to work:
 
 complaining about
 
-#+BEGIN_ASCII
+#+BEGIN_EXAMPLE
 There is no applicable method for the generic function:
   #<STANDARD-GENERIC-FUNCTION STREAM-WRITE-VECTOR #x30200006518F>
 when called with arguments:
@@ -159,7 +159,7 @@ LICENSE
 parachute.org
 setup
 ...
-#+END_ASCII
+#+END_EXAMPLE
 
 Fortunately, CCL:RUN-PROGRAM takes an :ELEMENT-TYPE keyword which
 allows us to get octet streams out of the subprocesses.
@@ -226,9 +226,10 @@ Implement ZFS.
 ** Osicat failing to grovel
 <https://github.com/osicat/osicat/pull/11/files>
 * Colophon
-#+BEGIN_ASCII
-        <mark@evenson.eu>
-        Created: 01-OCT-2015
-        Revised: <2017-11-28 Tue 09:53>
-#+END_ASCII
+#+BEGIN_EXAMPLE
+<mark@evenson.eu>
+Created: 01-OCT-2015
+Revised: <2017-11-28 Tue 09:59>
+#+END_EXAMPLE
+
 
