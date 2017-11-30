@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
+DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-set -x
+cf_vars="/opt/cloudfleet/apps/parachute/etc/cf-vars.sh"
 
-. "/opt/cloudfleet/apps/parachute/etc/cf-vars.sh" 
+if [[ ! -f ${cf_vars} ]]; then
+    cf_vars=${DIR}/../etc/cf-vars.sh
+fi
+
+. ${cf_vars}
+
 if [[ -z "${CF}" ]]; then
-   echo "Failed to source configuration" && exit 1
+   echo "Failed to source configuration from ${cf_vars}" && exit 1
 fi
 
 tmp=${CF_TMP}

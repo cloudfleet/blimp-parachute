@@ -6,7 +6,10 @@ case `uname -s` in
         ccl_uri=${ccl_uri_base}/ccl-1.11-darwinx86.tar.gz
         ;;
     Linux)
-        apt-get install -y wget 
+	if [[ ! $(which wget) ]]; then
+	    echo Attempting to install wget.
+            apt-get install -y wget
+	fi
         case `uname -m` in
             *86*)
                 ccl_uri=${ccl_uri_base}/ccl-1.11-linuxx86.tar.gz
@@ -47,6 +50,12 @@ recompile_ccl () {
 install_ccl () {
     ccl_uri=$1
     dest=$2
+    if [[ ! -w ${dest} ]]; then
+	echo No write permissions under ${dest}.
+	echo Try running as root or specify a different destination.
+	exit 1
+    fi
+    echo Installing ${ccl_uri} under ${dest}
     tmp=/tmp/
     if [[ ! -z $ccl_uri ]]; then
         echo Installing CCL from uri $ccl_uri
@@ -67,6 +76,20 @@ install_ccl () {
     fi
 }
 
+install_ccl_wrapper () {
+    ccl_root=$1
+    ccl_wrapper=$2
+    echo "#!/usr/bin/env bash" > ${ccl_wrapper}
+    cat <<EOF >> ${ccl_wrapper}
+export CCL_DEFAULT_DIRECTORY=${ccl_root}
+exec $CCL \$* 
+EOF
+    chmod a+x ${ccl_wrapper}
+    echo Created invocation wrapper as ${ccl_wrapper}.
+}
+
+install_ccl "${ccl_uri}" "${prefix}"
+echo ccl installed as ${CCL}
+install_ccl_wrapper "${prefix}/ccl" /usr/local/bin/ccl
 
 
-install_ccl $ccl_uri $prefix
