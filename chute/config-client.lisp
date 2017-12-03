@@ -57,9 +57,12 @@
 
 ;; SERVER
 (defparameter *blob-storage-dir*
-  (merge-pathnames "blob/storage/" (user-homedir-pathname)))
+  (merge-pathnames "var/chute/blob/storage/" (user-homedir-pathname)))
 ;; CLIENT
-(defparameter *tmp-directory* "/mnt/storage/tmp/")
+(defparameter *tmp-directory*
+  (merge-pathnames "var/chute/" (user-homedir-pathname))
+#+(or)
+  "/mnt/storage/tmp/")
 (defparameter *blobs-directory* (merge-pathnames "blobs/" *tmp-directory*))
 
 (defun buffer-size () 8192)

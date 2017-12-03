@@ -10,8 +10,8 @@
 (prove:ok
  (chute/config:with-cloudfleet-config
    (let* ((file #p"/etc/passwd")
-	  (blob-directory (make-blob file (make-new-directory)))
-	  (octets (decrypt-blob-as-octets blob-directory)))
+	  (blob-directory (chute:make-blob file (chute:make-new-directory)))
+	  (octets (chute:decrypt-blob-as-octets blob-directory)))
      (with-open-file (stream file :direction :input :element-type '(unsigned-byte 8))
        (loop
 	  :for n :from 0

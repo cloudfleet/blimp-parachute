@@ -108,7 +108,8 @@
                  buffer
                  (make-array (chute/config:buffer-size) :element-type '(unsigned-byte 8))))
          (bytes (read-sequence buffer stream)))
-    (when cipher-p
+    (when (and cipher-p
+               cipher)
       (ironclad:encrypt-in-place cipher b :start 0 :end bytes))
     (when digest-p
       (ironclad:update-digest digest b :start 0 :end bytes))
