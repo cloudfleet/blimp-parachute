@@ -1,5 +1,8 @@
 (in-package :chute)
 
-(defclass chute-model (t)
-  ())
+(defclass chute-model ()
+  ((statements))
+  (:documentation "Chute model of operations"))
+
+
 
