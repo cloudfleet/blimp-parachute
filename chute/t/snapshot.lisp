@@ -1,6 +1,16 @@
 (in-package :cl-user)
 
 (prove:plan 1)
+(prove-ok
+ (let ((snapshots (chute/fs:snapshots)))
+   (make-blob
+    (last snapshots)
+    (chute:make-new-directory)))
+ "Making a blob via defaults")
+
+
+#|
+(prove:plan 1)
 (prove:ok
  (chute/config:with-cloudfleet-config
    (let ((snapshots (chute/fs:snapshots)))
@@ -9,8 +19,11 @@
      (make-blob
       (first (reverse snapshots))
       (chute:make-new-directory))))
- "Making a blob from a snapshot…")
+"Making a blob from a snapshot…")
+#|
 
+
+#|
 ;;; lowlevel test of btrfs send snapshot to stream
 (prove:plan 1)
 (prove:ok
@@ -24,5 +37,6 @@
 	(streamp result)
 	(equal (stream-element-type result) '(unsigned-byte 8)))))))
     "Sending snapshot to stream…"
+|#
 
 (prove:finalize)

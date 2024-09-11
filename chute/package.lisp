@@ -1,6 +1,6 @@
-(defpackage :chute
+(defpackage chute
   (:nicknames #:parachute #:cloudfleet-parachute #:cloudfleet-chute)
-  (:use :cl)
+  (:use cl)
   (:export
    #:client
 
@@ -25,8 +25,8 @@
 
    #:start-api-server #:stop-api-server #:restart-api-server))
 
-(defpackage :chute/crypt
-  (:use :cl :chute)
+(defpackage chute/crypt
+  (:use cl chute)
   (:export
    #:get-cipher #:get-key
    #:decrypt-blob-as-octets
@@ -35,7 +35,7 @@
    #:aes-ctr)) ;; State of AES-CTR with 16 byte window index
 
 (defpackage :chute/config
-  (:use :cl :chute)
+  (:use cl chute)
   (:export
    #:*btrfs-command*
    #:default
@@ -55,8 +55,8 @@
    #:version  #:path #:api.port #:transfer-method #:backing-store
    #:default-mount))
 
-(defpackage :chute/server
-  (:use :cl :hunchentoot)
+(defpackage chute/server
+  (:use cl hunchentoot)
   (:import-from #:chute
                 #:note
                 #:*blob-uri-path*)
@@ -65,8 +65,8 @@
    #:running-server-p
    #:start-server #:stop-server #:restart-server))
 
-(defpackage :chute/fs
-  (:use :cl :chute)
+(defpackage chute/fs
+  (:use cl chute)
   (:export
    #:snapshots
 
@@ -77,10 +77,10 @@
    #:send))
 
 (restas:define-module #:chute/api
-  (:use #:cl #:chute))
+  (:use cl chute))
 
-(defpackage :chute/btrfs
-  (:use :cl :chute)
+(defpackage chute/btrfs
+  (:use cl chute)
   (:export
    #:snapshots
    #:snapshot-info #:snapshot/info
@@ -92,16 +92,21 @@
    #:subvolume/snapshot
    #:subvolume/show
    #:subvolume/find-new))
-   
-(defpackage :chute/zfs
-  (:use :cl :chute))
+
+(defpackage chute/zfs
+  (:use cl chute))
 
 (defpackage :chute/rsync
-  (:use :cl :chute))
+  (:use cl chute))
 
 (defpackage :chute/io.cloudfleet
-  (:use :cl :chute)
+  (:use cl chute)
   (:export
    #:engineroom-domain
    #:engineroom-node
    #:engineroom-key))
+
+;;; TODO move to dynamic naming of these things
+(let ((symbol 
+        (intern "CHUTE.NOT.ORG" 'chute)))
+      (export  symbol 'chute))

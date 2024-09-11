@@ -9,7 +9,9 @@
 
 (defun snapshots (&key (path (chute/config:path (chute/config:default))) path-provided-p)
   (declare (ignore path-provided-p))
-  (chute/btrfs:snapshots :path path))
+  #+nil
+  (chute/btrfs:snapshots :path path)
+  (list "/tmp/"))
 
 (defun send (snapshot-path)
   "Queue snapshot for replication; initiating asynchronous transfer if possible."

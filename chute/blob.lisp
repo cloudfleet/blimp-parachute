@@ -2,17 +2,18 @@
 
 (defclass metadata ()
   ((version
-    :initform "2015121300"
+    :initform "20240911a"
     :accessor version
     :documentation "Version of blob metadata.")
    (prototype
     :initform '(("lispClass" ."metadata") ("lispPackage". "chute")))
    (node
-    :initform (chute/io.cloudfleet:engineroom-node)
+    :initform #+nil (chute/io.cloudfleet:engineroom-node)
+              (chute:chute.not.org)
     :accessor node
     :documentation "Node creating this blob.")
    (domain
-    :initform (chute/io.cloudfleet:engineroom-domain)
+    :initform (chute:chute.not.org) ;;; named in node?
     :accessor domain
     :documentation "Domain creating this blob.")
    (mount
@@ -42,14 +43,29 @@
    (encrypted
     :initform t 
     :accessor encrypted-p
-    :documentation "Whether the blob is in an encrypted state.")))
-
-(defmethod make-blob ((file pathname) blob-path)
-  "Create blob from FILE at BLOB-PATH."
-  (with-open-file (input-stream file
-                                :direction :input
-                                :element-type '(unsigned-byte 8))
-    (make-blob input-stream blob-path)))
+    :documentation "Whether the blob is in an encrypted state.")
+   (uri
+    :initform `((:user . ,user)
+                (:parent . ,parent)
+                (:timestamp . ,timestamp)
+                (:shards . ,shards)
+                (:checksum . ,checksum)
+                (:nonce . ,nonce)
+                (:encrypted . ,encrypted)))))
+               
+(defmethod make-blob ((file-or-directory pathname) blob-path)
+  "Create blob from FILE-OR-DIRECTORY at BLOB-PATH"
+  (flet ((read-file (file blob-path)
+           (with-open-file (input-stream file
+                                         :direction :input
+                                         :element-type '(unsigned-byte 8))
+             (make-blob input-stream blob-path))))
+    (if
+     (not 
+      (equalp (pathname file-or-directory)
+              (uiop:ensure-directory-pathname file-or-directory))
+      (read-file file-or-directory pathname))
+     (error "Unimplemented MAKE-BLOB of recursive input"))))
 
 (defmethod make-blob ((snapshot-path string) blob-path)
   (prog1
