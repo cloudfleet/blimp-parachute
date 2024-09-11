@@ -17,12 +17,6 @@ tmp=${CF_TMP}
 base=${CF_APPS}/parachute
 chute="$base/chute"
 
-
-# Download Quicklisp installation code
-if [[ ! -r "$HOME/quicklisp.lisp" ]]; then
-  (cd "$HOME" && wget --continue https://beta.quicklisp.org/quicklisp.lisp)
-fi
-
 # Populate ASDF registry
 asdf_symlinkfarm="~/common-lisp/"
 mkdir -p "${asdf_symlinkfarm}"
