@@ -1,5 +1,5 @@
 (defsystem chute
-  :version "0.6.4"
+  :version "0.6.5"
   :depends-on (ironclad
                lparallel
                cl-date-time-parser
@@ -42,7 +42,8 @@
                (:module crypt :pathname ""
                         :depends-on (source)
                         :serial t :components
-                        ((:file "crypt")))
+                        ((:file "nonce")
+                         (:file "crypt")))
                (:module api :pathname ""
                         :depends-on (source)
                         :serial t :components
@@ -60,44 +61,36 @@
                         :depends-on (source)
                         :serial t :components
                         ((:file "macos")))))
-
-#+abcl
-(progn
-  (defsystem chute/rdf
-    :defsystem-depends-on (abcl-asdf)
-    :depends-on (chute jeannie))
-
-  (defsystem chute/rdf/t
-    :defsystem-depends-on (prove-asdf)
-    :depends-on (chute/rdf)
-    :components ((:module test
-		  :pathname "t/"
-		  :components
-                  ((:test-file "rdf")))))
-  (defsystem chute/uri
-    :components ((:module abcl
-                  :pathname "./"
-                  :components
-                  ((:file "uri"))))))
-#-abcl "Needs the Bear for these things (bootstrapping)."
+#-abcl (error "Need the Bear <https://abcl.org/releases/>")
+(defsystem chute/rdf
+  :defsystem-depends-on (abcl-asdf)
+  :depends-on (jeannie))
+(defsystem chute/rdf/t
+  :defsystem-depends-on (prove-asdf)
+  :depends-on (prove chute chute/rdf)
+  :components ((:module test :pathname "t/"
+		:components ((:test-file "rdf")))))
+(defsystem chute/uri
+  :components ((:module abcl :pathname "./"
+                :components ((:file "package") ;;; FIXME
+                             (:file "uri")))))
+#-abcl (error "End of Bear specific systems")
 
 (defsystem chute/t
   :defsystem-depends-on (prove-asdf)
-  :depends-on (prove
-	       chute/implementation)
-    :perform (asdf:test-op (op c)
-		           (uiop:symbol-call :prove-asdf 'run-test-system c)
-                           (when (eq uiop/os:*implementation-type* :abcl)
-		             (uiop:symbol-call :prove-asdf 'run-test-system :chute/rdf/t)))
-    :components ((:module test
-			  :pathname "t/"
-			  :components
-			  ((:test-file "aes")
-                           (:test-file "blob")
-                           (:test-file "type")
-			   (:test-file "snapshot")
-			   (:test-file "config")
-			   (:test-file "test")))))
+  :depends-on (prove chute)
+  :perform (asdf:test-op (op c)
+		         (uiop:symbol-call :prove-asdf 'run-test-system c)
+                         (when (eq uiop/os:*implementation-type* :abcl)
+		           (uiop:symbol-call :prove-asdf 'run-test-system :chute/rdf/t)))
+  :components ((:module test
+		:pathname "t/"
+		:components ((:test-file "aes")
+                             (:test-file "blob")
+                             (:test-file "type")
+		             (:test-file "snapshot")
+			     (:test-file "config")
+			     (:test-file "test")))))
 
 
 

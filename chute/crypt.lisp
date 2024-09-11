@@ -31,12 +31,12 @@
         (iv
           (make-array 16
                       :element-type '(unsigned-byte 8)
-                      :initial-element (random 2 16)))
+                      :initial-element (random (expt 2 16))))
           
         (key 
-          (or (chute/io.cloudfleet:engineroom-key)
+          (or (chute/io.cloudfleet:key)
               (make-array 32 :element-type '(unsigned-byte 8))
-               :initial-element (random 2 32)))) 
+               :initial-element (random (expt 2 32)))))
     (cond
       ((and (keywordp type)
             (eq type :aes-ctr))
@@ -52,10 +52,15 @@
       ((find type '(:salsa20 :salsa))
        (ironclad:make-cipher :salsa20 :mode :stream
                              :key key
-                             :initialization-vector (subseq iv 12))))
+                                      :initialization-vector (subseq iv 12))))
+
+(defun get-key ()
+  (get-key/aes-ctr)) ;;; highly speculative
 
 (defun get-key/aes-ctr ()
-  "Return a aes-ctr u8 KEY"
+  "Return a aes-ctr u8 KEY
+
+Use *"
   (let ((nonce (make-array 8 :element-type '(unsigned-byte 8))))
     (with-open-file (random "/dev/urandom"  :element-type '(unsigned-byte 8))
       (loop :for i :below 8
@@ -76,7 +81,7 @@
   ((key :accessor key
         :type '((unsigned-byte 8) 32)
         :initform (or
-                   (chute/io.cloudfleet:engineroom-key)
+                   (chute/io.cloudfleet:key)
                    (progn
                      (warn "Creating null key.")
                      (make-array 32 :element-type '(unsigned-byte 8)))))

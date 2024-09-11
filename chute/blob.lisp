@@ -8,7 +8,7 @@
    (prototype
     :initform '(("lispClass" ."metadata") ("lispPackage". "chute")))
    (node
-    :initform #+nil (chute/io.cloudfleet:engineroom-node)
+    :initform #+nil (chute/io.cloudfleet:node)
               (chute:chute.not.org)
     :accessor node
     :documentation "Node creating this blob.")

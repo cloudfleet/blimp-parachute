@@ -58,7 +58,7 @@
    #:default-mount))
 
 (defpackage chute/server
-  (:use cl chute)
+  (:use cl chute hunchentoot)
   (:import-from #:chute
                 #:note
                 #:*blob-uri-path*)
@@ -117,7 +117,8 @@
   (:export
    #:domain #:node #:key))
 
-;;; TODO move to dynamic naming of these things
-(let ((symbol 
-        (intern "CHUTE.NOT.ORG" 'chute)))
-      (export  symbol 'chute))
+(defpackage nonce.not.org
+  (:use cl chute)
+  (:export #:index))
+
+  

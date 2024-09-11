@@ -22,13 +22,13 @@ Returns nil if the aes key cannot be derived for some reason."
   (let ((key-file #p"/opt/cloudfleet/data/shared/crypt/storage-key"))
     (unless (probe-file key-file)
       (warn "No key file found at '~a'." key-file)
-      (return-from engineroom-key nil))
+      (return-from key nil))
     (handler-case 
         (ironclad:digest-file :sha256 key-file)
       (file-error (c)
         (warn "Failed to read key from '~a' because '~a'"
               key-file c)
-        (return-from engineroom-key nil)))))
+        (return-from key nil)))))
       
   
     

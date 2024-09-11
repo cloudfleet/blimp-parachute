@@ -15,14 +15,18 @@
     :documentation "Location of data for client."
     :initform (or (probe-file #p"/opt/io/cloudfleet/data")
                   #+abcl
-                  (probe-file #p"https://api.cloudfleet.io/client/config"))
+                  (probe-file #p"https://api.cloudfleet.io/client/config")
+                  #+abcl
+                  (probe-file #p"https://n3.not.org/chute/synk.lisp"))
     :accessor path)
    (backing-store
     :documentation "Locally available filesystem abstractions for snapshoting."
-    :initform (alexandria:random-elt '(:btrfs :zfs :rsync)))
+    :initform (or
+               :rsync
+               (alexandria:random-elt '(:btrfs :zfs :rsync))))
    (api.port
     :accessor api.port
-    :initform 2020)
+    :initform 2021) ;; shouldn't we have one port?
    (transfer-method
     :accessor transfer-method)))
 
@@ -51,7 +55,7 @@
 
 ;; REST contract with CloudFleet backup server
 (defparameter *scheme* "http")
-(defparameter *host* "127.0.0.1")
+(defparameter *host* "localhost") ;;; (or ip4/ip6 attempts?)
 (defparameter *port* 2001)
 (defparameter *blob-uri-path* "/chute/blob/")
 

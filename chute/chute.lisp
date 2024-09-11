@@ -16,7 +16,7 @@
      (lparallel:submit-task channel
                             #'transfer-task))))
 
-(defun sink (local remote) ;; mebbe add a "window" or "epoch" hint here
+(defun synk (local remote) ;; mebbe add a "window" or "epoch" hint here
   "Whole kitchen sync for local and remote state"
   (some 
    (lambda () (chute/rsync:sink local remote))

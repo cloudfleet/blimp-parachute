@@ -292,7 +292,7 @@ bash -x ./chute/configure-asdf.bash
 #+begin_example
 Mark     <evenson.not.org@gmail.com>
 Created: 01-OCT-2015
-Revised: <2024-09-11 Wed 22:19>
+Revised: <2024-09-11 Wed 23:08>
 #+end_example
 
 

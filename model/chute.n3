@@ -1,5 +1,5 @@
 # -*- Mode: n3 -*-
-@prefix :                <https://n3.not.org/2024/09/11#d> .
+@prefix :                <https://n3.not.org/2024/09/11#e> .
 
 @prefix chute:           <https://chute.not.org#> .
 @prefix rdf:             <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -98,4 +98,4 @@ chute:transfer
   rdfs:label "Blobs can be transferred between peers" .
 
 <>
- rdfs:seeAlso <https://github.com/cloudfleet/tree/master/blimp-parachute/model/chute.n3> .
+ rdfs:seeAlso <https://github.com/cloudfleet/blimp-parachute/blob/master/model/chute.n3> .

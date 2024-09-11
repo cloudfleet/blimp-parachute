@@ -1,6 +1,6 @@
 (in-package :chute/server)
 
-(defparameter *port* 2016)
+(defparameter *port* 2024)
 
 (defparameter *blob-storage-directory*
   (asdf:system-relative-pathname :chute "../var/blob/"))
@@ -19,4 +19,11 @@
   (:default-initargs
    :access-log-destination  *http-access-log* ;; TODO: configure via a lookup mechanism w/o specials
    :message-log-destination *http-error-log*))
+
+;;; XXX Implement!
+(defun index (&key
+                (uri "/")
+                (default-request-type :get))
+  "nil")
+
 
