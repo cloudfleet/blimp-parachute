@@ -7,6 +7,8 @@
    #:metadata
    #:timestamp #:shards #:size #:checksum
 
+   #:sink ;; N.b. not implemented
+
    #:transfer-blob/http #:put-file 
 
    #:note
@@ -20,8 +22,6 @@
    #:strip-double-slash
 
    #:chute-model
-
-   #:make-new-directory
 
    #:start-api-server #:stop-api-server #:restart-api-server))
 
@@ -74,6 +74,8 @@
    #:snapshot/info
    #:snapshot/mount
 
+   #:make-directory
+
    #:send))
 
 (restas:define-module #:chute/api
@@ -96,9 +98,13 @@
 (defpackage chute/zfs
   (:use cl chute))
 
-(defpackage :chute/rsync
+(defpackage chute/rsync
   (:use cl chute))
 
+(defpackage chute/uri
+  (:use cl chute))
+
+;;; TODO remove me
 (defpackage :chute/io.cloudfleet
   (:use cl chute)
   (:export
