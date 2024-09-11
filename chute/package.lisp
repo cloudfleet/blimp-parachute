@@ -102,9 +102,12 @@
   (:use cl chute))
 
 (defpackage chute/uri
-  (:use cl chute))
+  (:use cl chute)
+  (:export
+   #:remote-uri
+   #:get-uri))
 
-;;; TODO remove me
+;;; TODO remove me??
 (defpackage :chute/io.cloudfleet
   (:use cl chute)
   (:export

@@ -6,64 +6,74 @@
   chute-sink ~/Movies/
 #+end_src
 * Installation
-** Dockerification
+** Container (Docker, Podman)
+#+begin_src bash
+  podman build . 
+#+end_src
+
+*** Raspberry PI (arm32 )
 To build an image on arm32 with Docker installed:
-#+BEGIN_SRC shell
+#+begin_src shell
 bash make-arm32-dockerfile.bash 
 sudo docker build --file Dockerfile-arm32  . 
 #+END_SRC
-** Local Installation via Operating System Packages
-*** Debian package form
+** Local User Installation
+Build a version for local use, potentially from source.
+*** Unix (macOS)
+Debian package forms.
 See <[[file:Dockerfile::apt-get install -y screen wget rsync binutils gcc \\]]>
 
-#+name:  Basic installation of parachute in one command
+**** Basic installation of parachute in one command
 #+begin_src shell
 bash -x ./setup/install-parachute.bash
 #+end_src
 with the appropiate permissions should enable all the following
 subclauses to be met automatically.
 
-** Installing Quicklisp
+**** Windows
+Unsupported.  Try =bash= via WSL .
 
+*** Installing Quicklisp
+#+begin_src bash
+  bash -x setup/install-quicklisp.bash
+  ansi_cl=abcl
+  $ansi_cl --batch setup/install-quicklisp.lisp 
+#+end_src
 
-1.  From the shell, download the Quicklisp install shim.
-#+BEGIN_SRC shell
-wget https://beta.quicklisp.org/quicklisp.lisp
-#+END_SRC  
+**** If that fails, use the downloaded =quicklisp.lisp= artifact
+#+begin_src
+  (load "~/quicklisp.lisp")
+  (quicklisp-quickstart:install)
+  (ql:add-to-init-file)
+#+end_src
 
-2.  From a Common Lisp implementation, execute the shim.
-#+BEGIN_SRC lisp
-(load "~/quicklisp.lisp")
-(quicklisp-quickstart:install)
-(ql:add-to-init-file)
-#+END_SRC
-
-#+caption: (ABCL) Install the Quicklisp packages needed by =chute=
+*** (ABCL) Install the Quicklisp packages needed by =chute=
 #+begin_src lisp
   (asdf:make :quicklisp-abcl)
   (asdf:make :chute)
 #+end_src    
 
-#+caption: Have ASDF build =chute=
+*** Have ASDF build =chute=
+Needed once locally, or after one has updated the sources.
 #+begin_src lisp
   (time (asdf:make :chute))
 #+end_src
 
-   
-#+caption: Have ASDF test =chute=
-#+BEGIN_SRC lisp
+* Test
+** Have ASDF test =chute=
+#+begin_SRC lisp
 (asdf:test-system :chute)
-#+END_SRC    
+#+end_SRC    
 
-* Implementation
-=chute= provides both a client and a server implementation.  All
-nodes boot can potentially boot either.
+* Implementation PRE-ALPHA Quite Unstable
+=chute= is purely a peer: it mediates select parts of your local
+filesystem with a future version on their worldline.  All nodes boot
+can potentially boot either.
 
 A local management REST API is always available bound to ~tcp4:2002~
 
 ** URI
 Every URI has a local and remote morphism.
-
 *** TODO URI addressing for previous link
 ** Bootstrap
 Boot node for previous references to artifact.
@@ -78,36 +88,37 @@ http://trac.clozure.com/ccl/wiki/PlatformNotes
 
 *** (bootstrap) remote
 Orchestrated services
-* REST API
-** Current version 'v1'
-#+NAME: Fundamental Chute REST API
-#+BEGIN_EXAMPLE
+* REST
+** URI
+** API
+#+name: Fundamental Chute REST API
+#+caption: =chute= REST API Current version 'v1'
+#+begin_EXAMPLE
     -->  POST /chute/blob/
     (index.json)                
     <--  201 Resource Created or [45]xx Error
     ("/new/uri/to/use")
 
 
-    -->  GET /chute/blob/<URI>/index.json              
+    -->  GET /chute/blob/<URI_PATH>/index.json              
     nil
     <--  200 Original or 304 Not Modified or [45]xx Error
     (index.json) or nil
 
 
-    -->  PUT /chute/blob/<URI>/0    
+    -->  PUT /chute/blob/<URI_PATH>/0    
     (application/octet-bytes)
     <--  201 Ok
     (json) "true" or "false" 
 
 
-    -->  GET /chute/blob/<URI>/0
+    -->  GET /chute/blob/<URI_PATH>/0
     <--  200 
     (json) SHA256 Hash
+#+end_example
 
-#+END_EXAMPLE
 
-
-** Basic transfer of opaque binary data
+**** Basic Primitive: secure transfer of opaque binary data
 
 PUT with 'Byte-range' headers n bytes in m windows.  Use timing of
 previous sessions to dynamically expand/contract number of bytes in
@@ -115,13 +126,48 @@ each PUT request.
 
 Each chunk of a blob is adressed as a URI of the form:
 
-
     .../<domain>/<node>/<mount-path>/<timestamp>/<n-byte-chunks>/<mth-chunk>
 
 
 MIME type for PUT content is "application/octet-stream".
 
 * What is to be DONE
+** TODO Replace AES-CTR with CHACHA (xCHACHA ?? )
+Enable seekable blobs.
+** TODO Initial implementation at without byte ranges
+Implementation use HTTP 'Byte-range' header to files attached/detatched via mmap().
+** TODO Tests for use cases
+** TODO Metadata transcriptions
+Use basic DEFCLASS form, but allow metadata to be as freeform as possible.
+
+Start with CL:PATHNAME for local file objects.
+
+Possibly use mtree for hashing where available as an optimization.
+** TODO Verify basic transfer
+Basic transfer of backups needs to be implemented completely and
+tested:
+
+*** REST Transfer Implementation
+Initial mplementation completed.  Mocks in place for many other
+systems.
+
+*** Tests of transfer integrity
+
+
+**** CHUTE.TEST::TRANSFER.BLOB.1  
+Transform a given file into a blob
+
+**** CHUTE.TEST::TRANSFER.BLOB.2  
+
+Use results of BTRFS/SEND into a blob 
+
+** TODO Read key from key device
+Propsoal:  extract appropiate number of bytes from SHA256 of the LuKS key
+** TODO Initialize nonce from random data
+Done.  But needs to be verified via a test.
+** TODO Read domain from /opt/cloudfleet/data/config/blimp-vars.sh
+Best implementation:  exec a bash process then read its environment table
+
 ** TODO Authentication
 Reads don't matter without the local worldline's key.
 
@@ -132,6 +178,21 @@ Writes on behalf of need authentication.  Chaumian escrow at genesis?
 Authentication to be handled via HTTP Headers submitted to
 ```spire.marina.io``` API.
 #+end_example
+
+** TODO Future interface for subaddressing components of a blob
+For resumable transfers
+
+#+NAME: REST for resumable transfers
+#+BEGIN_SRC
+
+                PUT /<URI>/0/<chunk-bytes>/<nth-chunk>
+                ->>   201 on success or [345]00 
+                  (json) "true" or "false"
+
+                GET /<URI>/0/<chunk-bytes>/<nth-chunk>/hash/sha256  
+                ->>   20x [345]xx (does 314 make sense?)
+                  (json) SHA256 Hash
+#+END_SRC
 
 ** DONE BTRFS volume must have ".snapshot/" directory
    CLOSED: [2015-12-14 Mon 13:55]
@@ -152,8 +213,10 @@ be made part of the setup done by setting up the encrypted volumes.
    CLOSED: [2015-10-27 Tue 12:44]
    - CLOSING NOTE [2015-10-27 Tue 12:44] \\
      Done as setup/make-suid-btfs.bash
-
-**  BTRFS/SEND
+** DONE BTRFS/SEND
+CLOSED: [2024-09-11 Wed 17:38]
+- CLOSING NOTE [2024-09-11 Wed 17:38] \\
+  Deprecated.  Move purely to working with copies of local files.
 *** DONE stdout/stderr mixing
     CLOSED: [2015-11-14 Sat 10:16]
     - CLOSING NOTE [2015-11-14 Sat 10:16] \\
@@ -199,73 +262,28 @@ allows us to get octet streams out of the subprocesses.
    - CLOSING NOTE [2015-12-14 Mon 14:09] \\
      Finished with proper implementation of POST followed by subsequent
      PUTs to the unspecified sub-uri namespace.
-** TODO Read key from key device
-Propsoal:  extract appropiate number of bytes from SHA256 of the LuKS key
-** TODO Initialize nonce from random data
-Done.  But needs to be verified via a test.
-** TODO Read domain from /opt/cloudfleet/data/config/blimp-vars.sh
-
-Best implementation:  exec a bash process then read its environment table
 ** DONE MAKE-NEW-DIRECTORY 
-   CLOSED: [2015-12-13 Sun 10:40]
+CLOSED: [2024-09-11 Wed 17:39]
+- CLOSING NOTE [2024-09-11 Wed 17:39] \\
+  Renamed as CHUTE/FS:MAKE-DIRECTORY.
    - CLOSING NOTE [2015-12-13 Sun 10:40] \\
      Use CL-FAD routines instead of ASDF.
 Fails until run from the REPL.  Unsure what this entails.
-** TODO Verify basic transfer
-Basic transfer of backups needs to be implemented completely and
-tested:
-
-*** REST Transfer Implementation
-Initial mplementation completed.  Mocks in place for many other
-systems.
-
-*** Tests of transfer integrity
-
-
-**** CHUTE.TEST::TRANSFER.BLOB.1  
-Transform a given file into a blob
-
-**** CHUTE.TEST::TRANSFER.BLOB.2  
-
-Use results of BTRFS/SEND into a blob 
-
-** TODO Future interface for subaddressing components of a blob
-For resumable transfers
-
-#+NAME: REST for resumable transfers
-#+BEGIN_SRC
-
-                PUT /<URI>/0/<chunk-bytes>/<nth-chunk>
-                ->>   201 on success or [345]00 
-                  (json) "true" or "false"
-
-                GET /<URI>/0/<chunk-bytes>/<nth-chunk>/hash/sha256  
-                ->>   20x [345]xx (does 314 make sense?)
-                  (json) SHA256 Hash
-#+END_SRC
-
-** (at first without byte ranges).
-Implementation use HTTP 'Byte-range' header to files attached/detatched via mmap().
-
-** TODO Tests for use cases
-** TODO Metadata transcriptions
 
 ** DONE Generalize filesytem snapshoting abstraction 
 CLOSED: [2024-09-11 Wed 16:44]
 - CLOSING NOTE [2024-09-11 Wed 16:44] \\
   Not needed for stage 1.
 Implement ZFS 
+** DONE Document configuration of a local ANSI CL implementation and attendent Quicklisp installation
+CLOSED: [2024-09-11 Wed 16:43]
 * Notes
 ** Historical
-Install instructions in detail if ~./setup/install-parachute.bash~ doesn't work
 *** Place chute.asd in ASDF3 system registry
 #+NAME: Configuration of ASDF3 system registry to find blimp-parachute
 #+BEGIN_SRC shell
 bash -x ./chute/configure-asdf.bash
 #+END_SRC    
-
-*** DONE [doc] configure an ANSI CL and Quicklisp installation
-CLOSED: [2024-09-11 Wed 16:43]
 
 - CLOSING NOTE [2024-09-11 Wed 16:43]
 
@@ -273,10 +291,10 @@ CLOSED: [2024-09-11 Wed 16:43]
 <https://github.com/osicat/osicat/pull/11/files>
 * Colophon
 #+caption: <> :is <https://github.com/cloudfleet/blimp-parachure/README.org>. 
-#+BEGIN_EXAMPLE
-<evenson.not.org@gmail.com>
+#+begin_example
+Mark     <evenson.not.org@gmail.com>
 Created: 01-OCT-2015
-Revised: <2024-09-11 Wed 17:16>
-#+END_EXAMPLE
+Revised: <2024-09-11 Wed 18:00>
+#+end_example
 
 

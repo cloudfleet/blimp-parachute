@@ -1,3 +1,4 @@
+;;; deprecated??
 (in-package :chute/io.cloudfleet)
 
 (defun engineroom-domain ()
@@ -6,7 +7,7 @@
         `(,(let ((output (make-string-output-stream)))
                 (uiop:run-program "cat /opt/cloudfleet/data/config/domain.txt" :output output)
                 (get-output-stream-string output))
-         "example.com")))
+         "rdf.not.org")))
 
 (defun engineroom-node ()
   ;;; A dummy placeholder for now, as all domains only have a single node.
@@ -17,6 +18,8 @@
   "Return an aes key derived from the CloudFleet engineroom storage key
 
 Returns nil if the aes key cannot be derived for some reason."
+  (error "Currently no securely implemented key storage.")
+  #+nil
   (let ((key-file #p"/opt/cloudfleet/data/shared/crypt/storage-key"))
     (unless (probe-file key-file)
       (warn "No key file found at '~a'." key-file)

@@ -1,5 +1,5 @@
 (defsystem chute
-  :version "0.5.0"
+  :version "0.6.0"
   :perform (test-op (o c) (symbol-call :rt :do-tests))
   :depends-on (ironclad
                lparallel
@@ -61,7 +61,7 @@
                         ((:file "macos"))))
   :in-order-to ((asdf:test-op (asdf:test-op chute/t))))
 
-#-abcl "Needs the Bear"
+#+abcl
 (progn 
   (defsystem chute/rdf
     :defsystem-depends-on (abcl-asdf)
@@ -72,7 +72,13 @@
     :components ((:module test
 		  :pathname "t/"
 		  :components
-		  ((:test-file "rdf"))))))
+                  ((:test-file "rdf")))))
+  (defsystem chute/uri
+    :components ((:module abcl
+                  :pathname "./"
+                  :components
+                  ((:file "uri"))))))
+#-abcl  "Needs the Bear"
 
 (defsystem chute/t
     :defsystem-depends-on (prove-asdf)
@@ -82,7 +88,6 @@
 		           (uiop:symbol-call :prove-asdf 'run-test-system c)
                            (when (eq uiop/os:*implementation-type* :abcl)
 		             (uiop:symbol-call :prove-asdf 'run-test-system :chute/rdf/t)))
-
     :components ((:module test
 			  :pathname "t/"
 			  :components
