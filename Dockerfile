@@ -6,7 +6,9 @@ LABEL "VERSION" "0.0.4"
 # Provisioning 
 RUN export DEBIAN_FRONTEND='noninteractive' && \
     apt-get update  && \
-    apt-get install -y screen wget btrfs-tools rsync binutils gcc
+    apt-get install -y screen wget rsync binutils gcc \
+     abcl ant-optional ant-contrib maven \
+     sbcl cl-cffi 
 
 COPY    .   /opt/cloudfleet/apps/parachute
 WORKDIR     /opt/cloudfleet/apps/parachute
