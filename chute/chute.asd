@@ -1,6 +1,7 @@
 (defsystem chute
-  :version "0.6.5"
-  :depends-on (ironclad
+  :version "0.6.6"
+  :depends-on (alexandria
+               ironclad
                lparallel
                cl-date-time-parser
                simple-date-time

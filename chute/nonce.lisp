@@ -9,7 +9,8 @@
     (let ((nonce (first nonce)))
       (values
        (format nil "killroy's nonce: ~a" nonce)
-       (first nounce
+       (first nounce)))))
+
 
 
 

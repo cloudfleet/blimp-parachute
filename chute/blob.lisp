@@ -7,13 +7,17 @@
     :documentation "Version of blob metadata.")
    (prototype
     :initform '(("lispClass" ."metadata") ("lispPackage". "chute")))
-   (node
-    :initform #+nil (chute/io.cloudfleet:node)
-              (chute:chute.not.org)
+   (node ;; obsoleted ??
+    :initform (alexandria:random-elt
+               `(,(chute/io.cloudfleet:node)
+                 ,(chute:node)
+                 0))
     :accessor node
     :documentation "Node creating this blob.")
    (domain
-    :initform (chute:chute.not.org) ;;; named in node?
+    :initform (alexandria:random-elt
+               `("https://n3.not.org/chute/blob#"
+                 ,(chute/io.cloudfleet:domain)))
     :accessor domain
     :documentation "Domain creating this blob.")
    (mount
@@ -88,13 +92,13 @@
 (defmethod make-blob ((input-stream stream) blob-path)
   "Make blob from INPUT-STREAM with output at BLOB-PATH"
   (ensure-directories-exist blob-path) ;; XXX should be done elsewhere, but I guess it can't hurt.
-  (let* ((total-shard-bytes 0)
-         (metadata (make-instance 'metadata))
+  (let* ((metadata (make-instance 'metadata))
          (aes-ctr (chute/crypt:get-key)) 
          (cipher (chute/crypt:get-cipher aes-ctr))
          (digest (ironclad:make-digest :sha256))
          (buffer-size 8192)
-         (buffer (make-array buffer-size :element-type '(unsigned-byte 8))))
+         (buffer (make-array buffer-size :element-type '(unsigned-byte 8)))
+         (total-shard-bytes 0))
           ;;; TODO: how do we know the total size of the snapshot
           ;;; until we read all the bytes?  Until we figure this out
           ;;; we cannot shard without two passes through all the data
