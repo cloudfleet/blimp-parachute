@@ -1,7 +1,7 @@
 # CloudFleet Parachute client
 
-FROM debian:stretch
-LABEL "VERSION" "0.0.3"
+FROM debian:bookworm
+LABEL "VERSION" "0.0.4"
 
 # Provisioning 
 RUN export DEBIAN_FRONTEND='noninteractive' && \
