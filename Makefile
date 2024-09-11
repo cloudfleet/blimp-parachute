@@ -1,6 +1,6 @@
-DOCKER	:= docker
+DOCKER	:= podman
 
 .PHONY: all 
 all: 
-	$(DOCKER) build -t easye/blimp-parachute .
+	$(DOCKER) build -t $(USER)/chute .
 

@@ -32,5 +32,5 @@ pushd ${asdf_symlinkfarm} && ln -s {CF_APPS}/parachute
 CL=abcl
 
 # Install Quicklisp and the dependencies needed
-$CL --no-init --load "${CF_APPS}/parachute/chute/install-quicklisp.lisp"
+$CL --no-init --batch "${CF_APPS}/parachute/chute/install-quicklisp.lisp"
 

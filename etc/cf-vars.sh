@@ -12,5 +12,3 @@ mkdir -p "$CF_TMP" || echo "Failed to create $CF_TMP"
 # split export up for easier parsing and ksh compatibility
 export CF CF_VAR CF_DATA
 
-CCL_DEFAULT_DIRECTORY=${CF_APPS}/ccl
-export CCL_DEFAULT_DIRECTORY
