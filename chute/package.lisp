@@ -2,18 +2,20 @@
   (:nicknames #:parachute #:cloudfleet-parachute #:cloudfleet-chute)
   (:use cl)
   (:export
+   #:synk ;; N.b. not fully implemented
+   
    #:client
 
    #:metadata
    #:timestamp #:shards #:size #:checksum
 
-   #:sink ;; N.b. not implemented
+   #:transfer-blob/http #:put-file
 
-   #:transfer-blob/http #:put-file 
+   #:sink
 
    #:note
 
-   #:make-blob #:make-blob/test
+   #:make-blob 
 
    #:*blob-storage-dir*
 
@@ -34,7 +36,7 @@
    #:get-cipher
    #:aes-ctr)) ;; State of AES-CTR with 16 byte window index
 
-(defpackage :chute/config
+(defpackage chute/config
   (:use cl chute)
   (:export
    #:*btrfs-command*
@@ -56,7 +58,7 @@
    #:default-mount))
 
 (defpackage chute/server
-  (:use cl hunchentoot)
+  (:use cl chute)
   (:import-from #:chute
                 #:note
                 #:*blob-uri-path*)
@@ -71,6 +73,7 @@
    #:snapshots
 
    #:snapshot
+
    #:snapshot/info
    #:snapshot/mount
 
@@ -109,13 +112,10 @@
    #:remote-uri
    #:get-uri))
 
-;;; TODO remove me??
 (defpackage chute/io.cloudfleet
   (:use cl chute)
   (:export
-   #:engineroom-domain
-   #:engineroom-node
-   #:engineroom-key))
+   #:domain #:node #:key))
 
 ;;; TODO move to dynamic naming of these things
 (let ((symbol 

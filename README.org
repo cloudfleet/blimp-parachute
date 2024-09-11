@@ -3,23 +3,29 @@
 ** TODO Sink a =chute= blob
 #+caption: How one snaps onto a wordline for a local name
 #+begin_src bash
-  chute-sink ~/Movies/
+  synk ~/Movies/
 #+end_src
-* Installation
+* Installing =Chute=
 ** Container (Docker, Podman)
+*** Build in Container
 #+begin_src bash
-  podman build . 
+  podman build -t YOU/chute . 
 #+end_src
-*** Raspberry PI (arm32 )
+*** Run in Container
+#+begin_src bash
+  podman run -it YOU/chute
+#+end_src  
+**** Raspberry PI (arm32)
 To build an image on arm32 with Podman
 #+begin_src shell
 bash make-arm32-dockerfile.bash 
-docker build --file Dockerfile-arm32  . 
-#+END_SRC
+podman build --file Dockerfile-arm32  . 
+#+end_SRC
 ** Local User Installation
-Build a version for local use, potentially from source.
+How to build a version for local use, potentially from source.
 *** Unix (macOS)
-Debian package forms.
+Install the appropiate package forms (Debian or MacPorts).
+
 See <[[file:Dockerfile::apt-get install -y screen wget rsync binutils gcc \\]]>
 
 **** Basic installation of parachute in one command
@@ -36,7 +42,7 @@ Unsupported.  Try =bash= via WSL .
 #+begin_src bash
   bash -x setup/install-quicklisp.bash
   ansi_cl=abcl
-  $ansi_cl --batch setup/install-quicklisp.lisp 
+  "${ansi_cl}" --batch setup/install-quicklisp.lisp 
 #+end_src
 
 **** If that fails, use the downloaded =quicklisp.lisp= artifact
@@ -97,25 +103,18 @@ Orchestrated services
     (index.json)                
     <--  201 Resource Created or [45]xx Error
     ("/new/uri/to/use")
-
-
     -->  GET /chute/blob/<URI_PATH>/index.json              
     nil
     <--  200 Original or 304 Not Modified or [45]xx Error
     (index.json) or nil
-
-
     -->  PUT /chute/blob/<URI_PATH>/0    
     (application/octet-bytes)
     <--  201 Ok
     (json) "true" or "false" 
-
-
     -->  GET /chute/blob/<URI_PATH>/0
     <--  200 
     (json) SHA256 Hash
 #+end_example
-
 
 **** Basic Primitive: secure transfer of opaque binary data
 
@@ -293,7 +292,7 @@ bash -x ./chute/configure-asdf.bash
 #+begin_example
 Mark     <evenson.not.org@gmail.com>
 Created: 01-OCT-2015
-Revised: <2024-09-11 Wed 20:53>
+Revised: <2024-09-11 Wed 22:19>
 #+end_example
 
 

@@ -1,4 +1,4 @@
-(in-package chute/uri)
+(in-package :chute/uri)
 
 ;;; very ABCL specific in the ability to construct a remote URI
 ;;; addressable via CL:OPEN

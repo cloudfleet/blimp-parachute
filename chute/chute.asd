@@ -1,10 +1,5 @@
 (defsystem chute
-  :version "0.6.3"
-  :components nil
-  :in-order-to ((asdf:test-op
-                 (asdf:test-op chute/t))))
-   
-(defsystem chute/implementation
+  :version "0.6.4"
   :depends-on (ironclad
                lparallel
                cl-date-time-parser
@@ -60,20 +55,21 @@
                (:module io.cloudfleet :pathname ""
                         :depends-on (source)
                         :serial t :components
-                        ((:file "engineroom")))
+                        ((:file "engine")))
                (:module osx :pathname ""
                         :depends-on (source)
                         :serial t :components
                         ((:file "macos")))))
 
 #+abcl
-(progn 
+(progn
   (defsystem chute/rdf
     :defsystem-depends-on (abcl-asdf)
-    :depends-on (jeannie))
+    :depends-on (chute jeannie))
 
   (defsystem chute/rdf/t
     :defsystem-depends-on (prove-asdf)
+    :depends-on (chute/rdf)
     :components ((:module test
 		  :pathname "t/"
 		  :components
@@ -86,7 +82,7 @@
 #-abcl "Needs the Bear for these things (bootstrapping)."
 
 (defsystem chute/t
-    :defsystem-depends-on (prove-asdf)
+  :defsystem-depends-on (prove-asdf)
   :depends-on (prove
 	       chute/implementation)
     :perform (asdf:test-op (op c)

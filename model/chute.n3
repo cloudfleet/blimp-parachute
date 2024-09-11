@@ -1,5 +1,5 @@
 # -*- Mode: n3 -*-
-@prefix :                <https://n3.not.org/2024/09/11#c> .
+@prefix :                <https://n3.not.org/2024/09/11#d> .
 
 @prefix chute:           <https://chute.not.org#> .
 @prefix rdf:             <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
