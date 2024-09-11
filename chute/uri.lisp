@@ -18,5 +18,6 @@
   (defun remote-uri (local)
     (error "Unimplemented REMOTE-URI on ~a." (lisp-implementation-version)))
   (defun get-uri (local)
-    (error "Unimplemented GET-URI on ~a." (lisp-implementation-version)))
+    (error "Unimplemented GET-URI on ~a." (lisp-implementation-version))))
+
                  

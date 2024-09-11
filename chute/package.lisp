@@ -99,7 +99,9 @@
   (:use cl chute))
 
 (defpackage chute/rsync
-  (:use cl chute))
+  (:use cl chute)
+  (:export
+   #:sink)) ;;; initial implementation: push via rsync 
 
 (defpackage chute/uri
   (:use cl chute)

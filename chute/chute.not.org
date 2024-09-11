@@ -1,6 +1,5 @@
 #+title: Chute: A Practical Tiny Zero-Knowledge Graph Persistence
 
-
 * Installation
 
   +  Common Lisp (abcl,sbcl,ccl,ecl)
@@ -11,13 +10,11 @@
     (ql:quickload :chute)
   #+end_src    
 
-
-
 * Colophon
   #+caption: chute.not.org
   #+begin_example
     Mark <evenson@not.org>
     Created: 2024-9-11
-    Revised: <2024-09-11 Wed 14:31>
+    Revised: <2024-09-11 Wed 18:56>
   #+end_example
   

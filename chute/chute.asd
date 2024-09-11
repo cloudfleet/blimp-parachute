@@ -1,5 +1,5 @@
 (defsystem chute
-  :version "0.6.0"
+  :version "0.6.1"
   :perform (test-op (o c) (symbol-call :rt :do-tests))
   :depends-on (ironclad
                lparallel
@@ -11,6 +11,8 @@
                cl-who
                drakma
                osicat
+               #+abcl
+               chute/uri
                rt)
   :components ((:module package :pathname ""
                         :serial t :components
@@ -26,13 +28,13 @@
                          (:file "config-client")
                          (:file "config-server")))
                (:module source :pathname ""
-                        :depends-on (config)
+                        :depends-on (model config)
                         :serial t :components
                         ((:file "util")
                          (:file "fs")
+                         (:file "rsync")
                          (:file "btrfs")
                          (:file "zfs")
-                         (:file "rsync")
                          (:file "note")
                          (:file "blob")
                          (:file "chute")
@@ -78,7 +80,7 @@
                   :pathname "./"
                   :components
                   ((:file "uri"))))))
-#-abcl  "Needs the Bear"
+#-abcl "Needs the Bear for these things (bootstrapping)."
 
 (defsystem chute/t
     :defsystem-depends-on (prove-asdf)
