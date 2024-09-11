@@ -26,31 +26,36 @@
   "Return encryption source keyed for CIPHER"
   ;;; TODO: initialize cipher correctly
   (declare (keyword arg))
-  (let ((type arg))
+  (let ((type
+          arg)
+        (iv
+          (make-array 16
+                      :element-type '(unsigned-byte 8)
+                      :initial-element (random 2 16)))
+          
+        (key 
+          (or (chute/io.cloudfleet:engineroom-key)
+              (make-array 32 :element-type '(unsigned-byte 8))
+               :initial-element (random 2 32)))) 
     (cond
       ((and (keywordp type)
             (eq type :aes-ctr))
-       (let ((key (or (chute/io.cloudfleet:engineroom-key)
-                      (make-array 32 :element-type '(unsigned-byte 8)))))
-         (ironclad:make-cipher :aes :mode :ctr
-                               :key key
-                               :initialization-vector
-                               (make-array 16 :element-type '(unsigned-byte 8)))))
+       (ironclad:make-cipher :aes
+                             :mode :ctr
+                             :key key
+                             :initialization-vector iv)))
       ((eq type :aes)
-       (let ((key (or (chute/io.cloudfleet:engineroom-key)
-                      (make-array 32 :element-type '(unsigned-byte 8)))))
-         (ironclad:make-cipher :aes :mode :cfb
+         (ironclad:make-cipher :aes
+                               :mode :cfb
                                :key key
-                               :initialization-vector
-                               (make-array 16 :element-type '(unsigned-byte 8)))))
+                               :initialization-vector iv)))
       ((find type '(:salsa20 :salsa))
        (ironclad:make-cipher :salsa20 :mode :stream
-                             :key (make-array 32 :element-type '(unsigned-byte 8))
-                             :initialization-vector
-                             (make-array 12 :element-type '(unsigned-byte 8)))))))
+                             :key key
+                             :initialization-vector (subseq iv 12))))
 
-(defun get-key ()
-  "Return an AES-CTR ready to be used."
+(defun get-key/aes-ctr ()
+  "Return a aes-ctr u8 KEY"
   (let ((nonce (make-array 8 :element-type '(unsigned-byte 8))))
     (with-open-file (random "/dev/urandom"  :element-type '(unsigned-byte 8))
       (loop :for i :below 8

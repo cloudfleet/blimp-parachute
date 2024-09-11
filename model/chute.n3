@@ -1,5 +1,5 @@
 # -*- Mode: n3 -*-
-@prefix :                <https://n3.not.org/2024/09/11#b> .
+@prefix :                <https://n3.not.org/2024/09/11#c> .
 
 @prefix chute:           <https://chute.not.org#> .
 @prefix rdf:             <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -11,12 +11,13 @@
  :is "N3 triples" .
 
 @prefix dc:              <https://purl.org/dc/elements/1.1/> .
-dc:created           "15-JAN-2014" ;
-dc:modified          "11-SEP-2024" ;
-dc:version "20241109b" .
+<> 
+ dc:created           "15-JAN-2014" ;
+ dc:modified          "11-SEP-2024" .
 
 chute:synk
-  :a (http:get, http:put) # TODO fixme (probably broke N3 here)
+  :a http:get
+  :a http:put
   rdfs:label """
 The basic verb for use of Chute.
 
@@ -48,17 +49,26 @@ chute:pull
 
 chute:blob
   :a rdf:Bag;
-  :a (_:metadata) ;
+  rdf:_2 _:data ;
+  rdf:_3 _:metadata ;
   rdfs:label "Data comes in blobs" .
 
 chute:metadata
   rdfs:label "Blobs have metadata." .
 
 chute:world
-  :a :fs.
+  :a chute:fs ;
+  :a rdf:Bag ;
+  rdf:_0 _:genesis ;
+  rdf:_1 _:scratch ;
+  rdf:_2 _:first .
 
-chute:snapshot 
-  rdfs:label "Blobs can be created by the process of associating a world with a given time" .
+chute:snapshot
+  :a rdf:Bag ;
+  rdf:_2 chute:blob ;
+  rdfs:label """
+Snapshots of blobs can be created by the process of associating a world with a given time
+""" .
 
 chute:contract
   rdfs:label "Blobs are stored under contracts" .

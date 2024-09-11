@@ -1,15 +1,11 @@
 (defsystem chute
-  :version "0.6.2"
+  :version "0.6.3"
+  :components nil
   :in-order-to ((asdf:test-op
-                 (asdf:test-op chute/t)))
-  :components ((:module package
-                :pathname ""
-                :serial t
-                :components ((:file "package")))))
+                 (asdf:test-op chute/t))))
    
 (defsystem chute/implementation
-  :depends-on (chute
-               ironclad
+  :depends-on (ironclad
                lparallel
                cl-date-time-parser
                simple-date-time
@@ -22,10 +18,13 @@
                #+abcl
                chute/uri
                rt)
-  :components 
-	       ((:module model :pathname ""
-                        :components
-                        ((:file "model")))
+  :components ((:module package
+                :pathname "./"
+                :components ((:file "package")))
+               (:module model
+                 :pathname "./"
+                 :depends-on (package)
+                 :components ((:file "model")))
                (:module config :pathname ""
                         :depends-on (model)
                         :serial t :components
@@ -67,7 +66,6 @@
                         :serial t :components
                         ((:file "macos")))))
 
-
 #+abcl
 (progn 
   (defsystem chute/rdf
@@ -89,8 +87,8 @@
 
 (defsystem chute/t
     :defsystem-depends-on (prove-asdf)
-    :depends-on (prove
-		 chute/implementation)
+  :depends-on (prove
+	       chute/implementation)
     :perform (asdf:test-op (op c)
 		           (uiop:symbol-call :prove-asdf 'run-test-system c)
                            (when (eq uiop/os:*implementation-type* :abcl)
@@ -99,7 +97,7 @@
 			  :pathname "t/"
 			  :components
 			  ((:test-file "aes")
-                           (:test-file "blob-test")
+                           (:test-file "blob")
                            (:test-file "type")
 			   (:test-file "snapshot")
 			   (:test-file "config")

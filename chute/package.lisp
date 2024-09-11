@@ -110,7 +110,7 @@
    #:get-uri))
 
 ;;; TODO remove me??
-(defpackage :chute/io.cloudfleet
+(defpackage chute/io.cloudfleet
   (:use cl chute)
   (:export
    #:engineroom-domain
