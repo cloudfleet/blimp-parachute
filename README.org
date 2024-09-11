@@ -1,13 +1,21 @@
 #+TITLE: Parachute: a zero knowledge backup system
 * Installation
 
-Running 
+** TODO [doc] configure an ANSI CL and Quicklisp installation 
+
+#+begin_src lisp
+  (time (asdf:make :chute))
+#+end_src
+
+
+#+caption: deprecated (?)
 #+NAME:  Basic installation of parachute in one command
 #+BEGIN_SRC shell
 bash -x ./setup/install-parachute.bash
 #+END_SRC
 with the appropiate permissions should enable all the following
 subclauses to be met automatically
+
 ** Historical
 Install instructions in detail if ~./setup/install-parachute.bash~ doesn't work
 *** Place chute.asd in ASDF3 system registry
@@ -240,10 +248,11 @@ Implement ZFS.
 ** Osicat failing to grovel
 <https://github.com/osicat/osicat/pull/11/files>
 * Colophon
+#+caption: <> :is <https://github.com/cloudfleet/blimp-parachure/README.org>. 
 #+BEGIN_EXAMPLE
-<mark@evenson.eu>
+<evenson.not.org@gmail.com>
 Created: 01-OCT-2015
-Revised: <2017-11-29 Wed 16:18>
+Revised: <2024-09-11 Wed 16:39>
 #+END_EXAMPLE
 
 
