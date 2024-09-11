@@ -3,7 +3,7 @@
 (prove:plan 1)
 (prove-ok
  (let ((snapshots (chute/fs:snapshots)))
-   (make-blob
+   (chute:make-blob
     (last snapshots)
     (chute:make-new-directory)))
  "Making a blob via defaults")

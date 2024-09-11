@@ -59,14 +59,30 @@
                         :depends-on (source)
                         :serial t :components
                         ((:file "macos"))))
-    :in-order-to ((asdf:test-op (asdf:test-op chute/t))))
+  :in-order-to ((asdf:test-op (asdf:test-op chute/t))))
+
+#-abcl "Needs the Bear"
+(progn 
+  (defsystem chute/rdf
+    :defsystem-depends-on (abcl-asdf)
+    :depends-on (jeannie))
+
+  (defsystem chute/rdf/t
+    :defsystem-depends-on (prove-asdf)
+    :components ((:module test
+		  :pathname "t/"
+		  :components
+		  ((:test-file "rdf"))))))
 
 (defsystem chute/t
     :defsystem-depends-on (prove-asdf)
     :depends-on (prove
 		 chute)
     :perform (asdf:test-op (op c)
-			   (uiop:symbol-call :prove-asdf 'run-test-system c))
+		           (uiop:symbol-call :prove-asdf 'run-test-system c)
+                           (when (eq uiop/os:*implementation-type* :abcl)
+		             (uiop:symbol-call :prove-asdf 'run-test-system :chute/rdf/t)))
+
     :components ((:module test
 			  :pathname "t/"
 			  :components
