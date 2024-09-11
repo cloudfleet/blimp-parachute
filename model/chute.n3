@@ -1,5 +1,5 @@
 # -*- Mode: n3 -*-
-@prefix :           <https://rdf.not.org#> .
+@prefix :                <https://rdf.not.org#> .
 
 @prefix chute:           <https://chute.not.org#> .
 @prefix rdf:             <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -7,7 +7,15 @@
 
 @prefix http:            <http://www.ietf.org/rfc/1901#> .
 
-chute:sink
+<> 
+ abcl:is "N3 triples" .
+
+@prefix dc:              <https://purl.org/dc/elements/1.1/> .
+dc:created           "15-JAN-2014" ;
+dc:modified          "11-SEP-2024" ;
+dc:version "20241109a" .
+
+chute:synk
   :a (http:get, http:put) # TODO fixme (probably broke N3 here)
   rdfs:label """
 The basic verb for use of Chute.
@@ -15,24 +23,28 @@ The basic verb for use of Chute.
 Use it as follows:
 
 On single files:
-   sink .emacs
+   synk .emacs
 
 on local collections
-   sink .emacs.d/
+   synk .emacs.d/
 """ .
 
 chute:plumber
   :a http:post ;
-  rdfs:label "Quis custodiet ipsos custodes?" ;
+  rdfs:label """
+Everything you need for syncs.
+
+Quis custodiet ipsos custodes?
+""" .
 
 # Primitives
 chute:push
   :a http:put ;
-  rdfs:label "Push a local source into blob". 
+  rdfs:label "Push a local source into your sync.". 
 
 chute:pull
   :a http:get ;
-  rdfs:label "Possibly sync local status from blob". 
+  rdfs:label "Sync local status from a sync.". 
 
 chute:blob
   :a rdf:Bag;
@@ -63,20 +75,16 @@ chute:fs
   rdfs:label "A local collection of FILE and DIRECTORY objects" .
 
 chute:btrfs
-  rdfs:label "Deprecated" ;
+  rdfs:comment "Unused" ;
   rdfs:label "An implementation of snapshoting worldlines from BTRFS filesystems." .
 
 chute:zfs
-  rdfs:label "Unimplemented" ;
+  rdfs:comment "Unimplemented" ;
   rdfs:label "An implementation of snapshoting worldlines from ZFS filesystems." .
 
 # Historical
 chute:transfer
+  rdfs:comment "No longer necessary with ahistorical adressable naming ?!?"
   rdfs:label "Blobs can be transferred between peers" .
 
-
-
-
 <> rdfs:seeAlso <https://github.com/cloudfleet/tree/master/blimp-parachute/model/chute.n3> .
-
-
