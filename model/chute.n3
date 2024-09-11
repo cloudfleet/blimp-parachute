@@ -1,5 +1,5 @@
 # -*- Mode: n3 -*-
-@prefix :                <https://rdf.not.org#> .
+@prefix :                <https://n3.not.org/2024/09/11#b> .
 
 @prefix chute:           <https://chute.not.org#> .
 @prefix rdf:             <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -8,12 +8,12 @@
 @prefix http:            <http://www.ietf.org/rfc/1901#> .
 
 <> 
- abcl:is "N3 triples" .
+ :is "N3 triples" .
 
 @prefix dc:              <https://purl.org/dc/elements/1.1/> .
 dc:created           "15-JAN-2014" ;
 dc:modified          "11-SEP-2024" ;
-dc:version "20241109a" .
+dc:version "20241109b" .
 
 chute:synk
   :a (http:get, http:put) # TODO fixme (probably broke N3 here)
@@ -87,4 +87,5 @@ chute:transfer
   rdfs:comment "No longer necessary with ahistorical adressable naming ?!?"
   rdfs:label "Blobs can be transferred between peers" .
 
-<> rdfs:seeAlso <https://github.com/cloudfleet/tree/master/blimp-parachute/model/chute.n3> .
+<>
+ rdfs:seeAlso <https://github.com/cloudfleet/tree/master/blimp-parachute/model/chute.n3> .

@@ -1,7 +1,15 @@
 (defsystem chute
-  :version "0.6.1"
-  :perform (test-op (o c) (symbol-call :rt :do-tests))
-  :depends-on (ironclad
+  :version "0.6.2"
+  :in-order-to ((asdf:test-op
+                 (asdf:test-op chute/t)))
+  :components ((:module package
+                :pathname ""
+                :serial t
+                :components ((:file "package")))))
+   
+(defsystem chute/implementation
+  :depends-on (chute
+               ironclad
                lparallel
                cl-date-time-parser
                simple-date-time
@@ -10,15 +18,12 @@
                restas
                cl-who
                drakma
-               osicat
+               osicat ;;; ??? needed
                #+abcl
                chute/uri
                rt)
-  :components ((:module package :pathname ""
-                        :serial t :components
-                        ((:file "package")))
-	       (:module model :pathname ""
-                        :depends-on (package)
+  :components 
+	       ((:module model :pathname ""
                         :components
                         ((:file "model")))
                (:module config :pathname ""
@@ -60,8 +65,8 @@
                (:module osx :pathname ""
                         :depends-on (source)
                         :serial t :components
-                        ((:file "macos"))))
-  :in-order-to ((asdf:test-op (asdf:test-op chute/t))))
+                        ((:file "macos")))))
+
 
 #+abcl
 (progn 
@@ -85,7 +90,7 @@
 (defsystem chute/t
     :defsystem-depends-on (prove-asdf)
     :depends-on (prove
-		 chute)
+		 chute/implementation)
     :perform (asdf:test-op (op c)
 		           (uiop:symbol-call :prove-asdf 'run-test-system c)
                            (when (eq uiop/os:*implementation-type* :abcl)
@@ -94,6 +99,7 @@
 			  :pathname "t/"
 			  :components
 			  ((:test-file "aes")
+                           (:test-file "blob-test")
                            (:test-file "type")
 			   (:test-file "snapshot")
 			   (:test-file "config")

@@ -288,12 +288,12 @@ bash -x ./chute/configure-asdf.bash
 
 ** Osicat failing to grovel
 <https://github.com/osicat/osicat/pull/11/files>
-* 20241109a Colophon 
+* 20241109b Colophon 
 #+caption: <> :is <https://github.com/cloudfleet/blimp-parachure/README.org>. 
 #+begin_example
 Mark     <evenson.not.org@gmail.com>
 Created: 01-OCT-2015
-Revised: <2024-09-11 Wed 19:42>
+Revised: <2024-09-11 Wed 20:53>
 #+end_example
 
 
