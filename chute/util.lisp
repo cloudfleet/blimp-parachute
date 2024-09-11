@@ -13,20 +13,6 @@
              (write-char c result)))
     (get-output-stream-string result)))
 
-(defun make-new-directory ()
-  "Make a new temporary directory within CHUTE/CONFIG:*BLOBS-DIRECTORY*."
-  (let* ((var-root
-          (ensure-directories-exist chute/config:*blobs-directory*))
-         (directory-as-file
-          (pathname (cl-fad:open-temporary
-                     :template (namestring (merge-pathnames "blob-%" var-root)))))
-         (directory-with-file
-          (pathname (namestring (concatenate 'string
-                                             (namestring directory-as-file)
-                                             "/foo")))))
-    (delete-file directory-as-file)
-    (ensure-directories-exist directory-with-file)
-    (pathname (concatenate 'string (namestring directory-as-file) "/"))))
 
        
        

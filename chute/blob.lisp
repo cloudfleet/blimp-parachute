@@ -149,7 +149,7 @@
        metadata
        cipher))))
 
-(defun make-blob/test (&key (directory (make-new-directory)))
+(defun make-blob/test (&key (directory (chute/fs:make-directory)))
   "Create a test blob with random data returning the directory it was created within."
   (let ((metadata (make-instance 'metadata))
         (shard-size (random (expt 2 16)))

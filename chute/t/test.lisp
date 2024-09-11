@@ -2,7 +2,7 @@
 
 (prove:plan 1)
 (prove:ok
- (let ((directory (make-blob #p"/etc/passwd" (chute:make-new-directory)))
+ (let ((directory (make-blob #p"/etc/passwd" (chute/fs:make-directory)))
        (already-running-server-p (chute/server:running-server-p)))
    (unless already-running-server-p
      (chute/server:start-server))

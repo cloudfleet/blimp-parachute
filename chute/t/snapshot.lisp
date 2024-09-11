@@ -5,7 +5,7 @@
  (let ((snapshots (chute/fs:snapshots)))
    (chute:make-blob
     (last snapshots)
-    (chute:make-new-directory)))
+    (chute/fs:make-directory)))
  "Making a blob via defaults")
 
 
