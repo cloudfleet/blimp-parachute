@@ -1,28 +1,29 @@
 #+TITLE: Parachute: a zero knowledge backup system
+* Use Case
+** TODO Sink a =chute= blob
+#+caption: How one snaps onto a wordline for a local name
+#+begin_src bash
+  chute-sink ~/Movies/
+#+end_src
 * Installation
 
-** TODO [doc] configure an ANSI CL and Quicklisp installation 
+** DONE [doc] configure an ANSI CL and Quicklisp installation
+CLOSED: [2024-09-11 Wed 16:43]
+
+- CLOSING NOTE [2024-09-11 Wed 16:43]
+*** Debian package form
+See <[[file:Dockerfile::apt-get install -y screen wget rsync binutils gcc \\]]>
 
 #+begin_src lisp
   (time (asdf:make :chute))
 #+end_src
 
-
-#+caption: deprecated (?)
-#+NAME:  Basic installation of parachute in one command
-#+BEGIN_SRC shell
+#+name:  Basic installation of parachute in one command
+#+begin_src shell
 bash -x ./setup/install-parachute.bash
-#+END_SRC
+#+end_src
 with the appropiate permissions should enable all the following
-subclauses to be met automatically
-
-** Historical
-Install instructions in detail if ~./setup/install-parachute.bash~ doesn't work
-*** Place chute.asd in ASDF3 system registry
-#+NAME: Configuration of ASDF3 system registry to find blimp-parachute
-#+BEGIN_SRC shell
-bash -x ./chute/configure-asdf.bash
-#+END_SRC    
+subclauses to be met automatically.
 
 *** Loading from ASDF
 #+BEGIN_SRC lisp
@@ -53,12 +54,37 @@ wget https://beta.quicklisp.org/quicklisp.lisp
     (asdf:find-system :chute) "quicklisp-setup.lisp"))
 #+END_SRC    
 
-* Dockerification
+** Dockerification
 To build an image on arm32 with Docker installed:
 #+BEGIN_SRC shell
 bash make-arm32-dockerfile.bash 
 sudo docker build --file Dockerfile-arm32  . 
 #+END_SRC
+* Implementation
+~chute~ provides both a client and a server implementation.  All
+nodes boot can potentially boot either.
+
+A local management REST API is always available bound to ~tcp4:2002~
+
+** URI
+*** URI addressing for previous link
+
+** bootstrap 
+*** Client platform 
+A Common Lisp implementation on ~x86_64~, ~arm32~, or ~arm64~.
+*** CCL 
+Most efficient runtime on arm32 platform
+http://trac.clozure.com/ccl/wiki/PlatformNotes
+*** SBCL
+*** ABCL
+*** Server platform 
+A Common Lisp implementation.
+*** SBCL
+~sbcl-1.3.1~ or later known to work
+*** CCL
+~ccl-1.11~
+*** ABCL
+~abcl-1.5.0~
 * REST API
 ** Current version 'v1'
 #+NAME: Fundamental Chute REST API
@@ -104,26 +130,6 @@ Each chunk of a blob is adressed as a URI of the form:
 
 MIME type for PUT content is "application/octet-stream".
 
-* Platform
-~parachute~ provides both a client and a server implementation.  All
-nodes boot can potentially boot either.
-
-A local management REST API is always available bound to ~tcp4:2002~
-** Client platform 
-A Common Lisp implementation on ~x86_64~, ~arm32~, or ~arm64~.
-*** CCL 
-Most efficient runtime on arm32 platform
-http://trac.clozure.com/ccl/wiki/PlatformNotes
-*** SBCL
-*** ABCL
-** Server platform 
-A Common Lisp implementation running on ~x86_64~.
-*** SBCL
-~sbcl-1.3.1~ or later known to work
-*** CCL
-~ccl-1.11~
-*** ABCL
-~abcl-1.5.0~
 * What is to be DONE
 ** DONE BTRFS volume must have ".snapshot/" directory
    CLOSED: [2015-12-14 Mon 13:55]
@@ -241,10 +247,21 @@ Implementation use HTTP 'Byte-range' header to files attached/detatched via mmap
 
 ** TODO Tests for use cases
 ** TODO Metadata transcriptions
-*** URI Scheme for previous link
-** TODO Generalize filesytem snapshoting abstraction 
-Implement ZFS.
+
+** DONE Generalize filesytem snapshoting abstraction 
+CLOSED: [2024-09-11 Wed 16:44]
+- CLOSING NOTE [2024-09-11 Wed 16:44] \\
+  Not needed for stage 1.
+Implement ZFS 
 * Notes
+** Historical
+Install instructions in detail if ~./setup/install-parachute.bash~ doesn't work
+*** Place chute.asd in ASDF3 system registry
+#+NAME: Configuration of ASDF3 system registry to find blimp-parachute
+#+BEGIN_SRC shell
+bash -x ./chute/configure-asdf.bash
+#+END_SRC    
+
 ** Osicat failing to grovel
 <https://github.com/osicat/osicat/pull/11/files>
 * Colophon
@@ -252,7 +269,7 @@ Implement ZFS.
 #+BEGIN_EXAMPLE
 <evenson.not.org@gmail.com>
 Created: 01-OCT-2015
-Revised: <2024-09-11 Wed 16:39>
+Revised: <2024-09-11 Wed 16:44>
 #+END_EXAMPLE
 
 
