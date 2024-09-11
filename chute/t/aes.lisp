@@ -24,7 +24,7 @@
           :return nil
           :finally (return t))))
     '(t t)
-  "Testing that AES block ciphers as implemented by IRONCLAD indeed retain state~
+  "Testing that AES block ciphers as implemented by IRONCLAD indeed retain state ~
     D( E(x1) || E(x2) ) == x1 || x2")
 
 (prove:finalize)
