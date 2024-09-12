@@ -272,11 +272,11 @@ Fails until run from the REPL.  Unsure what this entails.
 CLOSED: [2024-09-11 Wed 16:44]
 - CLOSING NOTE [2024-09-11 Wed 16:44] \\
   Not needed for stage 1.
-Implement ZFS 
+Implement ZFS snapshotting.
 ** DONE Document configuration of a local ANSI CL implementation and attendent Quicklisp installation
 CLOSED: [2024-09-11 Wed 16:43]
 * Notes
-** Historical
+** Odds and Ends
 *** Place chute.asd in ASDF3 system registry
 #+NAME: Configuration of ASDF3 system registry to find blimp-parachute
 #+BEGIN_SRC shell
@@ -292,7 +292,7 @@ bash -x ./chute/configure-asdf.bash
 #+begin_example
 Mark     <evenson.not.org@gmail.com>
 Created: 01-OCT-2015
-Revised: <2024-09-11 Wed 23:08>
+Revised: <2024-09-12 Thu 10:01>
 #+end_example
 
 

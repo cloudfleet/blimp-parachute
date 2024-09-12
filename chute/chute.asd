@@ -1,5 +1,5 @@
 (defsystem chute
-  :version "0.6.6"
+  :version "0.6.7"
   :depends-on (alexandria
                ironclad
                lparallel
@@ -11,8 +11,7 @@
                cl-who
                drakma
                osicat ;;; ??? needed
-               #+abcl
-               chute/uri
+               (:feature :abcl chute/uri)
                rt)
   :components ((:module package
                 :pathname "./"
@@ -62,6 +61,7 @@
                         :depends-on (source)
                         :serial t :components
                         ((:file "macos")))))
+  
 #-abcl (error "Need the Bear <https://abcl.org/releases/>")
 (defsystem chute/rdf
   :defsystem-depends-on (abcl-asdf)

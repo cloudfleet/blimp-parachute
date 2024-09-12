@@ -22,9 +22,6 @@
    (lambda () (chute/rsync:sink local remote))
    (error "Unimplemented creation of sink")))
 
-(defun node ()
-  (values 0 
-          #p"https://waste.not.org/~a/"))
 
 
 
