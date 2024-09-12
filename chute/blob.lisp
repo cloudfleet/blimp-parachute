@@ -2,24 +2,26 @@
 
 (defclass metadata ()
   ((version
-    :initform "20240911a"
+    :initform "20240912a"
     :accessor version
     :documentation "Version of blob metadata.")
    (prototype
     :initform '(("lispClass" ."metadata") ("lispPackage". "chute")))
-   (node ;; obsoleted ??
+   (node 
     :initform (alexandria:random-elt
                `(,(chute/io.cloudfleet:node)
                  ,(chute:node)
                  0))
     :accessor node
     :documentation "Node creating this blob.")
+   #+nil
    (domain
     :initform (alexandria:random-elt
                `("https://n3.not.org/chute/blob#"
                  ,(chute/io.cloudfleet:domain)))
     :accessor domain
     :documentation "Domain creating this blob.")
+   #+nil
    (mount
     :initform (chute/config:path (chute/config:default))
     :accessor mount
@@ -30,7 +32,7 @@
    (parent
     :initform nil
     :accessor parent
-    :documentation "Previous blob, or nil if this is the first blob in a series.")
+    :documentation "Previous version of this blob, or nil if this is the first blob in a series.")
    (shards
     :initform 1
     :accessor shards
@@ -39,13 +41,16 @@
     :accessor size
     :documentation "Size of blob in bytes.")
    (checksum
-    :accessor checksum
+    :accessor checksum ;; TODO specify/switch algo
     :documentation "Checksum of blob.")
+   (iv
+    :accessor iv
+    :documentation "Unique initialization Vector (iv) of encryption for this blob.")
    (nonce 
     :accessor nonce
-    :documentation "Nonce of block key.")
+    :documentation "Nonce for this access to blob contents.")
    (encrypted
-    :initform t 
+    :initform nil ;;; ?? blobs can exist in staging areas locally unencrypted (local copy)
     :accessor encrypted-p
     :documentation "Whether the blob is in an encrypted state.")
    (uri
@@ -54,40 +59,32 @@
                 (:timestamp . ,timestamp)
                 (:shards . ,shards)
                 (:checksum . ,checksum)
-                (:nonce . ,nonce)
                 (:encrypted . ,encrypted)))))
-               
-(defmethod make-blob ((file-or-directory pathname) blob-path)
-  "Create blob from FILE-OR-DIRECTORY at BLOB-PATH"
-  (flet ((read-file (file blob-path)
-           (with-open-file (input-stream file
-                                         :direction :input
-                                         :element-type '(unsigned-byte 8))
-             (make-blob input-stream blob-path))))
-    (if
-     (not 
-      (equalp (pathname file-or-directory)
-              (uiop:ensure-directory-pathname file-or-directory))
-      (read-file file-or-directory pathname))
-     (error "Unimplemented MAKE-BLOB of recursive input"))))
 
-(defmethod make-blob ((snapshot-path string) blob-path)
-  (prog1
-      (make-blob (chute/fs:send snapshot-path) blob-path)
-    ;; The following shenanigans are just to set the blob timestamp to
-    ;; the creation time.  Obviously we should redo the API for making
-    ;; a blob somehow.
-    (let ((transfer (make-transfer snapshot-path))
-          (metadata (with-open-file (stream (merge-pathnames "index.json" blob-path))
-                      (cl-json:with-decoder-simple-clos-semantics (cl-json:decode-json stream)))))
-      (setf (timestamp metadata)
-            (creation-time transfer)
+(defgeneric stage-blob ((file-or-directory pathname))
+  (:documentation "Stage the artifacts at pathname, possibly recursively for blob encryption.")
+  (:method ((file-or-directory pathname))
+    (let ((blob-path (chute/fs:make-directory)))
+      (flet ((read-file (file blob-path)
+               (with-open-file (input-stream file
+                                             :direction :input
+                                             :element-type '(unsigned-byte 8))
+                 #+nil
+                 (make-blob input-stream blob-path))))
+      (if
+       (not 
+        (equalp (pathname file-or-directory)
+                (uiop:ensure-directory-pathname file-or-directory))
+        (read-file file-or-directory pathname))
+       (error "Unimplemented MAKE-BLOB of recursive input")
+       ;;; make an UPDATE-METADATA?
+       (let ((metadata (read-metadata blob-path :format :json)))
+         (setf (timestamp metadata)
+               (creation-time transfer)
 
-            (mount metadata)
-            (chute/fs:snapshot/mount snapshot-path))
-      (with-open-file (stream (merge-pathnames "index.json" blob-path) :direction :output
-                              :if-exists :supersede)
-        (cl-json:encode-json metadata stream)))))
+               (mount metadata)
+               (chute/fs:snapshot/mount snapshot-path))
+         (transcribe-metadata blob-path metadata :format :json)))))))
 
 (defmethod make-blob ((input-stream stream) blob-path)
   "Make blob from INPUT-STREAM with output at BLOB-PATH"
@@ -120,10 +117,28 @@
             (nonce metadata) (nonce aes-ctr)
             (checksum metadata) (ironclad:byte-array-to-hex-string
                                  (ironclad:produce-digest digest)))
-      (with-open-file (stream (merge-pathnames "index.json" blob-path) :direction :output
-                              :if-exists :supersede)
-        (cl-json:encode-json metadata stream))
+      (transcribe-metadata blob-path metadata)
       (values blob-path metadata))))
+
+(defgeneric transcribe-metadata ((path pathname) (metadata metadata) (format keyword))
+  (:documentation "Serialize METADATA to PATHNAME in FORMAT.")
+  (:method ((path pathname) (metadata metadata) (format (eql :json)))
+    (with-open-file (stream
+                     (merge-pathnames "index.json" path)
+                     :direction :output
+                     :if-exists :supersede)
+      (cl-json:encode-json metadata stream)))
+  (:method ((path pathname) (metadata metadata) (format (eql :n3)))
+    (with-open-file (stream (merge-pathnames "index.n3" path))
+      :direction :output
+      :if-exists :supersede
+      (error "Unimplemented serialization to N3 triples."))))
+
+(defgeneric read-metadata ((path pathame) (format keyword))
+  (:documentation "Read metadata instance at PATH with default FORMAT being :json")
+  (:method ((path pathname) (format (eql :json)))
+    (with-open-file (stream (merge-pathnames "index.json" path))
+      (cl-json:with-decoder-simple-clos-semantics (cl-json:decode-json stream)))))
 
 ;;; XXX this will read the ENTIRE BLOB into memory before returning a result
 (defun decrypt-blob-as-octets (directory)

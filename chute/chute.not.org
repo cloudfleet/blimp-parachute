@@ -8,13 +8,26 @@
     
   #+begin_src lisp
     (ql:quickload :chute)
-  #+end_src    
+  #+end_src
+
+* Research
+
+* RFC-2104 HMAC
+<https://www.rfc-editor.org/rfc/rfc2104>
+
+* Changes
+** TODO blob.lisp
+*** Use CL:PATHNAME
+*** Serialize metadata
+JSON, N3
+*** Minimize metadata
+We can always add?
 
 * Colophon
   #+caption: chute.not.org
   #+begin_example
     Mark <evenson@not.org>
     Created: 2024-9-11
-    Revised: <2024-09-11 Wed 18:56>
+    Revised: <2024-09-12 Thu 11:36>
   #+end_example
   
