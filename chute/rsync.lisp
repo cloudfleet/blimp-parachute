@@ -5,15 +5,13 @@
 
 ;;; one-way rsync (potentially destructive)
 ;;;
-;;; If you have a remote user that can rsync over SSH, then you
-;;; can use this method.  
+;;; If one has a remote user on host that has permissions to rsync to
+;;; via SSH, then you can use this method.
 (defun sink (from to
                &key remote-user)
   (warn "Attempting undebugged rsync from ~&<~a> to~&<~a>~%" local remote)
   (let* ((local
-           (or 
-            (uiop:pathname-directory-pathname from)
-            (pathname from)))
+           (truename from)) 
          (remote
            (chute/uri:remote-uri to))
          (host
@@ -24,9 +22,10 @@
             (uiop:getenv "USER")
             "me" ;;; TODO better autoconfigure
             "kilroy"))
-         (remote-rsync
+         (remote-rsync-command
            (format nil "~a@~a:.waste/~a"
-                   remote-user host
+                   remote-user
+                   host
                    (pathname-directory remote)))
          (start
           (let ((note (format "Starting rsync from ~&<~a> to~&<~a>~%" local remote)))
@@ -34,7 +33,7 @@
             note))
          (output
            (uiop:run-program '("rsync" "-avzP"
-                               local remote-rsync
+                               local remote-rsync-command
                                :output :string))))
     (values 
      (pushnew output

@@ -14,7 +14,6 @@
                  0))
     :accessor node
     :documentation "Node creating this blob.")
-   #+nil
    (domain
     :initform (alexandria:random-elt
                `("https://n3.not.org/chute/blob#"

@@ -1,14 +1,32 @@
 ;;;; implementation of access to local filesystem via CL:PATHNAME
 (in-package :chute/fs)
 
+(defun files-under (path)
+  (let (paths)
+    (cl-fad:walk-directory path (lambda (p) (push p paths)))
+    paths))
+
+(defun bundle (path)
+  "Create an in-memory copy of file structure at PATH"
+  ;; doesn't deal anything other than "normal" files and directories
+
+  (let ((file-sizes
+          (loop :for p :in (files-under path)
+                :when p
+                  :collect `(,p 
+                             ,(with-open-file (o p) (file-length o))))))
+    file-sizes))
+
 (defclass fs (chute-model)
   ((unimplemented)))
 
+;;; Old BTFS snapshot
 (defun snapshot (&key (path (chute/config:path (chute/config:default))) path-provided-p)
   (declare (ignore path-provided-p))
   (error "Need to figure out default for snapshot without local URI")
   #+nil
   (chute/btrfs:subvolume/snapshot :path path))
+
 
 (defun snapshots (&key (path (chute/config:path (chute/config:default))) path-provided-p)
   (declare (ignore path-provided-p))
