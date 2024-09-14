@@ -24,7 +24,7 @@
     :documentation "Filesystem mount point of blob.")
    (timestamp
     :accessor timestamp
-    :initform (simple-date-time:|yyyymmddThhmmssZ| (simple-date-time:now)))
+    :initform (timestamp-now))
    (parent
     :initform nil
     :accessor parent

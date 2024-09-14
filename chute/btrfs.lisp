@@ -29,12 +29,12 @@
 
 ;;; TODO Need command to figure out latest generation
 (defun subvolume/find-new (&key
-                             (path (chute/config:path (chute/config:default)))
+                             (configuration (chute/config:path (chute/config:default)))
                              (generation 0))
   (let* ((o (make-string-output-stream))
          (find-new (format nil "~a subvolume find-new ~a ~a"
                            chute/config:*btrfs-command*
-                           path generation)))
+                           configuration generation)))
     (uiop:run-program find-new :output o)
     (get-output-stream-string o)))
 
@@ -53,7 +53,7 @@
       (values output error))))
 
 (defun snapshots (&key
-                    (path (chute/config:path (chute/config:default))))
+                    (path (chute/config:client-configuration (chute/config:default))))
   "List all available snapshots which exist for PATH."
   (let ((show (subvolume/show :path path)))
     (loop

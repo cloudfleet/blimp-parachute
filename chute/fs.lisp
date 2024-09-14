@@ -29,8 +29,8 @@
   ((unimplemented)))
 
 ;;; Old BTFS snapshot
-(defun snapshot (&key (path (chute/config:path (chute/config:default))) path-provided-p)
-  (declare (ignore path-provided-p))
+(defun snapshot (&key (path (chute/config:client-configuration (chute/config:default))) path-provided-p)
+  (declare (ignore path path-provided-p))
   (error "Need to figure out default for snapshot without local URI")
   #+nil
   (chute/btrfs:subvolume/snapshot :path path))

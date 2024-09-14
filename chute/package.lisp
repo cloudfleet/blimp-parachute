@@ -59,7 +59,12 @@
    #:buffer-size
 
    #:config
-   #:client
+
+   #:client 
+   #:client-version
+   #:client-configuration
+   #:client-api.port
+   #:client-transfer-method
 
    #:with-cloudfleet-config
 

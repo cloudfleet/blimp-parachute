@@ -8,27 +8,30 @@
 (defclass client (config)
   ((version
     :initform "2016022600"
-    :accessor version)
+    :accessor client-version)
    (prototype
     :initform '(("lispClass" ."client") ("lispPackage". "chute")))
-   (path
-    :documentation "Location of data for client."
+   (configuration
+    :documentation "Configuration for chute client"
     :initform (or (probe-file #p"/opt/io/cloudfleet/data")
                   #+abcl
                   (probe-file #p"https://api.cloudfleet.io/client/config")
                   #+abcl
-                  (probe-file #p"https://n3.not.org/chute/synk.lisp"))
-    :accessor path)
+                  (probe-file #p"https://n3.not.org/chute/synk.lisp")
+                  (let ((default 
+                          (ensure-directories-exist #p"~/.chute/")))
+                    default))
+    :accessor configuration)
    (backing-store
     :documentation "Locally available filesystem abstractions for snapshoting."
     :initform (or
                :rsync
-               :btrfs :zfs)
+               :btrfs :zfs))
    (api.port
-    :accessor api.port
+    :accessor client-api.port
     :initform 2021) ;; shouldn't we have one port?
    (transfer-method
-    :accessor transfer-method)))
+    :accessor client-transfer-method)))
 
 (defun default (&key (file "client-config.json") (force nil))
   (when (or (not *client-config*)
