@@ -5,7 +5,7 @@
     (if from
       (push from nonce)
       (unless nonce
-        (push (random 2 128) nonce)))
+        (push (random (expt 2 128)) nonce)))
     (let ((nonce (first nonce)))
       (values
        (format nil "killroy's nonce: ~a" nonce)

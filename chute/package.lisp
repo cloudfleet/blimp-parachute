@@ -3,12 +3,18 @@
   (:use cl)
   (:export
    #:synk ;; N.b. not fully implemented
-   #:node 
    
    #:client
 
    #:metadata
-   #:timestamp #:shards #:size #:checksum
+   #:metadata-version
+   #:metadata-prototype
+   #:metadata-node
+   #:metadata-domain
+   #:metadata-timestamp
+   #:metadata-shards
+   #:metadata-size
+   #:metadata-checksum
 
    #:transfer-blob/http #:put-file
 

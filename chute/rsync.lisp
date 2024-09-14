@@ -9,9 +9,9 @@
 ;;; via SSH, then you can use this method.
 (defun sink (from to
                &key remote-user)
-  (warn "Attempting undebugged rsync from ~&<~a> to~&<~a>~%" local remote)
+  (warn "Attempting undebugged rsync from ~&<~a> to~&<~a>~%" from to)
   (let* ((local
-           (truename from)) 
+           (truename from))
          (remote
            (chute/uri:remote-uri to))
          (host
@@ -24,11 +24,11 @@
             "kilroy"))
          (remote-rsync-command
            (format nil "~a@~a:.waste/~a"
-                   remote-user
+                   user
                    host
                    (pathname-directory remote)))
          (start
-          (let ((note (format "Starting rsync from ~&<~a> to~&<~a>~%" local remote)))
+          (let ((note (format nil "Starting rsync from ~&<~a> to~&<~a>~%" local remote)))
             (note note)
             note))
          (output
@@ -39,7 +39,7 @@
      (pushnew output
               (slot-value *rsyncs* 'outputs))
      start
-     (let ((note (format "Finished rsync")))
+     (let ((note (format nil "Finished rsync")))
        (note note)
        note))))
 

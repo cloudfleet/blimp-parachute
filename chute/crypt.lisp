@@ -22,45 +22,36 @@
                        (ironclad:encrypt cipher plain-text cipher-text)
                        cipher-text))))))
 
-(defun get-cipher (arg) 
+(defun get-cipher (type) 
   "Return encryption source keyed for CIPHER"
   ;;; TODO: initialize cipher correctly
-  (declare (keyword arg))
-  (let ((type
-          arg)
-        (iv
-          (make-array 16
-                      :element-type '(unsigned-byte 8)
-                      :initial-element (random (expt 2 16))))
-          
+  (declare (keyword type))
+  (let ((iv
+          (make-random-byte-array 16))
         (key 
           (or (chute/io.cloudfleet:key)
-              (make-array 32 :element-type '(unsigned-byte 8))
-               :initial-element (random (expt 2 32)))))
-    (cond
-      ((and (keywordp type)
-            (eq type :aes-ctr))
+              (make-random-byte-array 32))))
+    (case type
+      (:aes-ctr
        (ironclad:make-cipher :aes
                              :mode :ctr
                              :key key
-                             :initialization-vector iv)))
-      ((eq type :aes)
+                             :initialization-vector iv))
+      (:aes
          (ironclad:make-cipher :aes
                                :mode :cfb
                                :key key
-                               :initialization-vector iv)))
-      ((find type '(:salsa20 :salsa))
+                               :initialization-vector iv))
+      ((:salsa20 :salsa)
        (ironclad:make-cipher :salsa20 :mode :stream
                              :key key
-                                      :initialization-vector (subseq iv 12))))
+                             :initialization-vector (subseq iv 12))))))
 
 (defun get-key ()
   (get-key/aes-ctr)) ;;; highly speculative
 
 (defun get-key/aes-ctr ()
-  "Return a aes-ctr u8 KEY
-
-Use *"
+  "Return a aes-ctr u8 KEY"
   (let ((nonce (make-array 8 :element-type '(unsigned-byte 8))))
     (with-open-file (random "/dev/urandom"  :element-type '(unsigned-byte 8))
       (loop :for i :below 8
@@ -156,4 +147,10 @@ Use *"
      buffer
      cipher
      digest)))
-     
+
+;;; using CL:RANDOM which may need some assumptions clarified
+(defun make-random-byte-array (length)
+  (let ((result (make-array length :element-type '(unsigned-byte 8))))
+    (map-into result (lambda (x) (random 256)) result)
+    result))
+  

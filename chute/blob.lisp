@@ -3,13 +3,14 @@
 (defclass metadata ()
   ((version
     :initform "20240912a"
-    :accessor version
+    :accessor metadata-version
     :documentation "Version of blob metadata.")
    (prototype
+    :accessor metadata-prototype
     :initform '(("lispClass" ."metadata") ("lispPackage". "chute")))
    (node 
-    :initform (chute/io.cloudfleet:node)
-    :accessor node
+    :initform "localhost"
+    :accessor metadata-node
     :documentation "Node creating this blob.")
    (domain
     :initform (alexandria:random-elt
@@ -17,8 +18,7 @@
                  ,(chute/io.cloudfleet:domain)))
     :accessor domain
     :documentation "Domain creating this blob.")
-   #+nil
-   (mount
+c   (mount
     :initform (chute/config:path (chute/config:default))
     :accessor mount
     :documentation "Filesystem mount point of blob.")
@@ -50,37 +50,38 @@
     :accessor encrypted-p
     :documentation "Whether the blob is in an encrypted state.")
    (uri
-    :initform `((:user . ,user)
-                (:parent . ,parent)
-                (:timestamp . ,timestamp)
-                (:shards . ,shards)
-                (:checksum . ,checksum)
-                (:encrypted . ,encrypted)))))
+    :initform nil
+    #+nil 
+    `((:user . ,user)
+      (:parent . ,parent)
+      (:timestamp . ,timestamp)
+      (:shards . ,shards)
+      (:checksum . ,checksum)
+      (:encrypted . ,encrypted)))))
 
-(defgeneric stage-blob ((file-or-directory pathname))
+(defgeneric stage-blob (file-or-directory)
   (:documentation "Stage the artifacts at pathname, possibly recursively for blob encryption.")
   (:method ((file-or-directory pathname))
     (let ((blob-path (chute/fs:make-directory)))
-      (flet ((read-file (file blob-path)
+      (flet ((make-blob-from-single-file (file blob-path)
                (with-open-file (input-stream file
                                              :direction :input
                                              :element-type '(unsigned-byte 8))
-                 #+nil
                  (make-blob input-stream blob-path))))
       (if
        (not 
         (equalp (pathname file-or-directory)
-                (uiop:ensure-directory-pathname file-or-directory))
-        (read-file file-or-directory pathname))
-       (error "Unimplemented MAKE-BLOB of recursive input")
+                (uiop:ensure-directory-pathname file-or-directory)))
+       (make-blob-from-single-file file-or-directory blob-path)
+       (error "Unimplemented MAKE-BLOB of recursive input"))
        ;;; make an UPDATE-METADATA?
-       (let ((metadata (read-metadata blob-path :format :json)))
+       (let ((metadata (read-metadata blob-path :json)))
          (setf (timestamp metadata)
                (creation-time transfer)
 
                (mount metadata)
                (chute/fs:snapshot/mount snapshot-path))
-         (transcribe-metadata blob-path metadata :format :json)))))))
+         (transcribe-metadata blob-path metadata :json))))))
 
 (defmethod make-blob ((input-stream stream) blob-path)
   "Make blob from INPUT-STREAM with output at BLOB-PATH"
@@ -116,7 +117,7 @@
       (transcribe-metadata blob-path metadata)
       (values blob-path metadata))))
 
-(defgeneric transcribe-metadata ((path pathname) (metadata metadata) (format keyword))
+(defgeneric transcribe-metadata (path metadata format)
   (:documentation "Serialize METADATA to PATHNAME in FORMAT.")
   (:method ((path pathname) (metadata metadata) (format (eql :json)))
     (with-open-file (stream
@@ -130,7 +131,7 @@
       :if-exists :supersede
       (error "Unimplemented serialization to N3 triples."))))
 
-(defgeneric read-metadata ((path pathame) (format keyword))
+(defgeneric read-metadata (path format)
   (:documentation "Read metadata instance at PATH with default FORMAT being :json")
   (:method ((path pathname) (format (eql :json)))
     (with-open-file (stream (merge-pathnames "index.json" path))

@@ -18,9 +18,7 @@
 
 (defun synk (local remote) ;; mebbe add a "window" or "epoch" hint here
   "Whole kitchen sync for local and remote state"
-  (some 
-   (lambda () (chute/rsync:sink local remote))
-   (error "Unimplemented creation of sink")))
+  (lambda () (chute/rsync:sink local remote)))
 
 
 

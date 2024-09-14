@@ -52,11 +52,11 @@
                          (:file "api")))
                (:module server :pathname "./"
                         :depends-on (source)
-                        :serial t :components
+                        :components
                         ((:file "server")))
                (:module io.cloudfleet :pathname "./"
                         :depends-on (source)
-                        :serial t :components
+                        :components
                         ((:file "engine")))
                (:module osx :pathname "./"
                         :depends-on (source)
