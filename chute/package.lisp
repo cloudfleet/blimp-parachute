@@ -3,7 +3,7 @@
   (:use cl)
   (:export
    #:synk ;; N.b. not fully implemented
-   #:node ;; provisional
+   #:node 
    
    #:client
 

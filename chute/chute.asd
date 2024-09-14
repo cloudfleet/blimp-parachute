@@ -13,6 +13,7 @@
                osicat ;;; ??? needed
                (:feature :abcl chute/uri)
                rt)
+  :in-order-to ((test-op (test-op chute/t)))
   :components ((:module package
                 :pathname "./"
                 :components ((:file "package")))
@@ -26,7 +27,7 @@
                         ((:file "macos")
                          (:file "config-client")
                          (:file "config-server")))
-               (:module source :pathname ""
+               (:module source :pathname "./"
                         :depends-on (model config)
                         :serial t :components
                         ((:file "util")
@@ -39,7 +40,7 @@
                          (:file "chute")
                          (:file "client")
                          (:file "transfer-http")))
-               (:module crypt :pathname ""
+               (:module crypt :pathname "./"
                         :depends-on (source)
                         :serial t :components
                         ((:file "nonce")
@@ -49,33 +50,37 @@
                         :serial t :components
                         ((:file "api-server")
                          (:file "api")))
-               (:module server :pathname ""
+               (:module server :pathname "./"
                         :depends-on (source)
                         :serial t :components
                         ((:file "server")))
-               (:module io.cloudfleet :pathname ""
+               (:module io.cloudfleet :pathname "./"
                         :depends-on (source)
                         :serial t :components
                         ((:file "engine")))
-               (:module osx :pathname ""
+               (:module osx :pathname "./"
                         :depends-on (source)
                         :serial t :components
                         ((:file "macos")))))
-  
-#-abcl (error "Need the Bear <https://abcl.org/releases/>")
-(defsystem chute/rdf
+
+#+abcl ;;; non-ABCL implementation still try to parse defsystem-depends-on clause?
+(defsystem chute/rdf/jeannie
+  :if-feature :abcl
   :defsystem-depends-on (abcl-asdf)
   :depends-on (jeannie))
+
 (defsystem chute/rdf/t
+  :if-feature :abcl
   :defsystem-depends-on (prove-asdf)
-  :depends-on (prove chute chute/rdf)
+  :depends-on (prove chute chute/rdf/jeannie)
   :components ((:module test :pathname "t/"
 		:components ((:test-file "rdf")))))
+
 (defsystem chute/uri
+  :if-feature :abcl
   :components ((:module abcl :pathname "./"
                 :components ((:file "package") ;;; FIXME
                              (:file "uri")))))
-#-abcl (error "End of Bear specific systems")
 
 (defsystem chute/t
   :defsystem-depends-on (prove-asdf)

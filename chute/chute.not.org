@@ -23,11 +23,24 @@ JSON, N3
 *** Minimize metadata
 We can always add?
 
+* Research
+
+** Choosing Block Cipher Modes
+
+<https://stackoverflow.com/questions/1220751/how-to-choose-an-aes-encryption-mode-cbc-ecb-ctr-ocb-cfb>
+
+** Disk encryption XTS, XEX, 
+<https://en.wikipedia.org/wiki/Disk_encryption_theory>
+
+We don't really have block sizes in implementing =synk=: each file
+"stands on its own", able to be accessed, modified, etc. minimally
+affecting the bundle.  
+
 * Colophon
   #+caption: chute.not.org
   #+begin_example
     Mark <evenson@not.org>
     Created: 2024-9-11
-    Revised: <2024-09-12 Thu 11:36>
+    Revised: <2024-09-13 Fri 09:32>
   #+end_example
   

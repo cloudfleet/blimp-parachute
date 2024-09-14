@@ -6,16 +6,24 @@
     (cl-fad:walk-directory path (lambda (p) (push p paths)))
     paths))
 
-(defun bundle (path)
-  "Create an in-memory copy of file structure at PATH"
-  ;; doesn't deal anything other than "normal" files and directories
+(defun file-attributes (path)
+  (with-open-file (input path :element-type '(unsigned-byte 8))
+    (let ((size
+            (file-length input))
+          (sha256
+            (ironclad:byte-array-to-hex-string
+             (ironclad:digest-stream :sha256 input))))
+      `(:size ,size :sha256 ,sha256))))
 
-  (let ((file-sizes
+(defun manifest (path)
+  "Return a manifest of file structure at PATH"
+  ;; doesn't deal anything other than "normal" files and directories
+  (let ((manifest
           (loop :for p :in (files-under path)
                 :when p
                   :collect `(,p 
-                             ,(with-open-file (o p) (file-length o))))))
-    file-sizes))
+                             ,(file-attributes p)))))
+    manifest))
 
 (defclass fs (chute-model)
   ((unimplemented)))

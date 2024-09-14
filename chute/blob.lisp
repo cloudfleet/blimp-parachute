@@ -8,10 +8,7 @@
    (prototype
     :initform '(("lispClass" ."metadata") ("lispPackage". "chute")))
    (node 
-    :initform (alexandria:random-elt
-               `(,(chute/io.cloudfleet:node)
-                 ,(chute:node)
-                 0))
+    :initform (chute/io.cloudfleet:node)
     :accessor node
     :documentation "Node creating this blob.")
    (domain

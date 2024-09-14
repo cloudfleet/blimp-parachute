@@ -18,7 +18,7 @@
            (getf (pathname-host remote) :authority))
          (user
            (or
-            user
+            remote-user
             (uiop:getenv "USER")
             "me" ;;; TODO better autoconfigure
             "kilroy"))
