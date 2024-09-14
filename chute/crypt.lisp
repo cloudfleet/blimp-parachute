@@ -69,20 +69,22 @@
 (defclass key () nil)
 
 (defclass aes-ctr (key)
-  ((key :accessor key
-        :type '((unsigned-byte 8) 32)
-        :initform (or
-                   (chute/io.cloudfleet:key)
-                   (progn
-                     (warn "Creating null key.")
-                     (make-array 32 :element-type '(unsigned-byte 8)))))
-   (nonce :accessor nonce
-          :type '((unsigned-byte 8) 8))
-   (initialization-vector :accessor iv
-                          :type '((unsigned-byte 8) 16))
+  ((key
+    :accessor key
+    :type '((unsigned-byte 8) 32)
+    :initform (or
+               (chute/io.cloudfleet:key)
+               (progn
+                 (warn "Creating random key.")
+                 (make-random-byte-array 32))))
+   (nonce
+    :accessor nonce
+    :type '((unsigned-byte 8) 8))
+   (initialization-vector
+    :accessor iv
+    :type '((unsigned-byte 8) 16))
    (cipher :accessor cipher)))
            
-
 (defmethod shared-initialize :after ((result aes-ctr) slot-names &key (nonce nil nonce-p))
   (declare (ignore slot-names))
   (unless nonce-p
@@ -151,6 +153,6 @@
 ;;; using CL:RANDOM which may need some assumptions clarified
 (defun make-random-byte-array (length)
   (let ((result (make-array length :element-type '(unsigned-byte 8))))
-    (map-into result (lambda (x) (random 256)) result)
+    (map-into result (lambda (x) (declare (ignore x)) (random 256)) result)
     result))
   

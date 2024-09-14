@@ -16,6 +16,8 @@
    #:metadata-size
    #:metadata-checksum
 
+   #:timestamp-now
+
    #:transfer-blob/http #:put-file
 
    #:sink
@@ -88,7 +90,7 @@
 
    #:send))
 
-(restas:define-module #:chute/api
+(restas:define-module chute/api
   (:use cl chute))
 
 (defpackage chute/btrfs

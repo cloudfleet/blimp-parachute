@@ -23,7 +23,7 @@
     :documentation "Locally available filesystem abstractions for snapshoting."
     :initform (or
                :rsync
-               (alexandria:random-elt '(:btrfs :zfs :rsync))))
+               :btrfs :zfs)
    (api.port
     :accessor api.port
     :initform 2021) ;; shouldn't we have one port?

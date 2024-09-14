@@ -40,6 +40,9 @@
                          (:file "chute")
                          (:file "client")
                          (:file "transfer-http")))
+               (:module synk :pathname "./"
+                :depends-on (source)
+                :components ((:file "synk")))
                (:module crypt :pathname "./"
                         :depends-on (source)
                         :serial t :components

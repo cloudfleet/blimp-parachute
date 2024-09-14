@@ -18,7 +18,7 @@
                  ,(chute/io.cloudfleet:domain)))
     :accessor domain
     :documentation "Domain creating this blob.")
-c   (mount
+   (mount
     :initform (chute/config:path (chute/config:default))
     :accessor mount
     :documentation "Filesystem mount point of blob.")
@@ -61,6 +61,8 @@ c   (mount
 
 (defgeneric stage-blob (file-or-directory)
   (:documentation "Stage the artifacts at pathname, possibly recursively for blob encryption.")
+  (:method ((file-or-directory string))
+    (stage-blob (pathname file-or-directory)))
   (:method ((file-or-directory pathname))
     (let ((blob-path (chute/fs:make-directory)))
       (flet ((make-blob-from-single-file (file blob-path)
@@ -68,20 +70,20 @@ c   (mount
                                              :direction :input
                                              :element-type '(unsigned-byte 8))
                  (make-blob input-stream blob-path))))
-      (if
-       (not 
-        (equalp (pathname file-or-directory)
-                (uiop:ensure-directory-pathname file-or-directory)))
-       (make-blob-from-single-file file-or-directory blob-path)
-       (error "Unimplemented MAKE-BLOB of recursive input"))
-       ;;; make an UPDATE-METADATA?
-       (let ((metadata (read-metadata blob-path :json)))
-         (setf (timestamp metadata)
-               (creation-time transfer)
+        (if
+         (not 
+          (equalp (pathname file-or-directory)
+                  (uiop:ensure-directory-pathname file-or-directory)))
+         (make-blob-from-single-file file-or-directory blob-path)
+         (error "Unimplemented MAKE-BLOB of recursive input"))
+        ;; make an UPDATE-METADATA?
+        (let ((metadata (read-metadata blob-path :json)))
+          (setf (timestamp metadata)
+                (timestamp-now)
 
-               (mount metadata)
-               (chute/fs:snapshot/mount snapshot-path))
-         (transcribe-metadata blob-path metadata :json))))))
+                (mount metadata) ;;; just use the PATHNAME
+                file-or-directory)
+          (transcribe-metadata blob-path metadata :json))))))
 
 (defmethod make-blob ((input-stream stream) blob-path)
   "Make blob from INPUT-STREAM with output at BLOB-PATH"
@@ -114,7 +116,7 @@ c   (mount
             (nonce metadata) (nonce aes-ctr)
             (checksum metadata) (ironclad:byte-array-to-hex-string
                                  (ironclad:produce-digest digest)))
-      (transcribe-metadata blob-path metadata)
+      (transcribe-metadata blob-path metadata :json)
       (values blob-path metadata))))
 
 (defgeneric transcribe-metadata (path metadata format)
@@ -165,4 +167,6 @@ c   (mount
        metadata
        cipher))))
 
+(defun timestamp-now ()
+  (simple-date-time:|yyyymmddThhmmssZ| (simple-date-time:now)))
 

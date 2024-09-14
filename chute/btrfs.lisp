@@ -6,7 +6,7 @@
 (defun subvolume/snapshot (&key (path (chute/config:default)))
   (let* ((output (make-string-output-stream))
          (error (make-string-output-stream))
-         (timestamp (simple-date-time:|yyyymmddThhmmssZ| (simple-date-time:now)))
+         (timestamp (timestamp-now))
          (snapshot-path (format nil "~a~a" (snapshot-directory path) timestamp))
          (snapshot (format nil "~a subvolume snapshot -r ~a ~a"
                            chute/config:*btrfs-command*

@@ -24,6 +24,7 @@
 (defun index (&key
                 (uri "/")
                 (default-request-type :get))
+  (declare (ignore uri default-request-type))
   "nil")
 
 
